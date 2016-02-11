@@ -2,30 +2,12 @@
 Goddard et. al.\cite{nsquared} describes a \todo{O(n2)} algorithm for finding the largest agreement subtree for two rooted binary trees. Given two trees T and U of size m and n, the idea is to iteratively find the largest agreement subtree and its size for every pair of subtrees from T and U. This can be done in quadratic time by using Lemma 1: \todo{\dots}
 
 \section{Implementation}
-We implemented the algorithm in java (using the forrester \cite{?} library to represent the trees?). We computed the agreement subtrees for each pair of nodes in the two trees by doing a postorder traversal of the first tree and for each node did a postorder traversal of the second tree.
+We implemented the algorithm in java (using the forrester \cite{?} library to represent the trees?). We computed the agreement subtrees for each pair of subtrees in the two trees by doing a postorder traversal of the first tree and for each node did a postorder traversal of the second tree. For each pair of nodes \texttt{a} and \texttt{w} we computed the agreement subtree \texttt{A\_a,w} for the two subtrees \texttt{T\_a} and \texttt{T\_w} having respectively \texttt{a} and \texttt{w} as roots. For such a pair of nodes there are three cases. \\
+The first case is that \texttt{a} and \texttt{w} are both leaves. If the leaves are equal, i.e. they have the same name, then \texttt{A\_a,w} will be the tree consisting of exactly one leaf with that name. Otherwise \texttt{A\_a,w} is empty. \\
+The second case is that we have a leaf and an internal node. Let's say \texttt{w} is the internal node having \texttt{x} and \texttt{y} as children. If the leaf corresponding to \texttt{a} is contained in \texttt{T\_w}, it will also be contained in either \texttt{T\_x} or \texttt{T\_y} and \texttt{A\_a,w} will be the same as either \texttt{A\_a,x} or \texttt{A\_a,y}. Since we do a postorder traversal of the trees, \texttt{A\_a,x} and \texttt{A\_a,y} have already been computed and \texttt{A\_a,w} can just be set to the largest of the two. \\
+The third case is that both \texttt{a} and \texttt{w} are internal nodes, where \texttt{a} have children \texttt{b} and \texttt{c} and \texttt{w} have children \texttt{x} and \texttt{y}. In this case we can use Lemma 1. Again, all the agreement subtrees to consider have already been computed. If the largest subtree is either \texttt{A\_b,x + A\_c,y} or \texttt{A\_b,y + A\_c,x}, \texttt{A\_a,w} will be the tree having the two subtrees as children. \\
 
-\begin{algorithm}
-	\caption{My algorithm}\label{euclid}
-	\begin{algorithmic}[1]
-		\Procedure{MyProcedure}{}
-		\State $\textit{stringlen} \gets \text{length of }\textit{string}$
-		\State $i \gets \textit{patlen}$
-		\BState \emph{top}:
-		\If {$i > \textit{stringlen}$} \Return false
-		\EndIf
-		\State $j \gets \textit{patlen}$
-		\BState \emph{loop}:
-		\If {$\textit{string}(i) = \textit{path}(j)$}
-		\State $j \gets j-1$.
-		\State $i \gets i-1$.
-		\State \textbf{goto} \emph{loop}.
-		\State \textbf{close};
-		\EndIf
-		\State $i \gets i+\max(\textit{delta}_1(\textit{string}(i)),\textit{delta}_2(j))$.
-		\State \textbf{goto} \emph{top}.
-		\EndProcedure
-	\end{algorithmic}
-\end{algorithm}
+All these agreement subtrees were stored in a matrix together with their sizes. The last cell in the matrix would then at the end contain the agreement subtree for the two input trees.
 
 
 \todo{\dots}
