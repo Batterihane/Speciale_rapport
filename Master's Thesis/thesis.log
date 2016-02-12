@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (MiKTeX 2.9) (preloaded format=pdflatex 2016.2.8)  11 FEB 2016 16:14
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (MiKTeX 2.9) (preloaded format=pdflatex 2016.2.10)  12 FEB 2016 10:23
 entering extended mode
 **./thesis.tex
 (thesis.tex
@@ -620,19 +620,19 @@ Document Style - pseudocode environments for use with the `algorithmicx' style
  (thesis.aux)
 \openout1 = `thesis.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 33.
-LaTeX Font Info:    ... okay on input line 33.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 33.
-LaTeX Font Info:    ... okay on input line 33.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 33.
-LaTeX Font Info:    ... okay on input line 33.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 33.
-LaTeX Font Info:    ... okay on input line 33.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 33.
-LaTeX Font Info:    ... okay on input line 33.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 33.
-LaTeX Font Info:    ... okay on input line 33.
-LaTeX Font Info:    Try loading font information for T1+lmr on input line 33.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 34.
+LaTeX Font Info:    ... okay on input line 34.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 34.
+LaTeX Font Info:    ... okay on input line 34.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 34.
+LaTeX Font Info:    ... okay on input line 34.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 34.
+LaTeX Font Info:    ... okay on input line 34.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 34.
+LaTeX Font Info:    ... okay on input line 34.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 34.
+LaTeX Font Info:    ... okay on input line 34.
+LaTeX Font Info:    Try loading font information for T1+lmr on input line 34.
 
 ("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\lm\t1lmr.fd"
 File: t1lmr.fd 2009/10/30 v1.6 Font defs for Latin Modern
@@ -651,36 +651,36 @@ File: t1lmr.fd 2009/10/30 v1.6 Font defs for Latin Modern
 \makeMPintoPDFobject=\count144
 \everyMPtoPDFconversion=\toks31
 )
-LaTeX Font Info:    Try loading font information for T1+lmss on input line 40.
+LaTeX Font Info:    Try loading font information for T1+lmss on input line 41.
  ("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\lm\t1lmss.fd"
 File: t1lmss.fd 2009/10/30 v1.6 Font defs for Latin Modern
 )
 Package epstopdf Info: Source file: <logo.eps>
-(epstopdf)                    date: 2016-02-10 15:03:28
-(epstopdf)                    size: 216454 bytes
+(epstopdf)                    date: 2016-02-12 09:23:04
+(epstopdf)                    size: 216470 bytes
 (epstopdf)             Output file: <logo-eps-converted-to.pdf>
-(epstopdf)                    date: 2016-02-10 15:09:53
+(epstopdf)                    date: 2016-02-12 09:23:04
 (epstopdf)                    size: 15554 bytes
 (epstopdf)             Command: <epstopdf --outfile=logo-eps-converted-to.pdf l
 ogo.eps>
-(epstopdf)             \includegraphics on input line 46.
+(epstopdf)             \includegraphics on input line 47.
 Package epstopdf Info: Output file is already uptodate.
 
 <logo-eps-converted-to.pdf, id=1, 319.1925pt x 49.18375pt>
 File: logo-eps-converted-to.pdf Graphic file (type pdf)
 
 <use logo-eps-converted-to.pdf>
-Package pdftex.def Info: logo-eps-converted-to.pdf used on input line 46.
+Package pdftex.def Info: logo-eps-converted-to.pdf used on input line 47.
 (pdftex.def)             Requested size: 319.19171pt x 49.18361pt.
 
-Overfull \hbox (44.27728pt too wide) in paragraph at lines 39--46
+Overfull \hbox (44.27728pt too wide) in paragraph at lines 40--47
 \T1/lmss/m/n/24.88 Al-go-rithms for Com-put-ing Max-i-mum Agree-
  []
 
 [1
 
-{C:/Users/Thomas/AppData/Local/MiKTeX/2.9/pdftex/config/pdftex.map} <./logo-eps
--converted-to.pdf>] (Chapters/Abstract.tex [2
+{C:/Users/Nikolaj/AppData/Local/MiKTeX/2.9/pdftex/config/pdftex.map} <./logo-ep
+s-converted-to.pdf>] (Chapters/Abstract.tex [2
 
 
 ]
@@ -745,32 +745,81 @@ Underfull \hbox (badness 10000) in paragraph at lines 3--5
 
  []
 
-) [3] [4
+! Missing $ inserted.
+<inserted text> 
+                $
+l.42 ...)=TypeOf($T_x)=Leaf  $\land$  $T_a$=$T_x$}
+                                                  
+I've inserted a begin-math/end-math symbol since I think
+you left one out. Proceed, with fingers crossed.
 
-]
+! Missing $ inserted.
+<inserted text> 
+                $
+l.42 ...)=TypeOf($T_x)=Leaf  $\land$  $T_a$=$T_x$}
+                                                  
+I've inserted a begin-math/end-math symbol since I think
+you left one out. Proceed, with fingers crossed.
+
+! Missing $ inserted.
+<inserted text> 
+                $
+l.42 ...)=TypeOf($T_x)=Leaf  $\land$  $T_a$=$T_x$}
+                                                  
+I've inserted a begin-math/end-math symbol since I think
+you left one out. Proceed, with fingers crossed.
+
+! Missing $ inserted.
+<inserted text> 
+                $
+l.42 ...)=TypeOf($T_x)=Leaf  $\land$  $T_a$=$T_x$}
+                                                  
+I've inserted a begin-math/end-math symbol since I think
+you left one out. Proceed, with fingers crossed.
+
+
+Overfull \hbox (211.73743pt too wide) detected at line 48
+[] [][]
+ []
+
+
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [3])
+[4]
 Chapter 2.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <24.88> on input line 71.
+(Font)              <24.88> on input line 72.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <20.74> on input line 71.
+(Font)              <20.74> on input line 72.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <17.28> on input line 71.
+(Font)              <17.28> on input line 72.
 
 LaTeX Warning: Citation `lazypropagation2010' on page 5 undefined on input line
- 75.
+ 76.
 
-(Chapters/NSquared.tex [5] [6
+(Chapters/NSquared.tex [5
+
+] [6
 
 ]
 Chapter 3.
 
 LaTeX Warning: Citation `?' on page 7 undefined on input line 5.
 
-) (Chapters/Conclusion.tex [7] [8
+LaTeX Font Info:    Try loading font information for T1+txtt on input line 5.
+("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\txfonts\t1txtt.fd"
+File: t1txtt.fd 2000/12/15 v3.1
+)
+Underfull \hbox (badness 10000) in paragraph at lines 5--9
 
-]
+ []
+
+) (Chapters/Conclusion.tex [7] [8]
 Chapter 4.
-) (thesis.bbl [9] [10
+) (thesis.bbl [9
+
+] [10
 
 ]) [11] (thesis.aux)
 
@@ -778,30 +827,31 @@ LaTeX Warning: There were undefined references.
 
  ) 
 Here is how much of TeX's memory you used:
- 5443 strings out of 493634
- 73707 string characters out of 3141312
- 154660 words of memory out of 3000000
- 8613 multiletter control sequences out of 15000+200000
- 86634 words of font info for 71 fonts, out of 3000000 for 9000
+ 5462 strings out of 493634
+ 73974 string characters out of 3141308
+ 156665 words of memory out of 3000000
+ 8625 multiletter control sequences out of 15000+200000
+ 76737 words of font info for 74 fonts, out of 3000000 for 9000
  1025 hyphenation exceptions out of 8191
- 42i,6n,35p,1044b,317s stack positions out of 5000i,500n,10000p,200000b,50000s
-{C:/Program Files (x86)/MiKTeX 2.9/fonts/enc/dvips/lm/lm-rm.enc}{C:/Program F
-iles (x86)/MiKTeX 2.9/fonts/enc/dvips/lm/lm-mathit.enc}{C:/Program Files (x86)/
-MiKTeX 2.9/fonts/enc/dvips/lm/lm-mathsy.enc}{C:/Program Files (x86)/MiKTeX 2.9/
-fonts/enc/dvips/lm/lm-ec.enc}<C:/Program Files (x86)/MiKTeX 2.9/fonts/type1/pub
-lic/lm/lmbx10.pfb><C:/Program Files (x86)/MiKTeX 2.9/fonts/type1/public/lm/lmbx
-12.pfb><C:/Program Files (x86)/MiKTeX 2.9/fonts/type1/public/lm/lmcsc10.pfb><C:
-/Program Files (x86)/MiKTeX 2.9/fonts/type1/public/lm/lmmi10.pfb><C:/Program Fi
-les (x86)/MiKTeX 2.9/fonts/type1/public/lm/lmr10.pfb><C:/Program Files (x86)/Mi
-KTeX 2.9/fonts/type1/public/lm/lmr8.pfb><C:/Program Files (x86)/MiKTeX 2.9/font
-s/type1/public/lm/lmr9.pfb><C:/Program Files (x86)/MiKTeX 2.9/fonts/type1/publi
-c/lm/lmri10.pfb><C:/Program Files (x86)/MiKTeX 2.9/fonts/type1/public/lm/lmss12
-.pfb><C:/Program Files (x86)/MiKTeX 2.9/fonts/type1/public/lm/lmss17.pfb><C:/Pr
-ogram Files (x86)/MiKTeX 2.9/fonts/type1/public/lm/lmsy10.pfb><C:/Program Files
- (x86)/MiKTeX 2.9/fonts/type1/public/amsfonts/symbols/msam10.pfb>
-Output written on thesis.pdf (19 pages, 254822 bytes).
+ 42i,18n,35p,1044b,246s stack positions out of 5000i,500n,10000p,200000b,50000s
+{C:/Program Files (x86)/MiKTeX 2.9/fonts/enc/dvips/lm/lm-mathex.enc}{C:/Progr
+am Files (x86)/MiKTeX 2.9/fonts/enc/dvips/lm/lm-mathit.enc}{C:/Program Files (x
+86)/MiKTeX 2.9/fonts/enc/dvips/lm/lm-mathsy.enc}{C:/Program Files (x86)/MiKTeX 
+2.9/fonts/enc/dvips/lm/lm-rm.enc}{C:/Program Files (x86)/MiKTeX 2.9/fonts/enc/d
+vips/lm/lm-ec.enc}<C:/Program Files (x86)/MiKTeX 2.9/fonts/type1/public/lm/lmbx
+10.pfb><C:/Program Files (x86)/MiKTeX 2.9/fonts/type1/public/lm/lmbx12.pfb><C:/
+Program Files (x86)/MiKTeX 2.9/fonts/type1/public/lm/lmex10.pfb><C:/Program Fil
+es (x86)/MiKTeX 2.9/fonts/type1/public/lm/lmmi10.pfb><C:/Program Files (x86)/Mi
+KTeX 2.9/fonts/type1/public/lm/lmmi8.pfb><C:/Program Files (x86)/MiKTeX 2.9/fon
+ts/type1/public/lm/lmr10.pfb><C:/Program Files (x86)/MiKTeX 2.9/fonts/type1/pub
+lic/lm/lmri10.pfb><C:/Program Files (x86)/MiKTeX 2.9/fonts/type1/public/lm/lmss
+12.pfb><C:/Program Files (x86)/MiKTeX 2.9/fonts/type1/public/lm/lmss17.pfb><C:/
+Program Files (x86)/MiKTeX 2.9/fonts/type1/public/lm/lmsy10.pfb><C:/Program Fil
+es (x86)/MiKTeX 2.9/fonts/type1/public/amsfonts/symbols/msam10.pfb><C:/Program 
+Files (x86)/MiKTeX 2.9/fonts/type1/public/txfonts/t1xtt.pfb>
+Output written on thesis.pdf (19 pages, 206066 bytes).
 PDF statistics:
- 129 PDF objects out of 1000 (max. 8388607)
+ 130 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
  6 words of extra memory for PDF output out of 10000 (max. 10000000)
 

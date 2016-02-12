@@ -15,4 +15,38 @@ The MAST problem is one of several ways of defining tree distances. -which one i
 The MAST problem applies to all trees, but we will choose to focus on the rooted, binary trees given that the motivation for the problem is primarily rooted in biology and linguistics, where these trees are most common.  
 
 
+\begin{align*}
+\frac{3x + y}{7} &= 9  && \text{given}   \\
+3x + y &= 63           && \text{multiply by 7}   \\
+3x &= 63 - y           && \text{subtract y}   \\
+x &= 21 - \frac{y}{3}  && \text{divide by 3}   \\
+\end{align*}
+
+
+\begin{equation*}
+\begin{aligned}
+f(T_a,T_x)=Max
+\begin{cases}
+f(T_b,T_y)+f(T_c,T_z) & \text{if TypeOf($T_a$)=Type Of($T_x$)=Internal Node}
+\\
+f(T_b,T_z)+f(T_c,T_y) &  \text{if TypeOf($T_a$)=Type Of($T_x$)=Internal Node}
+\\
+f(T_a, T_y)           & \text{if TypeOf($T_x$)=Internal Node}
+\\
+f(T_a, T_z)           & \text{if TypeOf($T_x$)=Internal Node}
+\\
+f(T_b, T_x)           & \text{if TypeOf($T_a$)=Internal Node}
+\\
+f(T_c, T_x)           & \text{if TypeOf($T_a$)=Internal Node}
+\\
+1 	                  & \text{if TypeOf($T_a$)=TypeOf($T_x)=Leaf  $\land$  $T_a$=$T_x$}
+\\
+0                     
+\end{cases}
+\end{aligned}
+\phantom{\hspace{6cm}}
+\end{equation*}
+
+
+
 \todo{\dots}
