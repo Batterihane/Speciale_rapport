@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (MiKTeX 2.9) (preloaded format=pdflatex 2016.2.8)  12 FEB 2016 10:35
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (MiKTeX 2.9) (preloaded format=pdflatex 2016.2.8)  12 FEB 2016 10:52
 entering extended mode
 **./thesis.tex
 (thesis.tex
@@ -807,7 +807,7 @@ LaTeX Warning: There were undefined references.
 Here is how much of TeX's memory you used:
  5462 strings out of 493634
  73974 string characters out of 3141312
- 156665 words of memory out of 3000000
+ 156645 words of memory out of 3000000
  8625 multiletter control sequences out of 15000+200000
  76737 words of font info for 74 fonts, out of 3000000 for 9000
  1025 hyphenation exceptions out of 8191
