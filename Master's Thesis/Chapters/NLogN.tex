@@ -1,1 +1,8 @@
 \chapter{The NLogN algorithm}
+
+\section{Centroid decompositions}
+The first step of the algorithm is to compute the \texttt{Centroid decomposition}s for the two trees. A centroid decomposition consists of an amount of disjoint paths through the tree, called \texttt{Centroid path}s. Such a path starts at a node in the tree and contains the edge to the child node holding the largest amount of leaves in its subtree. In case of a tie, an arbitrary edge is picked. The path will continue until reaching a leaf.
+
+For the first tree, the centroid decomposition consists of only the centroid path starting at the root. For the second tree, the centroid decomposition consists of all possible disjoint centroid paths.
+
+The implementation of this principle was done by storing the number of leaves in the subtree of a node at each node in the two trees such that this number could be looked up in constant time. Now for the centroid decomposition of the first tree, we simply started at the root node and picked the edge to the node with the highest number stored. For the second tree, the same thing was done, but when picking the edge to a child node, we also started another path at the second child if it wasn't a leaf.  

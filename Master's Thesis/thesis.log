@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (MiKTeX 2.9) (preloaded format=pdflatex 2016.2.8)  12 FEB 2016 10:52
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (MiKTeX 2.9) (preloaded format=pdflatex 2016.2.8)  29 FEB 2016 16:06
 entering extended mode
 **./thesis.tex
 (thesis.tex
@@ -793,21 +793,25 @@ Underfull \hbox (badness 10000) in paragraph at lines 5--14
 
  []
 
-[7]) (Chapters/Conclusion.tex [8]
+[7]) (Chapters/NLogN.tex [8]
 Chapter 4.
-) (thesis.bbl [9
+) (Chapters/Conclusion.tex [9
 
 ] [10
 
-]) [11] (thesis.aux)
+]
+Chapter 5.
+) (thesis.bbl [11] [12
+
+]) [13] (thesis.aux)
 
 LaTeX Warning: There were undefined references.
 
  ) 
 Here is how much of TeX's memory you used:
- 5462 strings out of 493634
- 73974 string characters out of 3141312
- 156645 words of memory out of 3000000
+ 5465 strings out of 493634
+ 74015 string characters out of 3141312
+ 156666 words of memory out of 3000000
  8625 multiletter control sequences out of 15000+200000
  76737 words of font info for 74 fonts, out of 3000000 for 9000
  1025 hyphenation exceptions out of 8191
@@ -827,9 +831,9 @@ lic/lm/lmri10.pfb><C:/Program Files (x86)/MiKTeX 2.9/fonts/type1/public/lm/lmss
 Program Files (x86)/MiKTeX 2.9/fonts/type1/public/lm/lmsy10.pfb><C:/Program Fil
 es (x86)/MiKTeX 2.9/fonts/type1/public/amsfonts/symbols/msam10.pfb><C:/Program 
 Files (x86)/MiKTeX 2.9/fonts/type1/public/txfonts/t1xtt.pfb>
-Output written on thesis.pdf (19 pages, 206364 bytes).
+Output written on thesis.pdf (21 pages, 210464 bytes).
 PDF statistics:
- 130 PDF objects out of 1000 (max. 8388607)
+ 136 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
  6 words of extra memory for PDF output out of 10000 (max. 10000000)
 
