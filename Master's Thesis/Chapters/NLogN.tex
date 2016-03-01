@@ -5,4 +5,34 @@ The first step of the algorithm is to compute the \texttt{Centroid decomposition
 
 For the first tree, the centroid decomposition consists of only the centroid path starting at the root. For the second tree, the centroid decomposition consists of all possible disjoint centroid paths.
 
-The implementation of this principle was done by storing the number of leaves in the subtree of a node at each node in the two trees such that this number could be looked up in constant time. Now for the centroid decomposition of the first tree, we simply started at the root node and picked the edge to the node with the highest number stored. For the second tree, the same thing was done, but when picking the edge to a child node, we also started another path at the second child if it wasn't a leaf.  
+The implementation of this principle was done by storing the number of leaves in the subtree of a node at each node in the two trees such that this number could be looked up in constant time. Now for the centroid decomposition of the first tree, we simply started at the root node and picked the edge to the node with the highest number stored. For the second tree, the same thing was done, but when picking the edge to a child node, we also started another path at the second child if it wasn't a leaf.
+
+\section{Induced subtree}
+Recall that the centroid decomposition of the main algorithm splits $T_1$ and $T_2$ into a forest of subtrees. We are in the second step of the algorithm required to determine the subtrees of $T_2$ induced by the leaves of $T_1's$ subtrees. 
+We will now show how to achieve this in linear time with respect to the number of leaves, provided that $T_2$ has been prepossed in linear time.
+
+\subsection{Preprocessing $T_2$}
+To induce subtrees in linear time, two requirements must be met. The Least Common Ancestor (LCA) between two leaves should be computed in constant time, and the depth of each vertex in the tree must be known. Both of these requirements can be achieved in linear time with respect to the size of the tree. 
+\\
+The vertex depth can be found in linear time by a simple pre-order tree traversal (REF?), where each node sets its children's depth to it's own depth+1. The depth of the root is initializes to zero.  
+\\
+Computing LCA in $O(1)$ is a tricky afair, and is covered in Section/Chapter ??
+
+\subsection{The Algorithm}
+We are given a tree and an ordered set of leaves, $L=l_1,l_2,l_3,...,l_n$ ,and must find the subtree induced by this set. The algorithm works in 3 steps:
+\begin{enumerate}
+	\item Find the LCA of each consecutive pair of leaves such that $A_i=LCA(l_i,l_i+1), where 1 \le i \le n-1$, and add them correspondingly to $L$. ($L$ now contains all vertices in the subtree)
+	\item For each vertex $V$ in $L$, find the closest vertex on either side, $V_l$ and $V_r$, that has smaller depth than itself.
+	\item The parent of vertex $V$ will be whichever of $V_l$ and $V_r$ that has the greatest depth.
+\end{enumerate}
+
+The challenge of implementing this algorithm was to perform step 2 in linear time. We did this by realizing that for the vertices of greatest depth, $V_l$ and $V_r$ would always be the vertices immediately to the left and right in the set (because of the way the LCAs were added to the set). By removing these vertices from the set, the same would now be the case for the vertices of second greatest depth and so forth. This resulted in the following approach for step 2 of the algorithm:
+\begin{enumerate}
+	\item For each vertex in the set, add its index number to a set $D_i$ corresponding to its depth.
+	\item Create a new set $S$ of length n, where each cell block points to the previous and the subsequent cell. (each cell corresponds to a vertex)
+	\item For each number in the depth sets, starting at the one with greatest depth, lookup the corresponding cell $s_i$ in $S$ and update the cells it points to, so that they no longer point to $s_i$, but instead points to each other. ($s_i$ is "removed" from the set).
+	\item Cell $s_i$ in $S$ now corresponds to vertex $V$ with index $i$ in $L$. $V_l$ and $V_r$ corresponds to the vertices at the indices pointed to by $s_i$.
+\end{enumerate}
+  
+
+\todo{\dots}
