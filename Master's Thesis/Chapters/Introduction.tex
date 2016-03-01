@@ -16,37 +16,82 @@ The MAST problem applies to all trees, but we will choose to focus on the rooted
 
 
 \begin{align*}
-\frac{3x + y}{7} &= 9  && \text{given}   \\
-3x + y &= 63           && \text{multiply by 7}   \\
-3x &= 63 - y           && \text{subtract y}   \\
-x &= 21 - \frac{y}{3}  && \text{divide by 3}   \\
+	\frac{3x + y}{7} &= 9  && \text{given}   \\
+	3x + y &= 63           && \text{multiply by 7}   \\
+	3x &= 63 - y           && \text{subtract y}   \\
+	x &= 21 - \frac{y}{3}  && \text{divide by 3}   \\
 \end{align*}
 
 
 \begin{equation*}
-\begin{aligned}
-f(T_a,T_x)=Max
-\begin{cases}
-f(T_b,T_y)+f(T_c,T_z) & \text{if TypeOf($T_a$)=Type Of($T_x$)=Internal Node}
-\\
-f(T_b,T_z)+f(T_c,T_y) &  \text{if TypeOf($T_a$)=Type Of($T_x$)=Internal Node}
-\\
-f(T_a, T_y)           & \text{if TypeOf($T_x$)=Internal Node}
-\\
-f(T_a, T_z)           & \text{if TypeOf($T_x$)=Internal Node}
-\\
-f(T_b, T_x)           & \text{if TypeOf($T_a$)=Internal Node}
-\\
-f(T_c, T_x)           & \text{if TypeOf($T_a$)=Internal Node}
-\\
-1 	                  & \text{if TypeOf($T_a$)=TypeOf($T_x$)=Leaf  $\land$  $T_a$=$T_x$}
-\\
-0                     
-\end{cases}
-\end{aligned}
-\phantom{\hspace{6cm}}
+	\begin{aligned}
+		f(T_a,T_x)=Max
+		\begin{cases}
+			f(T_b,T_y)+f(T_c,T_z) & \text{if TypeOf($T_a$)=Type Of($T_x$)=Internal Node}
+			\\
+			f(T_b,T_z)+f(T_c,T_y) &  \text{if TypeOf($T_a$)=Type Of($T_x$)=Internal Node}
+			\\
+			f(T_a, T_y)           & \text{if TypeOf($T_x$)=Internal Node}
+			\\
+			f(T_a, T_z)           & \text{if TypeOf($T_x$)=Internal Node}
+			\\
+			f(T_b, T_x)           & \text{if TypeOf($T_a$)=Internal Node}
+			\\
+			f(T_c, T_x)           & \text{if TypeOf($T_a$)=Internal Node}
+			\\
+			1 	                  & \text{if TypeOf($T_a$)=TypeOf($T_x$)=Leaf  $\land$  $T_a$=$T_x$}
+			\\
+			0                     
+		\end{cases}
+	\end{aligned}
+	\phantom{\hspace{6cm}}
 \end{equation*}
 
 
+\begin{algorithm}
+	\caption{Naive solution}\label{euclid}
+	\begin{algorithmic}[1]
+		\Procedure{MyProcedure}{}
+		\State $\textit{stringlen} \gets \text{length of }\textit{string}$
+		\State $i \gets \textit{patlen}$
+		\BState \emph{top}:
+		\If {$i > \textit{stringlen}$} \Return false
+		\EndIf
+		\State $j \gets \textit{patlen}$
+		\BState \emph{loop}:
+		\If {$\textit{string}(i) = \textit{path}(j)$}
+		\State $j \gets j-1$.
+		\State $i \gets i-1$.
+		\State \textbf{goto} \emph{loop}.
+		\State \textbf{close};
+		\EndIf
+		\State $i \gets i+\max(\textit{delta}_1(\textit{string}(i)),\textit{delta}_2(j))$.
+		\State \textbf{goto} \emph{top}.
+		\EndProcedure
+	\end{algorithmic}
+\end{algorithm}
+
+
+\section{Induced subtree}
+Recall that the centroid decomposition of the main algorithm splits $T_1$ and $T_2$ into a forest of subtrees. We are in the second step of the algorithm required to determine the subtrees of $T_2$ induced by the leaves of $T_1's$ subtrees. 
+We will now show how to achieve this in linear time with respect to the number of leaves, provided that $T_2$ has been prepossed in linear time.
+
+\subsection{Preprocessing $T_2$}
+To induce subtrees in linear time, two requirements must be met. The Least Common Ancestor (LCA) between two leaves should be computed in constant time, and the depth of each vertex in the tree must be known. Both of these requirements can be achieved in linear time with respect to the size of the tree. 
+\\
+The vertex depth can be found in linear time by a simple pre-order tree traversal (REF?), where each node sets its children's depth to it's own depth+1. The depth of the root is initializes to zero.  
+\\
+Computing LCA in $O(1)$ is a tricky afair, and is covered in Section/Chapter ??
+
+\subsection{The Algorithm}
+We are given a tree and an ordered set of leaves, $L=l_1,l_2,l_3,...,l_n$ ,and must find the subtree induced by this set. The algorithm works in 2 steps:
+\begin{enumerate}
+	\item The LCA of each pair of leaves such that $A_i=LCA(l_i,l_i+1), where 1 \le i \le n-1$   
+	\item The second item
+	\item The third etc \ldots
+\end{enumerate}
+
+
+subtrees given an ordered set of nodes in linear time with respect to the nodes.   
 
 \todo{\dots}
