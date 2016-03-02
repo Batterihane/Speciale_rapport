@@ -1,16 +1,20 @@
 \chapter{\todo{The NSquared algorithm}}
-Goddard et. al.\cite{nsquared} describes a \todo{O(n2)} algorithm for finding the largest agreement subtree for two rooted binary trees. Given two trees T and U of size m and n, the idea is to iteratively find the largest agreement subtree and its size for every pair of subtrees from T and U. This can be done in quadratic time by using Lemma 1: \todo{\dots}
+Goddard et. al.\cite{nsquared} describes a $O(n^2)$ algorithm for finding the largest agreement subtree for two rooted binary trees. Given two trees T and U of size m and n, the idea is to iteratively find the largest agreement subtree and its size for every pair of subtrees from T and U. This can be done in quadratic time by using Lemma 1: \todo{\dots}
 
 \section{Implementation}
-We implemented the algorithm in java (using the forrester \cite{?} library to represent the trees?). We computed the agreement subtrees for each pair of subtrees in the two trees by doing a postorder traversal of the first tree and for each node did a postorder traversal of the second tree. For each pair of nodes \texttt{a} and \texttt{w} we computed the agreement subtree \texttt{$A_{a,w}$} for the two subtrees \texttt{$T_a$} and \texttt{$T_w$} having respectively \texttt{a} and \texttt{w} as roots. For such a pair of nodes there are three cases. \\
-The first case is that \texttt{a} and \texttt{w} are both leaves. If the leaves are equal, i.e. they have the same name, then \texttt{$A_{a,w}$} will be the tree consisting of exactly one leaf with that name. Otherwise \texttt{$A_{a,w}$} is empty. \\
-The second case is that we have a leaf and an internal node. Let's say \texttt{w} is the internal node having \texttt{x} and \texttt{y} as children. If the leaf corresponding to \texttt{a} is contained in \texttt{$T_w$}, it will also be contained in either \texttt{$T_x$} or \texttt{$T_y$} and \texttt{$A_{a,w}$} will be the same as either \texttt{$A_{a,x}$} or \texttt{$A_{a,y}$}. Since we do a postorder traversal of the trees, \texttt{$A_{a,x}$} and \texttt{$A_{a,y}$} have already been computed and \texttt{$A_{a,w}$} can just be set to the largest of the two. \\
-The third case is that both \texttt{a} and \texttt{w} are internal nodes, where \texttt{a} have children \texttt{b} and \texttt{c} and \texttt{w} have children \texttt{x} and \texttt{y}. In this case we can use Lemma 1. Again, all the agreement subtrees to consider have already been computed. If the largest subtree is either \texttt{$A_{b,x}$ + $A_{c,y}$} or \texttt{$A_{b,y}$ + $A_{c,x}$}, \texttt{$A_{a,w}$} will be the tree having the two subtrees as children. \\
-\\
-All these agreement subtrees were stored in a matrix together with their sizes. The last cell in the matrix would then at the end contain the agreement subtree for the two input trees.\\
-\\
-How did we verify the algorithm? E.g. bruteforce MAST and compare results.\\
-Show trees and MAST outputted by the program.\\
+We implemented the algorithm in java (using the forrester \cite{?} library to represent the trees?). We computed the agreement subtrees for each pair of subtrees in the two trees by doing a postorder traversal of the first tree and for each node did a postorder traversal of the second tree. For each pair of nodes $a$ and $w$ we computed the agreement subtree $A_{a,w}$ for the two subtrees $T_a$ and $T_w$ having respectively $a$ and $w$ as roots. For such a pair of nodes there are three cases.
 
+The first case is that $a$ and $w$ are both leaves. If the leaves are equal, i.e. they have the same name, then $A_{a,w}$ will be the tree consisting of exactly one leaf with that name. Otherwise $A_{a,w}$ is empty.
+
+The second case is that we have a leaf and an internal node. Let's say $w$ is the internal node having $x$ and $y$ as children. If the leaf corresponding to $a$ is contained in $T_w$, it will also be contained in either $T_x$ or $T_y$ and $A_{a,w}$ will be the same as either $A_{a,x}$ or $A_{a,y}$. Since we do a postorder traversal of the trees, $A_{a,x}$ and $A_{a,y}$ have already been computed and $A_{a,w}$ can just be set to the largest of the two.
+
+The third case is that both $a$ and $w$ are internal nodes, where $a$ have children $b$ and $c$ and $w$ have children $x$ and $y$. In this case we can use Lemma 1. Again, all the agreement subtrees to consider have already been computed. If the largest subtree is either $A_{b,x} + A_{c,y}$ or $A_{b,y} + A_{c,x}$, $A_{a,w}$ will be the tree having the two subtrees as children.
+
+All these agreement subtrees were stored in a matrix together with their sizes. The last cell in the matrix would then at the end contain the agreement subtree for the two input trees.
+\\
+\\
+How did we verify the algorithm? E.g. bruteforce MAST and compare results.
+
+Show trees and MAST outputted by the program.
 
 \todo{\dots}
