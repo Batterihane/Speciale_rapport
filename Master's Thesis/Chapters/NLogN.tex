@@ -3,22 +3,22 @@
 \section{Centroid decompositions}
 The first step of the algorithm is to compute the \texttt{Centroid decomposition}s for the two trees. A centroid decomposition consists of an amount of disjoint paths through the tree, called \texttt{Centroid path}s. Such a path starts at a node in the tree and contains the edge to the child node holding the largest amount of leaves in its subtree. In case of a tie, an arbitrary edge is picked. The path will continue until reaching a leaf.
 
-For the first tree, the centroid decomposition consists of only the centroid path starting at the root. For the second tree, the centroid decomposition consists of all possible disjoint centroid paths.
+For the first tree, the centroid decomposition consists of only the centroid path starting at the root. We will refer to this path as $\pi$ having the nodes $u_1$ to $u_p$ from root to leaf. For the second tree, the centroid decomposition consists of all possible disjoint centroid paths. These paths will be referred to as $\pi(x)$, having nodes $v_1$ to $v_q$ from start node to leaf, where $x$ is the start node, which is the node on the path closest to the root.
 
 The implementation of this principle was done by storing the number of leaves in the subtree of a node at each node in the two trees such that this number could be looked up in constant time. Now for the centroid decomposition of the first tree, we simply started at the root node and picked the edge to the node with the highest number stored. For the second tree, the same thing was done, but when picking the edge to a child node, we also started another path at the second child if it wasn't a leaf.
 
-\section{Induced subtree}
-Recall that the centroid decomposition of the main algorithm splits $T_1$ and $T_2$ into a forest of subtrees. We are in the second step of the algorithm required to determine the subtrees of $T_2$ induced by the leaves of $T_1's$ subtrees. 
-We will now show how to achieve this in linear time with respect to the number of leaves, provided that $T_2$ has been prepossed in linear time.
+\section{Induced subtrees of $T_2$}
+The centroid decomposition of the main algorithm splits $T_1$ into a forest of subtrees $M_i$, $1 \le i \le p-1$. We are in the second step of the algorithm required to determine the subtrees $S_i$ of $T_2$ induced by the leaves of each $M_i$.
+We will now show how each of these can be computed linear time with respect to the number of leaves in the subtree, provided that $T_2$ has been preprocessed in linear time.
 
 \subsection{Preprocessing $T_2$}
 To induce subtrees in linear time, two requirements must be met. The Least Common Ancestor (LCA) between two leaves should be computed in constant time, and the depth of each vertex in the tree must be known. Both of these requirements can be achieved in linear time with respect to the size of the tree. 
 \\
 The vertex depth can be found in linear time by a simple pre-order tree traversal (REF?), where each node sets its children's depth to it's own depth+1. The depth of the root is initializes to zero.  
 \\
-Computing LCA in $O(1)$ is a tricky afair, and is covered in Section/Chapter ??
+Computing LCA in $O(1)$ is a tricky affair, and is covered in Section/Chapter ??
 
-\subsection{The Algorithm}
+\subsection{Inducing the subtree}
 We are given a tree and an ordered set of leaves, $L=l_1,l_2,l_3,...,l_n$ ,and must find the subtree induced by this set. The algorithm works in 3 steps:
 \begin{enumerate}
 	\item Find the LCA of each consecutive pair of leaves such that $A_i=LCA(l_i,l_i+1), where 1 \le i \le n-1$, and add them correspondingly to $L$. ($L$ now contains all vertices in the subtree)
@@ -33,6 +33,14 @@ The challenge of implementing this algorithm was to perform step 2 in linear tim
 	\item For each number in the depth sets, starting at the one with greatest depth, lookup the corresponding cell $s_i$ in $S$ and update the cells it points to, so that they no longer point to $s_i$, but instead points to each other. ($s_i$ is "removed" from the set).
 	\item Cell $s_i$ in $S$ now corresponds to vertex $V$ with index $i$ in $L$. $V_l$ and $V_r$ corresponds to the vertices at the indices pointed to by $s_i$.
 \end{enumerate}
-  
 
-\todo{\dots}
+\subsection{Computing the induced subtrees of $T_2$}
+Now that we can induce a subtree from a set of leaves in linear time, all we need is to find the leaves from which we can induce the subtree $S_i$ of $T_2$, given the subtree $M_i$ of $T_1$. Our approach to this is slightly different from the one explained in \cite{nlogn} \todo{explain why}. First we wanted the names of all leaves to be numbers (from 0 to n-1). This is done when creating the tree structures from the newick files?? which was/is explained in \todo{section/chapter ???}. Second, for each leaf in $T_1$ we wanted it to be possible to find its twin in $T_2$ in constant time. By storing a list for each tree of all its leaves, where each leaf is at the index corresponding to its name, the twin of a leaf named $i$ from $T_1$ can be looked up in constant time from the list for $T_2$ at index $i$.
+
+In order to induce subtree $S_i$, the input leaves needs to be sorted by the order that they appear in $T_2$. Our approach to this was to first compute a sorted list of all leaves in $T_1$, then splitting the leaves into lists corresponding to the subtrees $M_i$, $1 \le i \le p-1$ and finally use their twins to induce the subtree $S_i$ for each list.
+
+Creating a list, where index $i$ holds the position, left to right, of the leaf named $i$ in $T_2$ compared to the other leaves, is done in linear time simply by iterating through $T_2$. That list is used when sorting the leaves of $T_1$ to look up the position of the twins in $T_2$. We sort the leaves in linear time using bucket sort.
+
+By iterating through each subtree $M_i$, we can use linear time to have each leaf store a number corresponding to the subtree to which they belong. Having the sorted list of leaves in $T_1$, we can use the stored numbers to split the leaves into the final lists during a single iteration. Now the twins can be found and the subtrees $S_i$, $1 \le i \le p-1$ can be computed.
+
+All in all this process takes $O(n)$ time.
