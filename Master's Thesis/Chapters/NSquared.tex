@@ -1,5 +1,49 @@
 \chapter{\todo{The NSquared algorithm}}
-Goddard et. al.\cite{nsquared} describes a $O(n^2)$ algorithm for finding the largest agreement subtree for two rooted binary trees. Given two trees T and U of size m and n, the idea is to iteratively find the largest agreement subtree and its size for every pair of subtrees from T and U. This can be done in quadratic time by using Lemma 1: \todo{\dots}
+Goddard et. al.\cite{nsquared} describes a $O(n^2)$ algorithm for finding the largest agreement subtree for two rooted binary trees. Given two trees T and U of size m and n, the idea is to iteratively find the largest agreement subtree and its size for every pair of subtrees from T and U. This can be done in quadratic time by using Lemma 1. 
+
+\begin{Lemma}
+	Let $T_a$ be a tree rooted at vertex a with the children b and c; And let $T_w$ be rooted at w with children x and y. We now define $\#(T_a,T_x)$ as the size of the maximum agreement subtree of $T_a$ and $T_w$.  $\#(T_a,T_x)$ is given by the maximum of the following six numbers: \#$(T_b,T_x)+(T_c,T_y)$,
+	\#$(T_b,T_y)+(T_c,T_x)$,
+	\#$(T_a,T_x)$,
+	\#$(T_a,T_y)$,
+	\#$(T_b,T_w)$,
+	\#$(T_c,T_w)$
+\end{Lemma}
+
+What Lemma 1 essentially states is twofold. First, if the MAST contains children from all subtrees (a,b,x,y), then its size is given by the largest combination of these. Secondly, if the MAST does not include all subtrees, then its size is given by the largest combination of subtrees excluding at least one of them.    
+This gives rise to a recursive solution to finding the size of the maximum agreement subtree. The recursive function is defined as follows: 
+
+\begin{equation}
+\begin{aligned}
+f(T_a,T_w)=Max
+\begin{cases}
+f(T_b,T_x)+f(T_c,T_y) & \text{if Type($T_a$)=Type($T_w$)=Internal Node}
+\\
+f(T_b,T_y)+f(T_c,T_x) & \text{if Type($T_a$)=Type($T_w$)=Internal Node}
+\\
+f(T_a, T_x)           & \text{if Type($T_w$)=Internal Node}
+\\
+f(T_a, T_y)           & \text{if Type($T_w$)=Internal Node}
+\\
+f(T_b, T_w)           & \text{if Type($T_a$)=Internal Node}
+\\
+f(T_c, T_w)           & \text{if Type($T_a$)=Internal Node}
+\\
+1 	                  & \text{if Type($T_a$)=Type($T_w$)=Leaf  $\land$  $T_a$=$T_w$}
+\\
+0                     
+\end{cases}
+\end{aligned}
+\phantom{\hspace{6cm}}
+\end{equation}
+\\
+Like many similar recursive definitions in bioinformatics, we run into the problem that the recursive function computes the same partial results multiple times. This problem is rectified by the method of dynamic programming. Specifically, we wish to store the partial results in a $|T_a| \times |T_w|$ table. We seek to fill out the table with our partial results, and end up with the maximum size in the top right corner - \todo{\dots} see Figure X.
+Looking at (3.1) we see that the partial result for each tree node is dependent on the results of its children. This implies that we must list the table nodes in preorder, thereby ensuring that the partial results on which a given node is dependent, has already been calculated when we reach it. 
+ By introducing such a table we also introduce a requirement of $O(n^2)$ space and time. 
+
+
+
+\todo{\dots}
 
 \section{Implementation}
 We implemented the algorithm in java (using the forrester \cite{?} library to represent the trees?). We computed the agreement subtrees for each pair of subtrees in the two trees by doing a postorder traversal of the first tree and for each node did a postorder traversal of the second tree. For each pair of nodes $a$ and $w$ we computed the agreement subtree $A_{a,w}$ for the two subtrees $T_a$ and $T_w$ having respectively $a$ and $w$ as roots. For such a pair of nodes there are three cases.

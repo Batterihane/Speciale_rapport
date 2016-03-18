@@ -1,18 +1,15 @@
 \chapter{Introduction}
 \label{ch:intro}
-The Maximum Agreement Subtree problem (MAST) provides a  measure of similarity, and is defined as such: Given two rooted trees, T1 and T2, created over the same leaf-set \{1,2,3...,n\}, determine the largest possible subset of leaves inducing an agreeing subtree of T1 and T2. For a set of leaves to induce an agreeing subtree for T1 and T2, the subtrees restricted to the set of leaves must be isomorphic, which means that they are structurally equivalent.
+The Maximum Agreement Subtree problem (MAST) provides mutual information between rooted trees, and is defined as such: Given two rooted trees, T1 and T2, created over the same leaf-set \{1,2,3...,n\}, determine the largest possible subset of leaves inducing an agreeing subtree of T1 and T2. For a set of leaves to induce an agreeing subtree for T1 and T2, the subtrees restricted to the set of leaves must be isomorphic, implying structural equivalency.
 \\
 
-Let us start by motivating the interest in MAST by giving an example of its application. Suppose that we are interested in inspecting the relationship between DNA obtained from different species. This is typically done by the use of  Hierachical Clustering (REF) or Neighbor Joining (REF) to construct evolutionary trees. However, finding the true evolutionary tree is often hard (find another way of expressing hard), and evidence is required to support any suggested tree topology.  
+Let us start by motivating the interest in MAST by giving an example of its application. Suppose that we are interested in inspecting the relationship between DNA obtained from different animal species. This is typically done by the use of  Hierachical Clustering (REF) or Neighbor Joining (REF) to construct evolutionary trees. However, finding the true evolutionary tree is often an elusive task, and evidence is required to support any suggested tree topology. Finding the Maximum Agreement Subtree will present the information that both trees agree on, which makes the information more reliable, given that multiple sources support it. 
+
+The MAST problem applies to all trees, but we will choose to focus on the rooted, binary trees given that the motivation for the problem is primarily rooted in biology and linguistics, where these trees are most common. Specifically, we will examine, implement and compare three different algorithms for solving the MAST problem for binary trees in order to clarify strengths and weaknesses of each in theory and in practice.     
 
 
 
-
-The MAST problem is one of several ways of defining tree distances. -which one is supeiror?
-
-
-
-The MAST problem applies to all trees, but we will choose to focus on the rooted, binary trees given that the motivation for the problem is primarily rooted in biology and linguistics, where these trees are most common.  
+The MAST problem is one of several ways of defining tree distances. -which one is superior?
 
 
 \begin{align*}
@@ -23,29 +20,6 @@ The MAST problem applies to all trees, but we will choose to focus on the rooted
 \end{align*}
 
 
-\begin{equation*}
-	\begin{aligned}
-		f(T_a,T_x)=Max
-		\begin{cases}
-			f(T_b,T_y)+f(T_c,T_z) & \text{if TypeOf($T_a$)=Type Of($T_x$)=Internal Node}
-			\\
-			f(T_b,T_z)+f(T_c,T_y) &  \text{if TypeOf($T_a$)=Type Of($T_x$)=Internal Node}
-			\\
-			f(T_a, T_y)           & \text{if TypeOf($T_x$)=Internal Node}
-			\\
-			f(T_a, T_z)           & \text{if TypeOf($T_x$)=Internal Node}
-			\\
-			f(T_b, T_x)           & \text{if TypeOf($T_a$)=Internal Node}
-			\\
-			f(T_c, T_x)           & \text{if TypeOf($T_a$)=Internal Node}
-			\\
-			1 	                  & \text{if TypeOf($T_a$)=TypeOf($T_x$)=Leaf  $\land$  $T_a$=$T_x$}
-			\\
-			0                     
-		\end{cases}
-	\end{aligned}
-	\phantom{\hspace{6cm}}
-\end{equation*}
 
 
 \begin{algorithm}
