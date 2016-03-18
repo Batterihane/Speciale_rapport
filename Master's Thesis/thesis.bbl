@@ -1,5 +1,12 @@
 \begin{thebibliography}{1}
 
+\bibitem{nlogn}
+Richard Cole, Martin Farach-Colton, Ramesh Hariharan, Teresa Przytycka, and
+  Mikkel Thorup.
+\newblock An o(n log n) algorithm for the maximum agreement subtree problem for
+  binary trees.
+\newblock {\em SIAM Journal on Computing}, 30(5):1385–1404, 2000.
+
 \bibitem{nsquared}
 Wayne Goddard, Ewa Kubicka, Grezegorz Kubicki, and F.~R. McMorris.
 \newblock The agreement metric for labeled binary trees.
