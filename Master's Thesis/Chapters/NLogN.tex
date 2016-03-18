@@ -44,3 +44,35 @@ Creating a list, where index $i$ holds the position, left to right, of the leaf 
 By iterating through each subtree $M_i$, we can use linear time to have each leaf store a number corresponding to the subtree to which they belong. Having the sorted list of leaves in $T_1$, we can use the stored numbers to split the leaves into the final lists during a single iteration. Now the twins can be found and the subtrees $S_i$, $1 \le i \le p-1$ can be computed.
 
 All in all this process takes $O(n)$ time.
+
+\section{Matching Graphs}
+When having computed the $S_i$ subtrees, the next step is to compute the matching graphs. One graph for each path in the centroid decomposition for $T_2$. Such a graph consists of an amount of edges between two nodes.
+
+Let $x$ be the start node of the centroid path $\pi(x)$ in $T_2$ with side trees $N_j, 1 \le j \le q$. Then the graph $G(x)$ is defined as follows:
+
+\begin{itemize}
+	\item $G(x)$ consists of edges between two sets of nodes $L(x)$ and $R(x)$.
+	\item $R(x)$ consists of the nodes from $\pi(x)$
+	\item $L(x)$ contains nodes from the centroid path $\pi$ in $T_1$, for which there is an edge to some node in $R(x)$.
+	\item An edge $(u_i, v_j), 1 \le i \le p-1, 1 \le j \le q$ exists if and only if $S_i \cap N_j \ne \emptyset$
+	\item An edge $(u_p, v_j), 1 \le j \le q$ exists if the twin of $u_p$ is in $N_j$.
+\end{itemize}
+
+\subsection{Creating the Matching Graphs}
+First of all, a graph is created for each centroid path in $T_2$, where all nodes in the path is added to the right set. In order to get access to such a graph in constant time from a node in the path, we will make each start node of the paths point to the corresponding graph.
+Since the left set of each graph only contains nodes from $\pi$ we can add these nodes and all edges by doing a walk through $\pi$. This walkthrough contains the following steps for each node $z \in S_i$ for each $u_i \in \pi, 1 \le i \le p-1$:
+
+\begin{enumerate}
+	\item Find the corresponding node $z'$ in $T_2$.
+	\item If $z'$ is on a centroid path $\pi(z')$ (this is the case if $z'$ has a pointer to the start node of a path), do the following:
+	\subitem Find the graph $G(z')$ that corresponds to the path $\pi(z')$. This is done in linear time since $z'$ has a pointer to the start node $start(\pi(z'))$ which has a pointer to the graph.
+	\subitem Add $u_i$ to $L(z')$ if it has not already been added.
+	\subitem Add an edge between $u_i$ and $z'$ in $G(z')$.
+	\subitem Repeat from step 1 using the parent of $start(\pi(z'))$ as node $z$.
+	\item If $z'$ is not on a centroid path, repeat from step 1 using the parent of $z$.
+\end{enumerate}
+The loop stops either when reaching the root of $T_2$ or when reaching a node which is on the same path as the node in $T_2$ that corresponds to the parent of $z$ in $S_i$. The second case means that the rest of the processing has already been done by the parent. This ensures that for each node visited in $T_2$, an edge is added to some graph, meaning that the process of adding all edges takes linear time with respect to the total number of edges in the graphs.
+
+For the last node $u_p$ in $\pi$, the process is very similar. $z$ starts being the twin of $u_p$ and the loop continues until reaching the root of $T_2$.\\
+
+For a node $s$ in a subtree $S_i, 1 \le i \le p-1$, every node $v_j$ visited in the iteration, will be the node that is the closest ancestor of $s$ in some path, which means that either $s \in N_j$ or $s=v_j$. Both cases means that $S_i \cap N_j \ne \emptyset$ so an edge should be added.
