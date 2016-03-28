@@ -76,3 +76,44 @@ The loop stops either when reaching the root of $T_2$ or when reaching a node wh
 For the last node $u_p$ in $\pi$, the process is very similar. $z$ starts being the twin of $u_p$ and the loop continues until reaching the root of $T_2$.\\
 
 For a node $s$ in a subtree $S_i, 1 \le i \le p-1$, every node $v_j$ visited in the iteration, will be the node that is the closest ancestor of $s$ in some path, which means that either $s \in N_j$ or $s=v_j$. Both cases means that $S_i \cap N_j \ne \emptyset$ so an edge should be added.
+
+\section{Agreement Matchings}
+\todo{Describe how to create the agreement matchings}\\
+\todo{Describe definitions nsav, ...}
+
+\subsection{The Weighted Search Tree}
+For each matching graph $G(x)$, we need to create a weight balanced binary search tree $\mathcal{T}$ from the nodes in $R(x)$. Each node $v_j$ will be a leaf in $\mathcal{T}$ with weight $n_j + \frac{|T(x)|}{nsav(x)}$ if a non-singleton edge in $G(x)$ has endpoint in $v_j$ and weight $n_j$ otherwise.
+
+Such a tree can be constructed in $O(|R(x)|)$ time using the following algorithm which is our version of the algorithm described by \todo{[Mehlhorn (, Fredman)]}.
+
+\begin{itemize}
+	\item Given weights ${w_0, w_1, ..., w_{n-1}}$, construct two lists of sums ${L_0, ..., L_{n}}$ and ${R_0, ..., R_{n}}$, where
+	\subitem $L_j=\sum_{k=0}^{j-1} w_k$, $L_0=0$
+	\subitem $R_j=\sum_{k=j}^{n-1} w_k$, $R_{n}=0$
+	\item Construct the tree from weights ${w_0, w_1, ..., w_{n-1}}$ by recursion over the following steps:
+	\subitem Given weights ${w_i, ..., w_j}$
+	\subitem If $i=j+1$ then create node $j$ with children $i$ and $j$.
+	\subitem Otherwise, determine $i<k\le j$ such that
+	\subsubitem $L_{k-1} < R_{k-1}$ and $L_k \ge R_k$
+	\subitem Define node $k$ with the children created recursively from weights
+	\subsubitem ${w_i, ..., w_{k-1}}$ and ${w_k, ..., w_j}$
+	\subsubitem If $i=k-1$, the left child is just node $i$
+	\subsubitem If $k=j$, the right child is just node $j$
+\end{itemize}
+
+Determining $k$ from the weights ${w_i, ..., w_j}$ is done by finding the smallest $k$ satisfying $L_k \ge R_k$. This can be done in time $O(log(k))$ as follows:
+
+\begin{itemize}
+	\item For the middle index $k=i+(j-i+1)/2$, determine whether $L_k \ge R_k$
+	\item If not, let $k=i+1, k=i+2, k=i+4, k=i+8$ until $L_k \ge R_k$
+	\subitem In the interval between $k$ and the previous value of $k$, use binary search to find the smallest $k$ satisfying $L_k \ge R_k$
+	\item The case where $L_k \ge R_k$ is treated symmetrically
+\end{itemize}
+
+Our implementation of this algorithm was done iteratively, but the approach was the same.
+
+
+
+
+
+
