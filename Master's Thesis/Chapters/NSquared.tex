@@ -37,10 +37,44 @@ f(T_c, T_w)           & \text{if Type($T_a$)=Internal Node}
 \phantom{\hspace{6cm}}
 \end{equation}
 \\
-Like many similar recursive definitions in bioinformatics, we run into the problem that the recursive function computes the same partial results multiple times. This problem is rectified by the method of dynamic programming. Specifically, we wish to store the partial results in a $|T_a| \times |T_w|$ table. We seek to fill out the table with our partial results, and end up with the maximum size in the top right corner - \todo{\dots} see Figure X.
-Looking at (3.1) we see that the partial result for each tree node is dependent on the results of its children. This implies that we must list the table nodes in preorder, thereby ensuring that the partial results on which a given node is dependent, has already been calculated when we reach it. 
- By introducing such a table we also introduce a requirement of $O(n^2)$ space and time. 
+Like many similar recursive definitions in bioinformatics, we run into the problem that the recursive function computes the same partial results multiple times. This problem is rectified by the method of dynamic programming. Specifically, we wish to store the partial results in a $|T_a| \times |T_w|$ table. We seek to fill out the table with our partial results, and end up with the maximum size in the bottom right corner - \todo{\dots} see Figure X.
+Looking at (3.1) we see that the partial result for each tree node is dependent on the results of its children. This implies that we must list the table nodes in postorder, thereby ensuring that the partial results, on which a given node is dependent, has already been calculated when we reach it. 
+By introducing such a table we also introduce a requirement of $O(n^2)$ space and time, making it a quadratic algorithm. 
+\\
+We will in the following section show how we extend this method for calculation the size of the MAST to computing the actual tree.
 
+\subsection{Algorithm example}
+
+\begin{figure}
+	
+	\begin{itemize}
+		\item[] a. \Tree [.A [.B [.C leaf_1 leaf_2 ] [.D leaf_3 leaf_4 ] ].B [.E [.F leaf_5 leaf_6 ] [.G leaf_7 leaf_8 ] ].E ].A
+		
+		b. \Tree [.H [.I [.J leaf_1  leaf_8 ] [.L leaf_5 leaf_6 ] ].I [.M [.N leaf_2 leaf_7 ] [.F leaf_3 leaf_4 ] ].M ].H
+	\end{itemize}	
+	
+	\caption{Two example binary trees for MAST comparison}	
+\end{figure}
+
+
+\subsection{Computing the MAST}
+
+\begin{table}[]
+	\centering
+	\caption{My caption}
+	\label{my-label}
+	\begin{tabular}{|c|c|c|c|c|c|c|c|}
+		\hline
+		\textbf{}        & \textbf{leaf\_1} & \textbf{leaf\_2} & \textbf{C} & \textbf{.....} & \textbf{G} & \textbf{E} & \textbf{A} \\ \hline
+		\textbf{leaf\_1} & 1                & 0                & 1          & ...            & 0          & 0          & 1          \\ \hline
+		\textbf{leaf\_8} & 0                & 0                & 0          & ...            & 1          & 1          & 1          \\ \hline
+		\textbf{J}       & 1                & 0                & 1          & ...            & 1          & 1          & 2          \\ \hline
+		\textbf{...}     & ...              & ...              & ...        & ...            & ...        & ...        & ...        \\ \hline
+		\textbf{F}       & 0                & 0                & 0          & ...            & 0          & 0          & 2          \\ \hline
+		\textbf{M}       & 0                & 1                & 1          & ...            & 1          & 1          & 3          \\ \hline
+		\textbf{H}       & 1                & 1                & 2          & ...            & 2          & 3          & 6          \\ \hline
+	\end{tabular}
+\end{table}
 
 
 \todo{\dots}
