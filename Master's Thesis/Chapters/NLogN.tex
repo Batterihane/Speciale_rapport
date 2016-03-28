@@ -1,5 +1,54 @@
 \chapter{The NLogN algorithm}
 
+\section{The Base Case}
+The base case for finding the maximum agreement subtree of two trees $T_1$ and $T_2$ is when the internal nodes of each tree form a single path through its tree. In this case the maximum agreement subtree can be computed, by using a modified version of the $O(nlogn)$ solution to the Longest Increasing Subsequence (LIS) Problem. We will first describe the $O(nlogn)$ solution the the LIS problem and afterwards describe how we modified it to help us find the MAST of $T_1$ and $T_2$.
+
+\subsection{Solving the Longest Increasing Subsequence Problem}
+Given a list $L$ of integers, we want to compute the longest increasing subsequence of integers from that list.
+
+\todo{reference}
+
+The idea of this solution is to compute a list $I$ where the last index holds the smallest integer that ends a longest increasing subsequence of $L$. By having each number point to the number which was previous to it in $I$ when it was added (we will refer to this number as the parent), the LIS can be constructed by iterating through these pointers starting from the last number in $I$.
+
+The procedure is as follows:
+
+\begin{itemize}
+	\item Initialize list $I$ and add the first number of $L$.
+	\item For every other number $x$ in $L$ do the following:
+	\subitem If $x$ is greater than the last number of $I$, add $x$ to the end of $I$.
+	\subitem Otherwise, find the smallest number in $I$ which is greater than $x$ and replace it with $x$. This number can be found in $O(logn)$ time using binary search.
+	\item Construct the list $LIS$.
+	\subitem The last number of $LIS$ is the last number $x$ of $I$.
+	\subitem The second last number is the parent $x'$ of $x$.
+	\subitem The third last number is the parent of $x'$.
+	\subitem ...
+\end{itemize}
+
+\subsection{The Modified Longest Increasing Subsequence Problem}
+Having the two trees $T_1$ and $T_2$, we can number the leaves of $T_1$ top to bottom, where the ordering of the bottommost two leaves is arbitrary, and number the leaves of $T_2$ such that twins have the same number. This can be done in linear time since each leaf of $T_1$ has a pointer to its twin. By iterating through the leaves of $T_2$ top to bottom, again the ordering of the bottommost two leaves is arbitrary, we get a list $L$ of possibly non-increasing numbers. Since all internal nodes except from the bottommost have exactly one leaf as a child and the numbers of the leaves in $T_1$ are increasing top to bottom, we can construct a MAST from the two trees by finding the longest increasing subsequence of $L$ where the last number need only be greater than the third last number. Since the ordering of the bottommost two leaves of the result doesn't change the topology of the tree, the ordering of the last two numbers of the LIS shouldn't change the result either.
+
+This gives rise to our modified version of the Longest Increasing Subsequence Problem (MLIS):
+
+Given a list $L$ of integers, we want to compute the longest increasing subsequence of integers from that list, but where the last integer only needs to be greater than the third last.
+
+Our solution to this problem is just a modification to the solution described in the previous section.
+
+The list $I$ is constructed similarly, but the last number of $I$ might not be greater than the previous number. Besides having a parent, the last number $x$ of $I$ will also have a pointer to the number which preceded the parent when $x$ was added to $I$ (We will refer to this number as the grandparent of $x$).
+
+Initially, the first two numbers of $L$ is added to $I$. For every other number $x$ in $L$ there are 2 cases:
+
+\begin{itemize}
+	\item Case 1: The last number $y$ of $I$ is greater than its parent $p(y)$.
+	\subitem If $x > p(y)$, then $x$ is added at the end of $I$.
+	\subitem Otherwise, find the smallest number in $I$ which is greater than $x$ and replace it with $x$.
+	\item Case 2: The last number $y$ of $I$ is smaller than its parent.
+	\subitem If $x$ is greater than one of the two last numbers of $I$, $y$ and $y'$, then $x$ is put at the last index and the smallest of $y$ and $y'$ at the second last.
+	\subsubitem If $y < y'$, then the parent of $y$ is updated so that it now points to its grandparent.
+	\subitem Otherwise, find the smallest number in $I$ which is greater than $x$ and replace it with $x$.
+\end{itemize}
+
+\todo{explain each case?}
+
 \section{Centroid decompositions}
 The first step of the algorithm is to compute the \texttt{Centroid decomposition}s for the two trees. A centroid decomposition consists of an amount of disjoint paths through the tree, called \texttt{Centroid path}s. Such a path starts at a node in the tree and contains the edge to the child node holding the largest amount of leaves in its subtree. In case of a tie, an arbitrary edge is picked. The path will continue until reaching a leaf.
 
