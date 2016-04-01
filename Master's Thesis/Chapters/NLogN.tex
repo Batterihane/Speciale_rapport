@@ -6,7 +6,7 @@ The base case for finding the maximum agreement subtree of two trees $T_1$ and $
 \subsection{Solving the Longest Increasing Subsequence Problem}
 Given a list $L$ of integers, we want to compute the longest increasing subsequence of integers from that list.
 
-\todo{reference}
+\todo{reference Bespamyatnikh or Knuth?}
 
 The idea of this solution is to compute a list $I$ where the last index holds the smallest integer that ends a longest increasing subsequence of $L$. By having each number point to the number which was previous to it in $I$ when it was added (we will refer to this number as the parent), the LIS can be constructed by iterating through these pointers starting from the last number in $I$.
 
@@ -86,26 +86,38 @@ The challenge of implementing this algorithm was to perform step 2 in linear tim
 \subsection{Computing the induced subtrees of $T_2$}
 Now that we can induce a subtree from a set of leaves in linear time, all we need is to find the leaves from which we can induce the subtree $S_i$ of $T_2$, given the subtree $M_i$ of $T_1$. Our approach to this is slightly different from the one explained in \cite{nlogn} \todo{explain why}. First we wanted the names of all leaves to be numbers (from 0 to n-1). This is done when creating the tree structures from the newick files?? which was/is explained in \todo{section/chapter ???}. Second, for each leaf in $T_1$ we wanted it to be possible to find its twin in $T_2$ in constant time. By storing a list for each tree of all its leaves, where each leaf is at the index corresponding to its name, the twin of a leaf named $i$ from $T_1$ can be looked up in constant time from the list for $T_2$ at index $i$.
 
-In order to induce subtree $S_i$, the input leaves needs to be sorted by the order that they appear in $T_2$. Our approach to this was to first compute a sorted list of all leaves in $T_1$, then splitting the leaves into lists corresponding to the subtrees $M_i$, $1 \le i \le p-1$ and finally use their twins to induce the subtree $S_i$ for each list.
+In order to induce subtree $S_i$, the input leaves needs to be sorted by the order that they appear in $T_2$. Our approach to this was to first compute a sorted list of all leaves in $T_1$ according to $T_2$, then splitting the leaves into lists corresponding to the subtrees $M_i$, $1 \le i \le p-1$ and finally use their twins to induce the subtree $S_i$ for each list.
 
-Creating a list, where index $i$ holds the position, left to right, of the leaf named $i$ in $T_2$ compared to the other leaves, is done in linear time simply by iterating through $T_2$. That list is used when sorting the leaves of $T_1$ to look up the position of the twins in $T_2$. We sort the leaves in linear time using bucket sort.
+The leaves of $T_1$ was sorted by first giving each leaf of $T_2$ a number corresponding to its position (left to right) in $T_2$. This was done by iterating through $T_2$. Then sorting the leaves from $T_1$, by looking up the number of its twin in $T_2$, in linear time using bucket sort.
+For the input trees, the leaves of $T_1$ could also be sorted by their name, assuming that the names of $T_2$ where sorted. However, in the recursive calls the names will no longer correspond to the number of leaves, which is why we instead assign numbers the leaves of $T_2$.
 
-By iterating through each subtree $M_i$, we can use linear time to have each leaf store a number corresponding to the subtree to which they belong. Having the sorted list of leaves in $T_1$, we can use the stored numbers to split the leaves into the final lists during a single iteration. Now the twins can be found and the subtrees $S_i$, $1 \le i \le p-1$ can be computed.
+% First try
+% Creating a list, where index $i$ holds the position, left to right, of the leaf named $i$ in $T_2$ compared to the other leaves, is done in linear time simply by iterating through $T_2$. That list is used when sorting the leaves of $T_1$ to look up the position of the twins in $T_2$. We sort the leaves in linear time using bucket sort.
 
-All in all this process takes $O(n)$ time.
+By iterating through each subtree $M_i$, we can use linear time to have each leaf store a number corresponding to the subtree to which it belongs. Having the sorted list of leaves in $T_1$, we can use the stored numbers to split the leaves into the final lists during a single iteration. Now the twins can be found and the subtrees $S_i$, $1 \le i \le p-1$ can be computed.
+
+All in all this process takes linear time, w.r.t. the number of leaves.
+
+In the implementation, $S_i$ will not actually consist of the nodes from $T_2$. It is a new tree where each node contains a reference to the corresponding node in $T_2$ and vice versa.
+
+\section{Constructing MASTs recursively}
+When having computed the $S_i$ subtrees, we can construct the MASTs for each pair $(M_i, S_i)$, $1 \le i \le p-1$. This is done recursively, where $M_i$ becomes $T_1$ and $S_i$ becomes $T_2$. The twin pointers are transferred such that each leaf of $M_i$ points to its twin in $S_i$. % When constructing S_i, we add a pointer from the leaves in T_2 to the corresponding leaves in S_i. When constructing leaf m of M_i, we can get the twin of the corresponding leaf in T_1 and find the leaf that it points to in S_i. This should be the twin of m.
+After having constructed the MAST for $M_i$ and $S_i$, each node $w$ of $S_i$ should hold the size of the MAST for $M_i$ and the subtree $S_i(w)$. 
 
 \section{Matching Graphs}
-When having computed the $S_i$ subtrees, the next step is to compute the matching graphs. One graph for each path in the centroid decomposition for $T_2$. Such a graph consists of an amount of edges between two nodes.
+The next step of the algorithm is to compute the matching graphs. A graph is created for each path in the centroid decomposition for $T_2$, in order bottom to top. Such a graph consists of an amount of edges between two nodes.
 
 Let $x$ be the start node of the centroid path $\pi(x)$ in $T_2$ with side trees $N_j, 1 \le j \le q$. Then the graph $G(x)$ is defined as follows:
 
 \begin{itemize}
 	\item $G(x)$ consists of edges between two sets of nodes $L(x)$ and $R(x)$.
-	\item $R(x)$ consists of the nodes from $\pi(x)$
-	\item $L(x)$ contains nodes from the centroid path $\pi$ in $T_1$, for which there is an edge to some node in $R(x)$.
+	\item $R(x)$ consists of the nodes from $\pi(x)$, in order top to bottom.
+	\item $L(x)$ contains nodes from the centroid path $\pi$ in $T_1$, for which there is an edge to some node in $R(x)$. These nodes are in the order that they appear in $\pi$
 	\item An edge $(u_i, v_j), 1 \le i \le p-1, 1 \le j \le q$ exists if and only if $S_i \cap N_j \ne \emptyset$
 	\item An edge $(u_p, v_j), 1 \le j \le q$ exists if the twin of $u_p$ is in $N_j$.
 \end{itemize}
+
+A matching graph $G(x)$ is used to create a Largest Weight Agreement Matching (LWAM) which can be translated directly to the MAST of $T_1$ and $T_2(x)$. The LWAM is found by computing the LWAM containing only edges from $u_i$ and nodes following $u_i$ in $L(x)$, for each $u_i \in L(x)$. This will be covered in detail in \todo{section ??}.
 
 \subsection{Creating the Matching Graphs}
 First of all, a graph is created for each centroid path in $T_2$, where all nodes in the path is added to the right set. In order to get access to such a graph in constant time from a node in the path, we will make each start node of the paths point to the corresponding graph.
@@ -126,9 +138,32 @@ For the last node $u_p$ in $\pi$, the process is very similar. $z$ starts being 
 
 For a node $s$ in a subtree $S_i, 1 \le i \le p-1$, every node $v_j$ visited in the iteration, will be the node that is the closest ancestor of $s$ in some path, which means that either $s \in N_j$ or $s=v_j$. Both cases means that $S_i \cap N_j \ne \emptyset$ so an edge should be added.
 
+\subsection{Edge Weights}
+Each edge in a graph is a multiedge consisting of a white, green and red edge, each with its own weight. The weights are defined as follows:
+\begin{itemize}
+	\item White edge weight: $weight_w(u_i, v_j)=$ size of $MAST(M_i,N_j)$
+	\item Green edge weight: $weight_g(u_i, v_j)=$ size of $MAST(M_i,T_2(v_j))$
+	\item Red edge weight: $weight_r(u_i, v_j)=$ size of $MAST(T_1(u_i),N_j)$
+\end{itemize}
+
+In order to compute the weight of each edge in constant time, a node $map(i,j)$ is defined for the multiedge $(u_i,v_j)$. $map(i,j)$ is the node of $S_i$ which is closest the root and either a descendant of or equal to $v_j$ in $T_2$. The edge $(u_i,v_j)$ is added to a graph during an iteration of a node in $S_i$, as described in the previous section. That node is exactly the node closest to the root in $S_i$ which is also a descendant or equal to $v_j$ in $T_2$, so a reference to $map(i,j)$ is added in constant time.
+
+Recall that at this point in the algorithm, we have already constructed the MAST for $M_i$ and $S_i$, $1 \le i \le p-1$, and that each node $w$ of $S_i$ now holds the size of the MAST for $M_i$ and $S_i(w)$.
+
+First, if one of $u_i$ and $v_j$ is a leaf, then the weight of all three edges is 1. Otherwise, let $y=map(i,j)$.
+
+\subsubsection{White Edge Weight}
+$y$ is either a descendant of or equal to $v_j$. In the former case, we know that $y \in N_j$ or the edge would not have been added. So the weight of the white edge is the size of $MAST(M_i, S_i(y))$, which can be looked up in $y$ in constant time. In the latter case, one of $y's$ children is in $N_j$. That child $z$ is then the node closest to the root of $S_i$ which is in $N_j$, so the weight is the size of $MAST(M_i, S_i(z))$, which is looked up in $z$. Since all nodes on a path of $T_2$ has a reference to the topmost node of that path, $z$ can be found in constant time by picking the child of $v_j$ that does not have a reference to the same node as $v_j$, i.e. the root of $N_j$. If that node is the first child of $v_j$, then $z$ is the first child of $y$ and vice versa.
+
+\subsubsection{Green Edge Weight}
+The green edge weight is the size of $MAST(M_i,T_2(v_j))$. $S_i(y)$ is the subtree of $T_2(v_j)$ containing only leaves of $M_i$, so the weight is $MAST(M_i, S_i(y))$.
+
+\subsubsection{Red Edge Weight}
+Now let $y$ be the root of $N_j$, which we showed how to find in constant time. Since $y$ is a descendant of $x$ and the graphs and LWAMs are computed in order bottom the top, the LWAM of $G(y)$, has already been computed. In that computation, the LWAM containing only edges from $u_i$ and nodes following $u_i$ in $L(y)$ was also computed and translates to the MAST of $T_1(u_i)$ and $N_j$. The red edge weight is the size of that tree. We know that $u_i$ is in $L(y)$ since $M_i$ and $N_j = T_2(y)$ intersects.
+
 \section{Agreement Matchings}
 \todo{Describe how to create the agreement matchings}\\
-\todo{Describe definitions nsav, ...}
+\todo{Describe definitions: nsav, ...}
 
 \subsection{The Weighted Search Tree}
 For each matching graph $G(x)$, we need to create a weight balanced binary search tree $\mathcal{T}$ from the nodes in $R(x)$. Each node $v_j$ will be a leaf in $\mathcal{T}$ with weight $n_j + \frac{|T(x)|}{nsav(x)}$ if a non-singleton edge in $G(x)$ has endpoint in $v_j$ and weight $n_j$ otherwise.
