@@ -111,13 +111,14 @@ Let $x$ be the start node of the centroid path $\pi(x)$ in $T_2$ with side trees
 
 \begin{itemize}
 	\item $G(x)$ consists of edges between two sets of nodes $L(x)$ and $R(x)$.
-	\item $R(x)$ consists of the nodes from $\pi(x)$, in order top to bottom.
-	\item $L(x)$ contains nodes from the centroid path $\pi$ in $T_1$, for which there is an edge to some node in $R(x)$. These nodes are in the order that they appear in $\pi$
+	\item $R(x)$ consists of the nodes from $\pi(x)$.
+	\item $L(x)$ contains nodes from the centroid path $\pi$ in $T_1$, for which there is an edge to some node in $R(x)$.
+	\item The nodes of each set are in the order that they appear in the path that they are created from. I.e. the topmost node of a set is the node closest to the root and the bottommost is the one farthest from the root.
 	\item An edge $(u_i, v_j), 1 \le i \le p-1, 1 \le j \le q$ exists if and only if $S_i \cap N_j \ne \emptyset$
 	\item An edge $(u_p, v_j), 1 \le j \le q$ exists if the twin of $u_p$ is in $N_j$.
 \end{itemize}
 
-A matching graph $G(x)$ is used to create a Largest Weight Agreement Matching (LWAM) which can be translated directly to the MAST of $T_1$ and $T_2(x)$. The LWAM is found by computing the LWAM containing only edges from $u_i$ and nodes following $u_i$ in $L(x)$, for each $u_i \in L(x)$. This will be covered in detail in \todo{section ??}.
+A matching graph $G(x)$ is used to create a Largest Weight Agreement Matching (LWAM) which can be translated directly to the MAST of $T_1$ and $T_2(x)$. The LWAM is found by computing the LWAM containing only edges from $u_i$ and nodes below $u_i$ in $L(x)$, for each $u_i \in L(x)$, starting from the bottom. This will be covered in detail in \todo{section ??}.
 
 \subsection{Creating the Matching Graphs}
 First of all, a graph is created for each centroid path in $T_2$, where all nodes in the path is added to the right set. In order to get access to such a graph in constant time from a node in the path, we will make each start node of the paths point to the corresponding graph.
@@ -165,6 +166,28 @@ Now let $y$ be the root of $N_j$, which we showed how to find in constant time. 
 \todo{Describe how to create the agreement matchings}\\
 \todo{Describe definitions: nsav, ...}
 
+\subsection{Definitions}
+We will start by describing some definitions used in agreement matchings.
+
+\subsubsection{Vertices}
+For vertices in the graph $G(x)$ we have the following definitions:
+\begin{itemize}
+	\item $d_x(u_i)$: The 'degree' of a vertex $u_i \in L(x)$ is the number of white edges incident on it.
+	\subitem A vertex in $L(x)$ is a 'singleton' vertex if it has degree 1.
+	\subitem White edges incident on singleton vertices are called 'singleton' edges.
+	\item $nswe(x)$: The number of non-singleton white edges in $G(x)$.
+	\item $nsav(x)$: The number of vertices in $R(x)$ having at least one incident non-singleton edge.
+	\item $SV(x)$: The set of singleton vertices.
+\end{itemize}
+
+\subsubsection{Edges}
+For two edges $(a,b)$ and $(a',b')$ in $G(x)$, we will say they 'cross' if $a$ is above $a'$ in $L(x)$ and $b$ is below $b'$ in $R(x)$. The two edges 'touch' if they are either crossing or $a=a'$ or $b=b'$. Finally $(a,b)$ 'dominates' $(a',b')$ if $a$ is above $a'$ and $b$ is above $b'$.
+
+\subsubsection{Agreement Matchings}
+In the graph $G(x)$, a 'Proper Crossing' is either a single red edge, a single green edge or a crossing of a red edge $(u_i,v_j)$ and a green edge $(u_i',v_j')$ where $u_i'$ is above $u_i$ in $L(x)$.
+
+Now an agreement matching can be defined as a proper crossing and zero or more white edges, where all white edges dominate the edge(s) in the proper crossing and no white edge touches any other edge in the matching.
+
 \subsection{The Weighted Search Tree}
 For each matching graph $G(x)$, we need to create a weight balanced binary search tree $\mathcal{T}$ from the nodes in $R(x)$. Each node $v_j$ will be a leaf in $\mathcal{T}$ with weight $n_j + \frac{|T(x)|}{nsav(x)}$ if a non-singleton edge in $G(x)$ has endpoint in $v_j$ and weight $n_j$ otherwise.
 
@@ -177,26 +200,46 @@ Such a tree can be constructed in $O(|R(x)|)$ time using the following algorithm
 	\item Construct the tree from weights ${w_0, w_1, ..., w_{n-1}}$ by recursion over the following steps:
 	\subitem Given weights ${w_i, ..., w_j}$
 	\subitem If $i=j+1$ then create node $j$ with children $i$ and $j$.
-	\subitem Otherwise, determine $i<k\le j$ such that
-	\subsubitem $L_{k-1} < R_{k-1}$ and $L_k \ge R_k$
+	\subitem Otherwise, determine the smallest $k, i<k\le j$ such that
+	\subsubitem $L_k-L_i \ge R_k-R_{j+1}$
 	\subitem Define node $k$ with the children created recursively from weights
 	\subsubitem ${w_i, ..., w_{k-1}}$ and ${w_k, ..., w_j}$
 	\subsubitem If $i=k-1$, the left child is just node $i$
 	\subsubitem If $k=j$, the right child is just node $j$
 \end{itemize}
 
-Determining $k$ from the weights ${w_i, ..., w_j}$ is done by finding the smallest $k$ satisfying $L_k \ge R_k$. This can be done in time $O(log(k))$ as follows:
+Determining $k$ from the weights ${w_i, ..., w_j}$ is done by finding the smallest $k$ satisfying $L_k-L_i \ge R_k-R_{j+1}$. This can be done in time $O(log(k))$ as follows:
 
 \begin{itemize}
-	\item For the middle index $k=i+(j-i+1)/2$, determine whether $L_k \ge R_k$
-	\item If not, let $k=i+1, k=i+2, k=i+4, k=i+8$ until $L_k \ge R_k$
-	\subitem In the interval between $k$ and the previous value of $k$, use binary search to find the smallest $k$ satisfying $L_k \ge R_k$
-	\item The case where $L_k \ge R_k$ is treated symmetrically
+	\item For the middle index $k=i+(j-i+1)/2$, determine whether $L_k-L_i \ge R_k-R_{j+1}$
+	\item If not, let $k=i+1, k=i+2, k=i+4, k=i+8$ until $L_k-L_i \ge R_k-R_{j+1}$
+	\subitem In the interval between $k$ and the previous value of $k$, use binary search to find the smallest $k$ satisfying $L_k-L_i \ge R_k-R_{j+1}$
+	\item The case where $L_k-L_i \ge R_k-R_{j+1}$ is treated symmetrically
 \end{itemize}
 
 Our implementation of this algorithm was done iteratively, but the approach was the same.
 
+In the final tree, each node will hold an index number. Searching for the leaf created from $v_j$, with index number $i$, in $\mathcal{T}$ takes $O(log \dfrac{|T(x)|}{n_j}$ time \todo{explain why} and is done in the standard way by starting at the root and picking the left child if $i < the current node index$, and the right child otherwise until reaching the desired leaf. Each node will also hold the lowest index number in its subtree, which is used when searching for an ordered subset of $R(x)$. This number is added while creating the tree. For the root, the lowest index number is 0. For a left child, the lowest index number is equal to the lowest index number of the parent. For a right child, it is equal to the index number of the parent.
 
+Given the subset ${v_i, ..., v_j}$ of $R(x)$ in bottom to top order, let ${index(v_i), ..., index(v_j)}$ be the corresponding indices. Searching for the leaves with these indices in $\mathcal{T}$ is done by first searching for the leaf $l$ with index $index(v_i)$ in the standard way. Then search for the leaf with index $index(v_{i+1)}$ by starting at $l$ and go up through the tree until reaching a node whose lowest index number is less than $index(v_{i+1)}$. The leaf with index $index(v_{i+1)}$ is now found by searching in the standard way starting at the node just reached. This procedure takes $O(k*log \dfrac{nsav(x)}{k})$ time \todo{explain why}.
+
+\subsection{Computing the Agreement Matchings}
+Computing the LWAM for for the graph $G(x)$ is done by processing each node of $L(x)$ in order starting with the bottom node. For each node $u_i \in L(x)$, we process each edge incident on it in order starting with the bottommost edge. Recall that we will compute the LWAM containing only edges from $u_i$ and nodes below $u_i$ in $L(x)$, for each $u_i \in L(x)$. This is done by maintaining all that information in $\mathcal{T}$ while processing the nodes of $L(x)$.
+
+\subsubsection{Auxiliary Information in $\mathcal{T}$}
+While processing the edges of $G(x)$ we will maintain information at each node of $\mathcal{T}$ about the LWAM of the currently processed edges. For a node $z \in \mathcal{T}$, we define $anc(z)$ as the set of ancestors of $z$, including $z$ itself in order top to bottom. $lfringe(z)$ is defined as the left children of the vertices in $anc(z)$ which are not in $anc(z)$ themselves. $rfringe(z)$ is defined analogously. $anc(z)$ need not be stored $\mathcal{T}$, but can be created while searching for $z$ in $\mathcal{T}$. Likewise, $lfringe(z)$ and $rfringe(z)$ can be created by iterating through $anc(z)$.
+
+The following information in maintained at each vertex $z \in \mathcal{T}$. This is taken directly from \citeA{nlogn}, but slightly elaborated.
+\begin{itemize}
+	\item $g(z)$: After updating $g(z)$, it will hold the heaviest green edge in $\mathcal{T}$ which	forms a proper crossing with each red edge in $\mathcal{T}(z)$.
+	\subitem However, $g(z)$ is not maintained at all times, but the correct edge can be retrieved from $max_{z' \in anc(z)}g(z')$.
+	\subitem If there are no red edges in $\mathcal{T}(z)$ when updating $g(z)$, then $g(z)$ will be the heaviest green edge in $\mathcal{T}(z')$, for all $z' \in rfringe(z)$.
+	\item $x(z)$: This is the largest weight proper crossing, that is not a single red edge, among the edges in $\mathcal{T}(z)$.
+	\item $m(z)$: This is largest weight agreement matching containing a white edge
+	such that the topmost white edge is in $\mathcal{T}(z)$.
+	\item $y(z)$: This the largest weight proper crossing, which is not a single edge, such that the green edge is in $\mathcal{T}$ but not in $\mathcal{T}(z)$, the red edge is in $\mathcal{T}(z)$, and the green edge does not form a proper crossing with all the red edges in $\mathcal{T}(z)$.
+	\item $r(z)$: This is simply the heaviest red edge in $\mathcal{T}(z)$.
+\end{itemize}
 
 
 
