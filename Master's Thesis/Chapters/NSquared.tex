@@ -13,37 +13,43 @@ Goddard et. al.\cite{nsquared} describes a $O(n^2)$ algorithm for finding the la
 What Lemma 1 essentially states is twofold. First, if the MAST contains children from all subtrees (a,b,x,y), then its size is given by the largest combination of these. Secondly, if the MAST does not include all subtrees, then its size is given by the largest combination of subtrees excluding at least one of them.    
 This gives rise to a recursive solution to finding the size of the maximum agreement subtree. The recursive function is defined as follows: 
 
-\begin{equation}
-\begin{aligned}
-f(T_a,T_w)=Max
-\begin{cases}
-f(T_b,T_x)+f(T_c,T_y) & \text{if Type($T_a$)=Type($T_w$)=Internal Node}
-\\
-f(T_b,T_y)+f(T_c,T_x) & \text{if Type($T_a$)=Type($T_w$)=Internal Node}
-\\
-f(T_a, T_x)           & \text{if Type($T_w$)=Internal Node}
-\\
-f(T_a, T_y)           & \text{if Type($T_w$)=Internal Node}
-\\
-f(T_b, T_w)           & \text{if Type($T_a$)=Internal Node}
-\\
-f(T_c, T_w)           & \text{if Type($T_a$)=Internal Node}
-\\
-1 	                  & \text{if Type($T_a$)=Type($T_w$)=Leaf  $\land$  $T_a$=$T_w$}
-\\
-0                     
-\end{cases}
-\end{aligned}
-\phantom{\hspace{6cm}}
-\end{equation}
-\\
-Like many similar recursive definitions in bioinformatics, we run into the problem that the recursive function computes the same partial results multiple times. This problem is rectified by the method of dynamic programming. Specifically, we wish to store the partial results in a $|T_a| \times |T_w|$ table. We seek to fill out the table with our partial results, and end up with the maximum size in the bottom right corner - \todo{\dots} see Figure X.
-Looking at (3.1) we see that the partial result for each tree node is dependent on the results of its children. This implies that we must list the table nodes in postorder, thereby ensuring that the partial results, on which a given node is dependent, has already been calculated when we reach it. 
+\begin{figure}
+	\begin{equation*}
+	\begin{aligned}
+	f(T_a,T_w)=Max
+	\begin{cases}
+	f(T_b,T_x)+f(T_c,T_y) & \text{if Type($T_a$)=Type($T_w$)=Internal Node}
+	\\
+	f(T_b,T_y)+f(T_c,T_x) & \text{if Type($T_a$)=Type($T_w$)=Internal Node}
+	\\
+	f(T_a, T_x)           & \text{if Type($T_w$)=Internal Node}
+	\\
+	f(T_a, T_y)           & \text{if Type($T_w$)=Internal Node}
+	\\
+	f(T_b, T_w)           & \text{if Type($T_a$)=Internal Node}
+	\\
+	f(T_c, T_w)           & \text{if Type($T_a$)=Internal Node}
+	\\
+	1 	                  & \text{if Type($T_a$)=Type($T_w$)=Leaf  $\land$  $T_a$=$T_w$}
+	\\
+	0                     
+	\end{cases}
+	\end{aligned}
+	\phantom{\hspace{6cm}}
+	\end{equation*}
+	\caption{Recursive MAST size function}
+	\label{Fig:Function1}
+\end{figure}
+
+
+Like many similar recursive definitions in bioinformatics, we run into the problem that the recursive function computes the same partial results multiple times. This problem is rectified by the method of dynamic programming. Specifically, we wish to store the partial results in a $|T_a| \times |T_w|$ table. We seek to fill out the table with our partial results, and end up with the maximum size in the bottom right corner.
+Looking at the function in Figure \ref{Fig:Function1} we see that the partial result for each tree node is dependent on the results of its children. This implies that we must list the table nodes in postorder, thereby ensuring that the partial results, on which a given node is dependent, has already been calculated when we reach it. 
 By introducing such a table we also introduce a requirement of $O(n^2)$ space and time, making it a quadratic algorithm. 
 \\
-We will in the following section show how we extend this method for calculation the size of the MAST to computing the actual tree.
+We will in the following sections show how we extend this method for calculation the size of the MAST to computing the actual tree.
 
 \subsection{Algorithm example}
+Two example trees have been provided in Figure \ref{Fig:Binary1}. We now wish to compute the size of their maximum agreement subtree using the agorithm desribed above. For this reason, we create a $15 \times 15$ table containing the nodes of each tree in postorder. Using the function desribed in (3.1), we can now fill out the table by starting from the topmost row and going towards the bottom. The resulting table can be seen in \ref{Table:Table1}, where we from the bottom right corner than see that the maximum size of the MAST is 6. By looking at the trees for a little while, one can come to the conclusion that 6 is indeed correct, since removing only one leaf cannot produce an agreement tree in this case, while removing $leaf_1 and leaf_7$ will produce an agreement tree of size 6. 
 
 \begin{figure}
 	
@@ -53,16 +59,13 @@ We will in the following section show how we extend this method for calculation 
 		b. \Tree [.H [.I [.J leaf_1  leaf_8 ] [.L leaf_5 leaf_6 ] ].I [.M [.N leaf_2 leaf_7 ] [.F leaf_3 leaf_4 ] ].M ].H
 	\end{itemize}	
 	
-	\caption{Two example binary trees for MAST comparison}	
+	\caption{Two example binary trees for MAST comparison}
+	\label{Fig:Binary1}	
 \end{figure}
 
 
-\subsection{Computing the MAST}
-
 \begin{table}[]
 	\centering
-	\caption{My caption}
-	\label{my-label}
 	\begin{tabular}{|c|c|c|c|c|c|c|c|}
 		\hline
 		\textbf{}        & \textbf{leaf\_1} & \textbf{leaf\_2} & \textbf{C} & \textbf{.....} & \textbf{G} & \textbf{E} & \textbf{A} \\ \hline
@@ -74,7 +77,72 @@ We will in the following section show how we extend this method for calculation 
 		\textbf{M}       & 0                & 1                & 1          & ...            & 1          & 1          & 3          \\ \hline
 		\textbf{H}       & 1                & 1                & 2          & ...            & 2          & 3          & 6          \\ \hline
 	\end{tabular}
+	
+	\label{Table:Table1}
+	\caption{Score Matrix for the Trees in Figure 3.1}
 \end{table}
+
+
+
+
+\subsection{Computing the MAST}
+
+\begin{lstlisting}[language=Java, caption=Java pseudo code for BackTracking]
+Function RecBackTrack(Tree Tree1, Tree Tree2)
+{
+	int Score = ScoreMatrix[Tree1][Tree2];
+
+	if(Type(Tree1) = Type(Tree2) = InternalNode)
+	{
+		int Score1 = ScoreMatrix[Tree1.Child1][Tree2.Child1];
+		int Score2 = ScoreMatrix[Tree1.Child2][Tree2.Child2];
+		int Score3 = ScoreMatrix[Tree1.Child1][Tree2.Child2];
+		int Score4 = ScoreMatrix[Tree1.Child2][Tree2.Child1];
+
+		if(Score = Score1 + Score2) {
+			Tree subTree1 = RecBackTrack(Tree1.Child1, Tree2.Child1);
+			Tree subTree2 = RecBackTrack(Tree1.Child2, Tree2.Child2);
+			//Return internal node with subTree1 and subTree2 as children
+		}
+		else if (Score1 = Score3 + Score4) {
+			Tree subTree1 = RecBackTrack(Tree1.Child1, Tree2.Child2);
+			Tree subTree2 = RecBackTrack(Tree1.Child2, Tree2.Child1);
+			//Return internal node with subTree1 and subTree2 as children
+		}
+	}
+
+	else if (Type(Tree1) = InternalNode)
+	{
+		int Score1 = ScoreMatrix[Tree1.Child1][Tree2]; 
+		int Score2 = ScoreMatrix[Tree1.Child2][Tree2];
+
+		if (Score = Score1) {
+			return RecBackTrack(Tree1.Child1, Tree2);
+		}
+		else if (Score = Score2) {
+			return RecBackTrack(Tree1.Child2, Tree2);
+		}
+	}
+
+	else if (Type(Tree2) = InternalNode)
+	{
+		int Score1 = ScoreMatrix[Tree1][Tree2.Child1]; 
+		int Score2 = ScoreMatrix[Tree1][Tree2.Child2];
+
+		else if (Score = Score1) {
+			return RecBackTrack(Tree1, Tree2.Child1);
+		}
+		else if (Score = Score2) {
+			return RecBackTrack(Tree1, Tree2.Child2);
+		}
+	}
+
+	else if (Type(Tree1)= Type(Tree2) = Leaf) {
+		return Tree1 = Tree2 ? Tree1 : null; 
+	}	
+}
+\end{lstlisting}
+
 
 
 \todo{\dots}

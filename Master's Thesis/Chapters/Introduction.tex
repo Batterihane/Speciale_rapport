@@ -23,9 +23,19 @@ The MAST problem is one of several ways of defining tree distances. -which one i
 
 
 \begin{algorithm}
-	\caption{Naive solution}\label{euclid}
+	\caption{Backtracking}\label{euclid}
 	\begin{algorithmic}[1]
-		\Procedure{MyProcedure}{}
+		\Procedure{RecBackTrack(Tree Tree1, Tree Tree2)}{}
+		
+		\State $\textit{stringlen} \gets \text{length of }\textit{string}$
+		
+		\If {$\textit{Type(Tree1) = Type(Tree2) = InternalNode} $} \Return \textit{Combine(RecBackTrack(Tree1.Child1, Tree2.Child1), RecBackTrack(Tree1.Child1, Tree2.Child1))}
+		\EndIf
+		\State $j \gets \textit{patlen}$
+		
+		
+		
+		
 		\State $\textit{stringlen} \gets \text{length of }\textit{string}$
 		\State $i \gets \textit{patlen}$
 		\BState \emph{top}:
