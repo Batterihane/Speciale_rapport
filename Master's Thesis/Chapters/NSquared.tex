@@ -44,7 +44,7 @@ This gives rise to a recursive solution to finding the size of the maximum agree
 
 Like many similar recursive definitions in bioinformatics, we run into the problem that the recursive function computes the same partial results multiple times. This problem is rectified by the method of dynamic programming. Specifically, we wish to store the partial results in a $|T_a| \times |T_w|$ table. We seek to fill out the table with our partial results, and end up with the maximum size in the bottom right corner.
 Looking at the function in Figure \ref{Fig:Function1} we see that the partial result for each tree node is dependent on the results of its children. This implies that we must list the table nodes in postorder, thereby ensuring that the partial results, on which a given node is dependent, has already been calculated when we reach it. 
-By introducing such a table we also introduce a requirement of $O(n^2)$ space and time, making it a quadratic algorithm. 
+By introducing such a table we also introduce a requirement of $O(n^2)$ space and time, making it a quadratic algorithm. Simple techniques for reducing the space requirement, like only storing a few number of rows in the table at a time, cannot be applied in this case, since the computation of a new row may depend on all the previous rows in the worst case.  
 \\
 We will in the following sections show how we extend this method for calculation the size of the MAST to computing the actual tree.
 
@@ -86,6 +86,11 @@ Two example trees have been provided in Figure \ref{Fig:Binary1}. We now wish to
 
 
 \subsection{Computing the MAST}
+Extending the solution for computing the size of the MAST to include the computation of the actual MAST is fairly simple in this case. We found two different ways of going about it. 
+\\
+\textbf{Option 1:}
+
+
 
 \begin{lstlisting}[language=Java, caption=Java pseudo code for BackTracking]
 Function RecBackTrack(Tree Tree1, Tree Tree2)
