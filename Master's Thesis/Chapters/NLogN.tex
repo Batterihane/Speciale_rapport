@@ -98,7 +98,7 @@ By iterating through each subtree $M_i$, we can use linear time to have each lea
 
 All in all this process takes linear time, w.r.t. the number of leaves.
 
-In the implementation, $S_i$ will not actually consist of the nodes from $T_2$. It is a new tree where each node contains a reference to the corresponding node in $T_2$ and vice versa.
+In the implementation, $S_i$ will not actually consist of nodes from $T_2$. It is a new tree where each node contains a reference to the corresponding node in $T_2$ and vice versa.
 
 \section{Constructing MASTs recursively}
 When having computed the $S_i$ subtrees, we can construct the MASTs for each pair $(M_i, S_i)$, $1 \le i \le p-1$. This is done recursively, where $M_i$ becomes $T_1$ and $S_i$ becomes $T_2$. The twin pointers are transferred such that each leaf of $M_i$ points to its twin in $S_i$. % When constructing S_i, we add a pointer from the leaves in T_2 to the corresponding leaves in S_i. When constructing leaf m of M_i, we can get the twin of the corresponding leaf in T_1 and find the leaf that it points to in S_i. This should be the twin of m.
@@ -164,6 +164,7 @@ Now let $y$ be the root of $N_j$, which we showed how to find in constant time. 
 
 \section{Agreement Matchings}
 \todo{Describe how to create the agreement matchings}\\
+\todo{Describe how and why a LWAM corresponds to a MAST}
 \todo{Describe definitions: nsav, ...}
 
 \subsection{Definitions}
@@ -223,8 +224,8 @@ In the final tree, each node $v$ will hold an index number $index(v)$. Searching
 
 Given the subset ${v_i, ..., v_j}$ of $R(x)$ in bottom to top order, let ${index(v_i), ..., index(v_j)}$ be the corresponding indices. Searching for the leaves with these indices in $\mathcal{T}$ is done by first searching for the leaf $l$ with index $index(v_i)$ in the standard way. Then search for the leaf with index $index(v_{i+1)}$ by starting at $l$ and go up through the tree until reaching a node whose lowest index number is less than $index(v_{i+1)}$. The leaf with index $index(v_{i+1)}$ is now found by searching in the standard way starting at the node just reached. This procedure takes $O(k*log \dfrac{nsav(x)}{k})$ time \todo{explain why}. Given a subset of $R(x)$ in top to bottom order, searching for the corresponding leaves in $\mathcal{T}$ is done similarly, but using the largest index numbers instead of the lowest.
 
-\subsection{Computing the Agreement Matchings}
-Computing the LWAM for for the graph $G(x)$ is done by processing each node of $L(x)$ in order starting with the bottom node. For each node $u_i \in L(x)$, we process each edge incident on it. Recall that we will compute the LWAM containing only edges from $u_i$ and nodes below $u_i$ in $L(x)$, for each $u_i \in L(x)$. This is done by maintaining all that information in $\mathcal{T}$ while processing the nodes of $L(x)$.
+\subsection{Computing the Largest Weight Agreement Matchings}
+Computing the LWAM for the graph $G(x)$ is done by processing each node of $L(x)$ in order starting with the bottom node. For each node $u_i \in L(x)$, we process each edge incident on it. Recall that we will compute the LWAM containing only edges from $u_i$ and nodes below $u_i$ in $L(x)$, for each $u_i \in L(x)$. This is done by maintaining all that information in $\mathcal{T}$ while processing the nodes of $L(x)$.
 
 \subsubsection{Auxiliary Information in $\mathcal{T}$}
 While processing the edges of $G(x)$ we will maintain information at each node of $\mathcal{T}$ about the LWAM of the currently processed edges. For a node $z \in \mathcal{T}$, we define $anc(z)$ as the set of ancestors of $z$, including $z$ itself in order top to bottom. $lfringe(z)$ is defined as the left children of the vertices in $anc(z)$ which are not in $anc(z)$ themselves. $lfringe$ will only contain nodes with indices less than $index(z)$. $rfringe(z)$ is defined analogously where the nodes all have indices greater or equal to $index(z)$. $anc(z)$ need not be stored in $\mathcal{T}$, but can be created while searching for $z$ in $\mathcal{T}$. Likewise, $lfringe(z)$ and $rfringe(z)$ can be created by iterating through $anc(z)$. After processing an edge $(u,v)$, we say that the edge is in $\mathcal{T}$. For a node $z \in \mathcal{T}$ we also say that $(u,v)$ is in $T(z)$ if $T(z)$ contains the node corresponding to $v$.
@@ -267,7 +268,23 @@ Adding a green edge to $\mathcal{T}$ might change the values $g(z), z \in lfring
 \subsubsection{Processing order}
 Recall that we process the edges by iterating through $L(x)$ starting from the bottommost node, and process the edges incident on each of these nodes. For a node $u_i \in L(x)$ we will start by processing the white edges incident on $u_i$ in order, starting from the topmost edge, i.e. the edge incident on the topmost node in $R(x)$. Starting with the white edges in top-down order means that when processing the white edge $e=(u_i,v_j)$, no other edge incident on $u_i$ below $e$ has been processed.
 
-Next, we process the red and green edges incident on $u_i$ in order, starting from the bottommost edge. This assures that when processing a green edge $e=(u_i,v_j)$, no red edges incident on $u_i$ and above e has been processed.
+Next, we process the red and green edges incident on $u_i$ in order, starting from the bottommost edge. This ensures that when processing a green edge $e=(u_i,v_j)$, no red edges incident on $u_i$ and above e has been processed.
+
+\subsubsection{Extracting the Largest Weight Agreement Matchings}
+First, we need to compute the LWAM containing only edges from $u_i$ and nodes below $u_i$ in $L(x)$, for each $u_i \in L(x)$. For any $u_i \in L(x)$, all the information needed to compute such a matching is stored at the root $r$ of $\mathcal{T}$ after having processed the edges incident on $u_i$ and before processing edges incident on the above nodes in $L(x)$. The LWAM is extracted in the following way:
+
+If the LWAM contains a white edge it is simply given by $m(r)$. If the LWAM is a proper crossing, but not a single red edge, it is given by $x(r)$. And finally, if the LWAM is a single red edge, it is given by $r(r)$. Therefore the LWAM is the heaviest of these three matchings.
+
+For each $v_j \in R(x)$, we also need to compute the LWAM containing only edges incident on $v_j$ and nodes below $v_j$ in $R(x)$. For leaf $v_j \in R(x)$, such a matching will correspond to the MAST between $T_1$ and $T_2(v_j)$ which is the MAST that needs to be stored at $v_j \in T_2$. The LWAMs are extracted from $\mathcal{T}$, after all edges in $G(x)$ have been processed, in the following way:
+
+For node $v_j \in R(x)$, let $l$ be the leaf in $\mathcal{T}$ corresponding to $v_j$ and let $LWAM(v_j)$ be the LWAM containing only edges incident on $v_j$ and nodes below $v_j$ in $R(x)$. $LWAM(v_j)$ is either equal to $LWAM(v_{j+1}), j \ne |R(x)|$ (-1?), or it is the LWAM having a white edge incident on $v_j$ as the topmost edge, or it is the largest proper crossing having a red edge incident on $v_j$, or it is a single green edge incident on $v_j$. Thus, $LWAM(v_j)$ is given by $max\{LWAM(v_{j+1}), m(l), y(l), max_{z \in anc(l)}g(z) + r(l), x(l)\}$ where $LWAM(v_{|R(x)|+1}) = 0$.
+
+\section{Creating the Maximum Agreement Subtrees}
+As mentioned earlier, a Largest Weight Agreement Matching constructed from the matching graph $G(x)$ corresponds to a Maximum Agreement Subtree between $T_1$ and $T_2(x)$. We will show how the MAST $\mathcal{A}$ can be constructed given the LWAM with white edges ${we_0, we_1, ...}$ and proper crossing with edges ${ge, re}$ or single edge $ge$ or $re$.
+
+Recall that a white edge $(u_i, v_j)$ corresponds to the subtree $MAST(M_i,N_j)$, a green edge corresponds to $MAST(M_i,T_2(v_j))$ and a red edge corresponds to $MAST(T_1(u_i),N_j)$. These subtrees will appear in $\mathcal{A}$ in the same order that the edges appear in the matching. $\mathcal{A}$ will have an internal node for each white edge which forms a path ${p_0, p_1, ...}$ through $\mathcal{A}$. These nodes will be in the same order that the white edges appear in the matching. The off-path child of node $p_i$ will then be the root of the subtree corresponding to edge $w_i$. The second off-path child $c$ of the last node in the path will hold the subtree(s) corresponding to the edge(s) in the proper crossing. If the proper crossing is a single edge, $c$ will be the root of the subtree corresponding to that edge. Otherwise $c$ will have two children, one being the root of the subtree corresponding to $ge$ and one being the root of the subtree corresponding to $re$.
+
+What we need now is to find the subtrees corresponding to the edges in the matching. All these subtrees have already been computed and is found in the same way as the edge weight were computed. \todo{store subtrees at edges??}.
 
 
 
