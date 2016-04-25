@@ -1,5 +1,7 @@
 \chapter{The NLogN algorithm}
 
+\todo{Describe the overall strategy}
+
 \section{The Base Case}
 The base case for finding the maximum agreement subtree of two trees $T_1$ and $T_2$ is when the internal nodes of each tree form a single path through its tree. In this case the maximum agreement subtree can be computed, by using a modified version of the $O(nlogn)$ solution to the Longest Increasing Subsequence (LIS) Problem. We will first describe the $O(nlogn)$ solution the the LIS problem and afterwards describe how we modified it to help us find the MAST of $T_1$ and $T_2$.
 
@@ -100,9 +102,9 @@ All in all this process takes linear time, w.r.t. the number of leaves.
 
 In the implementation, $S_i$ will not actually consist of nodes from $T_2$. It is a new tree where each node contains a reference to the corresponding node in $T_2$ and vice versa.
 
-\section{Constructing MASTs recursively}
-When having computed the $S_i$ subtrees, we can construct the MASTs for each pair $(M_i, S_i)$, $1 \le i \le p-1$. This is done recursively, where $M_i$ becomes $T_1$ and $S_i$ becomes $T_2$. The twin pointers are transferred such that each leaf of $M_i$ points to its twin in $S_i$. % When constructing S_i, we add a pointer from the leaves in T_2 to the corresponding leaves in S_i. When constructing leaf m of M_i, we can get the twin of the corresponding leaf in T_1 and find the leaf that it points to in S_i. This should be the twin of m.
-After having constructed the MAST for $M_i$ and $S_i$, each node $w$ of $S_i$ should hold the size of the MAST for $M_i$ and the subtree $S_i(w)$. 
+\section{Constructing Largest Weight Agreement Matchings recursively}
+When having computed the $S_i$ subtrees, we can construct the largest weight agreement matchings for each pair $(M_i, S_i)$, $1 \le i \le p-1$. This is done recursively, where $M_i$ becomes $T_1$ and $S_i$ becomes $T_2$. The twin pointers are transferred such that each leaf of $M_i$ points to its twin in $S_i$. % When constructing S_i, we add a pointer from the leaves in T_2 to the corresponding leaves in S_i. When constructing leaf m of M_i, we can get the twin of the corresponding leaf in T_1 and find the leaf that it points to in S_i. This should be the twin of m.
+After having constructed the LWAMs for $M_i$ and $S_i$, each node $w$ of $S_i$ should hold the LWAM and its weight (the size of the MAST) for $M_i$ and the subtree $S_i(w)$. 
 
 \section{Matching Graphs}
 The next step of the algorithm is to compute the matching graphs. A graph is created for each path in the centroid decomposition for $T_2$, in order bottom to top. Such a graph consists of an amount of edges between two nodes.
@@ -147,9 +149,9 @@ Each edge in a graph is a multiedge consisting of a white, green and red edge, e
 	\item Red edge weight: $weight_r(u_i, v_j)=$ size of $MAST(T_1(u_i),N_j)$
 \end{itemize}
 
-In order to compute the weight of each edge in constant time, a node $map(i,j)$ is defined for the multiedge $(u_i,v_j)$. $map(i,j)$ is the node of $S_i$ which is closest the root and either a descendant of or equal to $v_j$ in $T_2$. The edge $(u_i,v_j)$ is added to a graph during an iteration of a node in $S_i$, as described in the previous section. That node is exactly the node closest to the root in $S_i$ which is also a descendant or equal to $v_j$ in $T_2$, so a reference to $map(i,j)$ is added in constant time.
+In order to compute the weight of each edge in constant time, a node $map(i,j)$ is defined for the multiedge $(u_i,v_j)$. $map(i,j)$ is the node of $S_i$ which is closest to the root and either a descendant of or equal to $v_j$ in $T_2$. The edge $(u_i,v_j)$ is added to a graph during an iteration of a node in $S_i$, as described in the previous section. That node is exactly the node closest to the root in $S_i$ which is also a descendant or equal to $v_j$ in $T_2$, so a reference to $map(i,j)$ is added in constant time.
 
-Recall that at this point in the algorithm, we have already constructed the MAST for $M_i$ and $S_i$, $1 \le i \le p-1$, and that each node $w$ of $S_i$ now holds the size of the MAST for $M_i$ and $S_i(w)$.
+Recall that at this point in the algorithm, we have already constructed the LWAM for $M_i$ and $S_i$, $1 \le i \le p-1$, and that each node $w$ of $S_i$ now holds the LWAM and its weight for $M_i$ and $S_i(w)$.
 
 First, if one of $u_i$ and $v_j$ is a leaf, then the weight of all three edges is 1. Otherwise, let $y=map(i,j)$.
 
@@ -160,12 +162,9 @@ $y$ is either a descendant of or equal to $v_j$. In the former case, we know tha
 The green edge weight is the size of $MAST(M_i,T_2(v_j))$. $S_i(y)$ is the subtree of $T_2(v_j)$ containing only leaves of $M_i$, so the weight is $MAST(M_i, S_i(y))$.
 
 \subsubsection{Red Edge Weight}
-Now let $y$ be the root of $N_j$, which we showed how to find in constant time. Since $y$ is a descendant of $x$ and the graphs and LWAMs are computed in order bottom the top, the LWAM of $G(y)$, has already been computed. In that computation, the LWAM containing only edges from $u_i$ and nodes following $u_i$ in $L(y)$ was also computed and translates to the MAST of $T_1(u_i)$ and $N_j$. The red edge weight is the size of that tree. We know that $u_i$ is in $L(y)$ since $M_i$ and $N_j = T_2(y)$ intersects.
+Now let $y$ be the root of $N_j$, which we showed how to find in constant time. Since $y$ is a descendant of $x$ and the graphs and LWAMs are computed in order bottom the top, the LWAM of $G(y)$, has already been computed. In that computation, the LWAM containing only edges from $u_i$ and nodes following $u_i$ in $L(y)$ was also computed and corresponds to the MAST of $T_1(u_i)$ and $N_j$. The red edge weight is the size of that tree. We know that $u_i$ is in $L(y)$ since $M_i$ and $N_j = T_2(y)$ intersects.
 
 \section{Agreement Matchings}
-\todo{Describe how to create the agreement matchings}\\
-\todo{Describe how and why a LWAM corresponds to a MAST}
-\todo{Describe definitions: nsav, ...}
 
 \subsection{Definitions}
 We will start by describing some definitions used in agreement matchings.
@@ -187,7 +186,20 @@ For two edges $(a,b)$ and $(a',b')$ in $G(x)$, we will say they 'cross' if $a$ i
 \subsubsection{Agreement Matchings}
 In the graph $G(x)$, a 'Proper Crossing' is either a single red edge, a single green edge or a crossing of a red edge $(u_i,v_j)$ and a green edge $(u_i',v_j')$ where $u_i'$ is above $u_i$ in $L(x)$.
 
-Now an agreement matching can be defined as a proper crossing and zero or more white edges, where all white edges dominate the edge(s) in the proper crossing and no white edge touches any other edge in the matching.
+Now an agreement matching is defined as a proper crossing and zero or more white edges, where all white edges dominate the edge(s) in the proper crossing and no white edge touches any other edge in the matching.
+
+This way of defining an agreement matching makes sure that a largest weight agreement matching holds all the information needed to uniquely determine a corresponding maximum agreement subtree. 
+
+\subsection{Agreement Matchings and MASTs}
+Consider the two trees $T_1$ and $T_2$ giving the graph $G(x)$ for the topmost node $x$ in a centroid path $\pi(x)$ of $T_2$. $T_1$ has the centroid path $\pi$. For each multiedge $e = (u_i, v_j), u_i \in L(x), v_j \in R(x)$ of $G(x)$, the white edge of $e$ corresponds to the tree $MAST(M_i, N_j)$, the green edge of $e$ corresponds to $MAST(M_i, T_2(v_j))$ and the red edge of $e$ corresponds to $MAST(T_1(u_i), N_j)$. Since the weight of each edge in $G(x)$ is the size of its corresponding tree, the largest weight agreement matching gives the set of trees, satisfying the conditions for a matching, with the maximum number of leaves. These trees will be sidetrees on a path in the MAST between $T_1$ and $T_2(x)$.
+
+Consider two MASTs bewteen sidetrees of $\pi$ and $\pi(x)$; $MAST(M_i, N_j)$ and $MAST(M_i', N_j')$, where $u_i$ is above $u_i'$ in $\pi$. In order for both of these trees to be in $MAST(T_1, T_2(x))$, $v_j$ must be above $v_j'$ in $\pi(x)$. This condition is exactly what is captured in the agreement matching by not letting white edges touch.
+
+$MAST(T_1, T_2(x))$ can also contain the trees $MAST(M_i, T_2(v_j))$ and/or $MAST(T_1(u_i), N_j)$ for some $u_i \in \pi, v_j \in \pi(x)$. This is captured by the green and red edges in the agreement matching respectively. In order for $MAST(M_i, T_2(v_j))$ to be in $MAST(T_1, T_2(x))$, no other subtree in $MAST(T_1, T_2(x))$ can contain a leaf from $T_2(v_j)$ which is why an agreement matching can only contain a single green edge and no other edge can be incident on a node in $R(x)$ below the node in $R(x)$ incident on the green edge. Similarly, since $MAST(T_1(u_i), N_j)$ can only be in $MAST(T_1, T_2(x))$ if no other subtree in $MAST(T_1, T_2(x))$ contains a leaf from $T_1(u_i)$, a matching can only contain a single red edge and no other edge can be incident on a node in $L(x)$ below the node in $L(x)$ incident on the red edge. This also means that a red and a green edge may be crossing.
+
+For trees $MAST(M_i, N_j)$ and $MAST(M_i', T_2(v_j'))$, $v_j$ must be above $v_j'$ in $\pi(x)$, so $u_i$ also needs to be above $u_i'$ in $\pi$ meaning that the white edges in an agreement matching must be above the green edge. For a similar reason, the white edges must also be above the red edges.
+
+Finally two different edges in an agreement matcing can not be incident on the same node, since this would result in two different sidetrees in $MAST(T_1, T_2(x))$ while one of $T_1$ and $T_2$ only has one sidetree for the same leaves.
 
 \subsection{The Weighted Search Tree}
 For each matching graph $G(x)$, we need to create a weight balanced binary search tree $\mathcal{T}$ from the nodes in $R(x)$. Each node $v_j$ will be a leaf in $\mathcal{T}$ with weight $n_j + \frac{|T(x)|}{nsav(x)}$ if a non-singleton edge in $G(x)$ has endpoint in $v_j$ and weight $n_j$ otherwise.
@@ -273,18 +285,25 @@ Next, we process the red and green edges incident on $u_i$ in order, starting fr
 \subsubsection{Extracting the Largest Weight Agreement Matchings}
 First, we need to compute the LWAM containing only edges from $u_i$ and nodes below $u_i$ in $L(x)$, for each $u_i \in L(x)$. For any $u_i \in L(x)$, all the information needed to compute such a matching is stored at the root $r$ of $\mathcal{T}$ after having processed the edges incident on $u_i$ and before processing edges incident on the above nodes in $L(x)$. The LWAM is extracted in the following way:
 
-If the LWAM contains a white edge it is simply given by $m(r)$. If the LWAM is a proper crossing, but not a single red edge, it is given by $x(r)$. And finally, if the LWAM is a single red edge, it is given by $r(r)$. Therefore the LWAM is the heaviest of these three matchings.
+If the LWAM contains a white edge it is simply given by $m(r)$. If the LWAM is a proper crossing, but not a single red edge, it is given by $x(r)$. And finally, if the LWAM is a single red edge, it is given by $r(r)$. Therefore the LWAM is the heaviest of these three matchings. This LWAM is saved, such that it can be retrieved in constant time given $u_i$ and $x$.
 
-For each $v_j \in R(x)$, we also need to compute the LWAM containing only edges incident on $v_j$ and nodes below $v_j$ in $R(x)$. For leaf $v_j \in R(x)$, such a matching will correspond to the MAST between $T_1$ and $T_2(v_j)$ which is the MAST that needs to be stored at $v_j \in T_2$. The LWAMs are extracted from $\mathcal{T}$, after all edges in $G(x)$ have been processed, in the following way:
+For each $v_j \in R(x)$, we also need to compute the LWAM containing only edges incident on $v_j$ and nodes below $v_j$ in $R(x)$. For leaf $v_j \in R(x)$, such a matching will correspond to the MAST between $T_1$ and $T_2(v_j)$, so this is the LWAM that needs to be stored at $v_j \in T_2$. The LWAMs are extracted from $\mathcal{T}$, after all edges in $G(x)$ have been processed, in the following way:
 
-For node $v_j \in R(x)$, let $l$ be the leaf in $\mathcal{T}$ corresponding to $v_j$ and let $LWAM(v_j)$ be the LWAM containing only edges incident on $v_j$ and nodes below $v_j$ in $R(x)$. $LWAM(v_j)$ is either equal to $LWAM(v_{j+1}), j \ne |R(x)|$ (-1?), or it is the LWAM having a white edge incident on $v_j$ as the topmost edge, or it is the largest proper crossing having a red edge incident on $v_j$, or it is a single green edge incident on $v_j$. Thus, $LWAM(v_j)$ is given by $max\{LWAM(v_{j+1}), m(l), y(l), max_{z \in anc(l)}g(z) + r(l), x(l)\}$ where $LWAM(v_{|R(x)|+1}) = 0$.
+For node $v_j \in R(x)$, let $l$ be the leaf in $\mathcal{T}$ corresponding to $v_j$ and let $M(v_j)$ be the LWAM containing only edges incident on $v_j$ and nodes below $v_j$ in $R(x)$. $M(v_j)$ is either equal to $M(v_{j+1}), j \ne |R(x)|$ (-1?), or it is the LWAM having a white edge incident on $v_j$ as the topmost edge, or it is the largest proper crossing having a red edge incident on $v_j$, or it is a single green edge incident on $v_j$. Thus, $M(v_j)$ is given by $max\{M(v_{j+1}), m(l), y(l), max_{z \in anc(l)}g(z) + r(l), x(l)\}$ where $M(v_{|R(x)|+1}) = 0$.
 
 \section{Creating the Maximum Agreement Subtrees}
+The last step of the algorithm is to construct the maximum agreement subtree from the LWAMs that have been computed.
+
 As mentioned earlier, a Largest Weight Agreement Matching constructed from the matching graph $G(x)$ corresponds to a Maximum Agreement Subtree between $T_1$ and $T_2(x)$. We will show how the MAST $\mathcal{A}$ can be constructed given the LWAM with white edges ${we_0, we_1, ...}$ and proper crossing with edges ${ge, re}$ or single edge $ge$ or $re$.
 
 Recall that a white edge $(u_i, v_j)$ corresponds to the subtree $MAST(M_i,N_j)$, a green edge corresponds to $MAST(M_i,T_2(v_j))$ and a red edge corresponds to $MAST(T_1(u_i),N_j)$. These subtrees will appear in $\mathcal{A}$ in the same order that the edges appear in the matching. $\mathcal{A}$ will have an internal node for each white edge which forms a path ${p_0, p_1, ...}$ through $\mathcal{A}$. These nodes will be in the same order that the white edges appear in the matching. The off-path child of node $p_i$ will then be the root of the subtree corresponding to edge $w_i$. The second off-path child $c$ of the last node in the path will hold the subtree(s) corresponding to the edge(s) in the proper crossing. If the proper crossing is a single edge, $c$ will be the root of the subtree corresponding to that edge. Otherwise $c$ will have two children, one being the root of the subtree corresponding to $ge$ and one being the root of the subtree corresponding to $re$.
 
-What we need now is to find the subtrees corresponding to the edges in the matching. All these subtrees have already been computed and is found in the same way as the edge weight were computed. \todo{store subtrees at edges??}.
+What we need now is to find the subtrees corresponding to the edges in the matching. All the LWAMs corresponding to these subtrees have already been computed and is found in the same way as the edge weights were found. \todo{store subtrees/matchings at edges??}. The subtrees can now be constructed recursively.
+
+\subsection{Challenges} \todo{Maybe a whole section for challenges?}
+Our first approach to construct the MAST for the two input trees, was to construct and save the MAST for each of the LWAMs created in the algorithm. When constructing the MAST for a LWAM, the subtrees corresponding to each edge had already been created and could be looked up in constant time. However, this gave rise to a runtime complexity of $O(n^2)$. Consider the tree in figure ?? \todo{base case tree}. If the input trees are identical with a structure as in the figure and with size $n$, the algorithm would create $n$ LWAMs with sizes $1, ..., n$ each of which should be used to construct a MAST. Constructing the MAST from a LWAM takes time linear w.r.t. to the size of the LWAM giving a total runtime of $O(n^2)$.
+
+Instead, we chose to only create and store the LWAMs in the algorithm and construct the final MAST recursively when having created every LWAM.
 
 
 
