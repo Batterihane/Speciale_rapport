@@ -1,0 +1,26 @@
+\chapter{Experiments}
+\section{The NLogN Algorithm}
+\subsection{Random Trees}
+In order to test the runtime of the algorithm, we ran the algorithm on randomly created trees of sizes $100, 200, ..., 80000$. For each tree size, we created five different pairs of trees which we tested the algorithm on and plotted the median runtime in the graph. By using the median value instead of the mean value, we avoid outliers affecting the graph. Such outliers could among other things be caused by the OS prioritizing other processes so ignoring these will give a more representative graph.
+
+The result of this test is seen in \todo{figure ??}. Since we expected the algorithm to have runtime $O(nLogn)$, we divided the runtime with $nlogn$ and the graph should be constant. However, this is not exactly what we see in the graph. There are three things to notice. First from size ~10000 to ~15000 the graph is growing, at size ~30000 and ~42000 the graph makes a sudden increase and afterwards decreases, and at ~80000 the graph again makes a sudden increase, but seems to keep increasing. A reason for this behavior could be that the runtime is affected by the garbage collector working while the program is running. The garbage collector used in the execution is the default collector for the JVM. This garbage collector pauses the program execution when collecting and therefore directly affects its runtime.
+
+We created a test to measure how much time was used by the garbage collector for each run of the algorithm. Again we created random trees of sizes $100, 200, ..., 80000$ and plotted the mean runtime of five runs for each tree size. Dividing the runtimes with $nLogn$ gave the graph shown in \todo{figure ??}. Here we see almost the exact same behaviour as for the runtime of the algorithm which indicates that the unexpected behaviour was all caused by the garbage collector and that the runtime of the algorithm is indeed $O(nLogn)$. 
+
+\todo{explain behaviour of GC - 'jumps' depend on amount of allocated memory}
+
+\subsection{Induced Subtrees}
+A requirement for the algorithm was that any tree $T$ can be preprocessed in $O(|T|)$ time, such that for any subset $L$ of its leaves, the subtree induced by $L$ can be computed in $O(|L|)$ time.
+
+In order to verify that this was satisfied, we created a test for the runtime of the preprocessing and two tests for the runtime of the computation of the induced subtrees.
+
+\subsubsection{Preprocessing}
+Since the preprocessing is done by simply traversing the input tree and preprocessing the tree for LCA queries (which we know is done in $O(|T|)$ time), the structure of the tree does not affect the runtime. We therefore tested the runtime for random trees of sizes between 1000 and 100000. Dividing the runtime with the size of the input tree gave the graph in \todo{figure ??} which indeed looks constant.
+
+\subsubsection{Inducing}
+To verify that the runtime is not affected by the size of the tree, we tested the runtime for random trees of sizes between 1000 and 100000 and a constant number of input leaves. The test result is plotted in the graph in \todo{figure ??}.
+
+To verify that the runtime is linear w.r.t. the number of input leaves, we tested the runtime for a tree of size 100000 and input leaves of sizes between 100 and 100000. Dividing the runtime with the number of input leaves gave the graph in \todo{figure ??}.
+
+
+
