@@ -12,7 +12,10 @@
 \usepackage[labeled]{multibib}
 \usepackage{color}
 \usepackage{datetime}
-\usepackage{epstopdf} 
+\usepackage{epstopdf}
+
+\usepackage{graphicx}
+\graphicspath{ {images/} }
 
 \usepackage{amsmath}
 \usepackage{algorithm}
@@ -104,11 +107,8 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\chapter{\todo{\dots}}
-\label{ch:main}
-
-\todo{example of a citation to primary literature: \citeA{nsquared},
-and one to secondary literature: \citeB{lazypropagation2010}}
+% Implementation
+\input{./Chapters/Implementation.tex}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -124,6 +124,11 @@ and one to secondary literature: \citeB{lazypropagation2010}}
 
 % NAIVE
 \input{./Chapters/Naive.tex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Experiments
+\input{./Chapters/Experiments.tex}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
