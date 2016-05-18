@@ -1,5 +1,5 @@
 \chapter{The NLogN algorithm}
-In this chapter we will walk through the $O(nlogn)$ algorithm for the MAST problem described in the paper \cite{nlogn} by Cole et. al. We will give a detailed description of each step of the algorithm and our process of implementing it.
+In this chapter we will walk through the $O(nlogn)$ algorithm for the MAST problem described in the paper \cite{nlogn} by Cole et. al. We will give a detailed description of each step of the algorithm and analyse the time complexity.
 
 \section{Definitions and Notations}
 \subsubsection{Trees}
@@ -143,9 +143,9 @@ When having computed the $S_i$ subtrees, we can recursively construct the larges
 After having constructed the LWAMs for $M_i$ and $S_i$, each node $v$ of $S_i$ will hold the LWAM and its weight (the size of the MAST) for $M_i$ and the subtree $S_i(v)$. We will explain later how this is done.
 
 \subsection{Time Complexity}
-Given that each recursive call $computeLWAM(M_i, S_i)$ has time complexity $O(m_ilogm_i)$, we can show that the total time complexity of the algorithm is $O(nlogn)$.
+Given that each recursive call $computeLWAM(M_i, S_i)$ has time complexity $O(m_ilogm_i)$, we can show that the total time complexity of recursively constructing the LWAMs is $O(nlogn)$.
 
-For the two input trees $T_1$ and $T_2$, we recursively create LWAMs for each pair $(M_i, S_i)$ of size $m_i, 1 \le i \le p-1$. Each recursive call takes $O(m_ilogm_i)$ time and since $\sum_{i=1}^p m_i = n$, the total runtime is $O(nlogn)$.
+For the two input trees $T_1$ and $T_2$, we recursively create LWAMs for each pair $(M_i, S_i)$ of size $m_i, 1 \le i \le p-1$. Each recursive call takes $O(m_ilogm_i)$ time and since $\sum_{i=1}^p m_i = n$, we get $O(\sum_{i=1}^{p-1} m_ilogm_i) \le O(\sum_{i=1}^{p-1} m_ilogn) = O((\sum_{i=1}^{p-1} m_i)logn) = O(nlogn)$. So the runtime is limited by $O(nlogn)$.
 
 \section{Matching Graphs}
 The next step of the algorithm is to compute the matching graphs. A graph is created for each path in the centroid decomposition for $T_2$, in order bottom to top. Such a graph consists of an amount of edges between two sets of nodes.
@@ -356,7 +356,7 @@ After having computed the LWAMs for all matching graphs, the LWAM corresponding 
 \subsubsection{Time Complexity}
 A search tree $\mathcal{T}$ is created such that a leaf $v_j$ has weight $n_j + \frac{|T_2(x)|}{nsav(x)}$ if a non-singleton edge in $G(x)$ has endpoint in $v_j$ and weight $n_j$ otherwise. Balancing the tree with these weights ensures that searching for a leaf $v_j$ in $\mathcal{T}$ takes $O(log\frac{|T_2(x)|}{n_j})$ time, and searching for an ordered subset of $k$ leaves in $\mathcal{T}$ takes $O(k*log \dfrac{nsav(x)}{k})$ time. Processing a node $u_i \in L(x)$ for a matching graph $G(x)$ is done by searching for the leaves in $\mathcal{T}$ that corresponds to the nodes in $R(x)$ incident on edges from $u_i$. Processing an edge $(u_i, v_j)$ after having found the leaf $l \in \mathcal{T}$ corresponding to $v_j$ is simply done by iterating through one or more of $anc(l), lfringe(l)$ and $rfringe(l)$, doing constant time operations on the nodes. Given the time taken to search for leaves in $\mathcal{T}$, it can be proved that the total time taken to process each node $u_i \in \pi$ over all matching graphs is $O(m_ilog\dfrac{n}{m_i})$. The analysis giving these results can be found in \cite{nlogn}. Extracting the LWAM for edges from $u_i$ and nodes below $u_i$ in $L(x)$, for each $u_i \in L(x)$ takes constant time after having processed $u_i$. Extracting the LWAM for edges from $v_j$ and nodes below $v_j$ in $R(x)$, for each $v_j \in R(x)$ is done through a single traversal of $\mathcal{T}$ in $O(|R(x)|)$ time. This means that the total time for computing the largest weight agreement matchings is $O(\sum_{i=1}^p m_ilog\dfrac{n}{m_i}) \le O(nlogn)$.
 
-\section{Creating the Maximum Agreement Subtrees}
+\section{Creating the Maximum Agreement Subtree}
 The last step of the algorithm is to construct the maximum agreement subtree from the LWAMs that have been computed.
 
 As mentioned earlier, the Largest Weight Agreement Matching constructed from a matching graph $G(x)$ corresponds to the Maximum Agreement Subtree between $T_1$ and $T_2(x)$. We will show how the MAST $\mathcal{A}$ can be constructed given the LWAM with white edges ${we_1, we_2, ...}$ and proper crossing with edges ${ge, re}$ or single edge $ge$ or $re$ (See figure \ref{lwam_mast_figure}).
@@ -434,23 +434,23 @@ Initially, the first two numbers of $L$ is added to $I$. For every other number 
 \todo{explain each case?}
 
 \section{LCA}
-A requirement for the algorithm is that any tree $T$ can be preprocessed in $O(|T|)$ time such that the Least Common Ancestor of any two leaves in $T$ can be computed in constant time. Gusfield \todo{ref "Algorithms on String, Trees and Sequences"} explains how this can be done and our implementation directly follows this approach.
-
-One thing to mention is that our implementation assumes that bit operations on numbers up to O(logn) bits can be done in constant time. \todo{Explain why this is a fair assumption}
+A requirement for the algorithm is that any tree $T$ can be preprocessed in $O(|T|)$ time such that the Least Common Ancestor of any two leaves in $T$ can be computed in constant time. Gusfield \todo{ref "Algorithms on String, Trees and Sequences"} explains in detail an algorithm for how this can be done. Our implementation directly follows this approach.
 
 \section{Time Complexity}
+Throughout this chapter, we explained the runtime of each step of the algorithm. Since each step satisfies the time complexity of $O(nlogn)$ and there is a constant number of steps, the total runtime of the algorithm is $O(nlogn)$. Table \ref{runtimeTable} gives an overview.
 \begin{table}[]
 	\centering
-	\label{runtimeTable}
 	\begin{tabular}{l|l}
 		Creating Centroid Decompositions & O(n)     \\
 		Inducing Subtrees                & O(n)     \\
+		Construct LWAMs recursively		 & O(nlogn) \\
 		Creating Matching Graphs         & O(nlogn) \\
 		Computing LWAMs                  & O(nlogn) \\
 		Creating the MAST                & O(n)     \\ \hline
 		Total                            & O(nlogn)
 	\end{tabular}
 	\caption{Runtime}
+	\label{runtimeTable}
 \end{table}
 
 \section{Space Consumption}
