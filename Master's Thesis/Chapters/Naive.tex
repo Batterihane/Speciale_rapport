@@ -1,5 +1,98 @@
 \chapter{The Naive algorithm}
+The MAST problem is not inherently hard to solve since a quite simple, although slow, algorithm can quickly be constructed. The naive solution to the problem is to run through all possible subsets of leaves, inducing the two resulting subtrees for the leaf subset in question and recording the largest existing agreement subtree seen. In other words, we simply look through all possible soltutions and pick the largest one. In order to do so, one must find a reasonably elegant way of iterating through all subsets of leaves, and a way of comparing two induced subtrees to see if they structurally agree over a given leafset. 
+\\
+\\
+We chose to represent a leaf subset as a bitstring, where each bit is dedicated to one specific leaf. The value of the bit naturally denotes if the leaf in question is included in the subset or not. By representing a subset as a bitstring, we can run through all possible subsets by starting with the bitstring of all zeros, $0_10_20_3...0_n$, and incrementing it for each new subset needed until we reach the bitstring of all ones, $1_11_21_3...1_n$. The pseudo code for the naive algorithm can be seen in Figure \ref{Code:Naive1}, where the tree pruning and comparison can be seen in the following subsections.
 
-In order to verify the correctness of our implementations of the algorithms, we implemented a naive algorithm to compute the MAST of two trees in a simple matter. The algorithm tries all possible combinations of leaves to prune from the two trees and picks the one giving the largest agreement subtree.
+\begin{figure}
+	\begin{lstlisting}[language=Java, mathescape]
+	Function NaiveMast(Tree1, Tree2){
+	  n = Tree1.size;  //number of leaves
+	  largestMastSoFar = 0;
+	  mast = null;
+	  
+	  forall subset = $0_00_1...0_n$ to $1_01_1...1_n$ {
+	    tree1Mast = Prune(Tree1, subset);
+	    tree2Mast = Prune(Tree2, subset);
+	    
+	    if(isIsomorphic(tree1Mast, tree2Mast) && 
+	       tree1Mast.size > largestMastSoFar) 
+	    {
+	      mast = tree1Mast;
+	      largestMastSoFar = tree1Mast.size;
+	    }
+	    
+	    return mast;
+	  }
+	}
+	\end{lstlisting}
+	\caption{Java pseudo code for The Naive Algorithm}
+	\label{Code:Naive1}
+\end{figure}
+One can improve this naive solution slightly by realizing that the parity of the subset bit string represents the size of the MAST, if the MAST indeed exists. This means that you can simply run through all possible values of the bitstring, but starting with the values of highest parity instead. The instant we find a value representing a possible MAST, we know that it is the largest possible. To keep the naive solution as simple as possible, we decided to refrain from implementing this small optimization.
 
-Since the number of possible combinations of leaves is exponential in the number of leaves, the runtime of this approach is at least exponential.
+As for the running time, we see that we have $2^n$ diffrent subsets, which makes the naive approach exponential. Pruning of a tree can be done in O(n), and checking for isomorphism can likewise be done in O(n). All in all, the complexity for the entire algorithm is $O(2n*2^n)=O(n2^n)$.  
+
+\subsection{Tree Pruning}
+Pruning is the act of removing a subset of nodes from a given tree and restoring the desired tree structure afterwards. In our case, where we deal with binary trees exclusively, we first remove the desired leaves, and then remove any redundant internal vertices. An internal vertex is deemed redundant when it has a degree different from 3 (the root being an exception). An example pruning can be seen in Figure \ref{Fig:Pruning1}, where internal vertices D,F and G have been removed. 
+Our pruning algorithm can be seen in Figure \ref{Code:Prune1}, where the sibling of a given node simply denotes the other child of the parent.
+
+\begin{figure}
+	\begin{itemize}
+		\setlength\itemsep{3em}
+		\item[] \Tree [.A [.B [.C leaf_1 leaf_2 ] [.D leaf_3 leaf_4 ] ].B [.E [.F leaf_5 leaf_6 ] [.G leaf_7 leaf_8 ] ].E ].A
+		
+		\item[] \Tree [.A [.B [.C leaf_1 leaf_2 ] leaf_4 ].B [.E leaf_6 leaf_8 ].E ].A
+	\end{itemize}	
+	
+	\caption{Pruning of the topmost tree according to bitstring 11010101}
+	\label{Fig:Pruning1}	
+\end{figure}
+
+
+\begin{figure}
+	\begin{lstlisting}[language=Java, mathescape]
+	Function Prune(Tree1, subset){
+	  result = Tree1;
+	
+	  forall (leaf: leaves in Tree1) {
+	    if(leaf $\in$ subset) {
+	      parent = leaf.getParent();
+	      
+	      if(parent is the tree root) {
+	        result = Tree1.getSibling(leaf);     
+	      }
+	      else
+	        /*make the leaf sibling a child of
+	          the leaf grandparent */
+	    }
+	  }
+	  return result; 
+	}  
+	\end{lstlisting}
+	\caption{Java pseudo code for Tree Pruning}
+	\label{Code:Prune1}
+\end{figure}
+
+
+\subsection{Tree Comparison}
+For each of the subsets in Figure \ref{Code:Naive1}, we have to ensure that the induced subtrees agree in the sense that they are isomorphic. The definition of isomorphism in this case can be seen in Definition 1 below.
+
+\newtheorem{definition}{Definition}
+\begin{definition}
+	We say that two binary trees are isomorphic if they depict the same ancestral relationships. This is true exactly when there exists a mapping M, $T_1 \rightarrow T_2$, such that \\
+	$\forall L_{1.1}, L_{1.2} \in \{ x | x \in T_1 \bigwedge Type(x)=Leaf \}$, \\ $\forall L_2 \in \{ y | y \in T_1 \bigwedge Type(y)=Leaf \}$
+	\begin{itemize}
+		\item if $L_1 = L_2 : M(L_1)=L_2$
+		
+		\item if $L_{1.1} \neq L_{1.2} : M(lca_{T_1}(L_{1.1}, L_{1.2})) = lca_(T_2)(M(L_{1.1}), M(L_{1.2})$
+	\end{itemize}
+	Intuitively, such a mapping is possible when you are able to obtain one tree from the other by swapping the order of children of any given internal node.  
+\end{definition}
+
+A simple solution to checking for isomorphism is through a base case and a recursive case. The base case simply checks if two leaves are the same, whereas the recursive case makes the recursive calls for all four combinations of subtrees for two given internal nodes, creating two cases; one case that handles when children are swapped, and one that handles when they are not. 
+
+
+
+
+
