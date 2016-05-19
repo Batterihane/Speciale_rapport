@@ -7,8 +7,40 @@ Goddard et. al.\cite{nsquared} describes a $O(n^2)$ algorithm for finding the la
 	\#$(T_a,T_x)$,
 	\#$(T_a,T_y)$,
 	\#$(T_b,T_w)$,
-	\#$(T_c,T_w)$
+	\#$(T_c,T_w)$.\\
+	\textbf{Proof.}\\
+	This is a proof by case over the possible subtrees contributing to the agreement subtree for $T_a$ and $T_w$, $A_{aw}$.\\
+	\underline{Case 1}: Only $T_b$ contributes to $A_{aw}$.
+	If this is the case, then the agreement subtree can only exist between $T_b$ and $T_w$, \#$(T_b,T_w)$.\\
+	\underline{Case 2}: Only $T_c$ contributes to $A_{aw}$.
+	If this is the case, then the agreement subtree can only exist between $T_c$ and $T_w$,
+	\#$(T_c,T_w)$.\\
+	\underline{Case 3}: Only $T_x$ contributes to $A_{aw}$.
+	If this is the case, then the agreement subtree can only exist between $T_x$ and $T_a$,
+	\#$(T_a,T_x)$.\\
+	\underline{Case 4}: Only $T_y$ contributes to $A_{aw}$.
+	If this is the case, then the agreement subtree can only exist between $T_y$ and $T_a$,
+	\#$(T_a,T_y)$.\\
+	\underline{Case 5}: Only $T_y$ contributes to $A_{aw}$.
+	If this is the case, then the agreement subtree can only exist between $T_y$ and $T_a$,
+	\#$(T_a,T_y)$.
+	
+	  
 \end{Lemma}
+
+\begin{figure}
+	\begin{enumerate}
+		
+		\item[]  \Tree [.r [.s b' c' ].s [.t f ].t ].r
+		\hskip 0.4in
+		 \Tree [.a [.b b' f ].b [.c c' ].c ].a
+		
+	\end{enumerate}	
+	
+	\caption{Two example binary trees for, and they resulting MAST}
+	\label{Fig:Binary1}	
+\end{figure}
+
 
 What Lemma 1 essentially states is twofold. First, if the MAST contains children from all subtrees (a,b,x,y), then its size is given by the largest combination of these. Secondly, if the MAST does not include all subtrees, then its size is given by the largest combination of subtrees excluding at least one of them.    
 This gives rise to a recursive solution for finding the size of the maximum agreement subtree. The recursive function is defined as follows: 
@@ -174,28 +206,8 @@ Java inspired pseudo-code for the backtracking algorithm can be seen in Figure \
 	\label{Code:Backtracking1}
 \end{figure}	
 
-
+\section{Evaluation}
+All in all, the $O(n^2)$ algorithm is fairly simple to implement and understand, but it also has its practical limitations when working with large trees. As we will see in the testing section, the algorithm starts having trouble with binary trees of size \todo{size?} in terms of time and memory consumption. The main problem with the algorithm is that is considers too many combinations of subtrees that end up being irrelevant. Effectively most of the time spent filling out the size table is wasted. In our previous example of filling out the size table of 225 cells, only 11 cells ended up ultimately having an impact on the produced MAST. The $O(nlogn)$ algorithm that we are about to examine improves on the 'wasted' work by only considering more relevant information between subtrees.
   
 
-
-
-
-\section{Discussion?}
-\todo{forrester, parsing, newick and so on. Guide on how to run it, recursive vs iterative, memory constrains, realistic tree sizes, problems with the algorithm overall}
-
-We implemented the algorithm in java using the forrester \cite{?} library to represent and display the trees. The correctness of our algorithm was confirmed by comparing the results to that of the naive algorithm, which in turn was verified by hand. We have made a test suite of binary trees to ensure that we can reproduce results, and so that we include not only representations of the average balanced binary trees, but also worst and best case trees. However, for this specific algorithm, the topology of the trees do not matter since we are required to fill out the $O(n^2)$ table regardless.\\
-\fbox{%
-	\begin{minipage}{5.1 in}
-		\textbf{How to Run}
-		
-		\begin{itemize}
-			\item *link to github dl*
-			\item *open cmd from this folder*
-			\item *Type ... with argument X and Y for this algorithm *
-			\item *
-		\end{itemize}
-	\end{minipage}}
- 
-show some trees outputte from the program. 
-
-\todo{\dots}
+\todo{\dots show some trees output from the program?}
