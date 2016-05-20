@@ -288,16 +288,21 @@ where $A$ and $B$ are constants. This function can be proven to grow at most lin
 
 \subsubsection{Searching}
 \label{st_searching}
-In the final tree, each node $v$ will hold an index number $index(v)$. Searching for the leaf created from $v_j$, with index number $i$, in $\mathcal{T}$ is done in the standard way by starting at the root and picking the left child if $i < the current node index$, and the right child otherwise until reaching the desired leaf.
+In order to minimize the runtime when searching for leaves in the search tree, we will specify how two kinds of searches should be performed.
+
+In the final tree, each node $v$ will hold an index number $index(v)$. Searching for a leaf in $\mathcal{T}$ with index number $i$, is done in the standard way by starting at the root and picking the left child if $i < the$ $current$ $node$ $index$, and the right child otherwise until reaching the desired leaf.
 
 Each node $v$ will also hold the lowest index number $low(v)$ and largest index number $high(v)$ in its subtree, which is used when searching for an ordered subset of $R(x)$. These numbers are added while creating the tree. For the root $r$, $low(r)$ is 0 and $high(r)$ is $|R(x)|-1$. For a left child $v$, $low(v)=low(parent(v))$ and $high(v)=index(parent(v))-1$. For a right child $v$, $low(v)=index(parent(v))$ and $high(v)=high(parent(v))$.
 
-Given the subset ${v_i, ..., v_j}$ of $R(x)$ in bottom to top order, let ${index(v_i), ..., index(v_j)}$ be the corresponding indices. Searching for the leaves with these indices in $\mathcal{T}$ is done by first searching for the leaf $l$ with index $index(v_i)$ in the standard way. Then search for the leaf with index $index(v_{i+1)}$ by starting at $l$ and go up through the tree until reaching a node whose lowest index number is less than $index(v_{i+1)}$. The leaf with index $index(v_{i+1)}$ is now found by searching in the standard way starting at the node just reached. Given a subset of $R(x)$ in top to bottom order, searching for the corresponding leaves in $\mathcal{T}$ is done similarly, but using the largest index numbers instead of the lowest.
+Given the subset ${v_i, ..., v_j}$ of $R(x)$ in bottom to top order, let ${index(v_i), ..., index(v_j)}$ be the corresponding indices. Searching for the leaves with these indices in $\mathcal{T}$ is done with a sequential search by first searching for the leaf $l$ with index $index(v_i)$ in the standard way. Then search for the leaf with index $index(v_{i+1)}$ by starting at $l$ and go up through the tree until reaching a node whose lowest index number is less than $index(v_{i+1)}$. The leaf with index $index(v_{i+1)}$ is now found by searching in the standard way starting at the node just reached. Given a subset of $R(x)$ in top to bottom order, searching for the corresponding leaves in $\mathcal{T}$ is done similarly, but using the largest index numbers instead of the lowest.
+
+\subsubsection{Properties of the Search Tree}
+A search tree $\mathcal{T}$ is created such that a leaf $l$ corresponding to $v_j \in R(x)$ has weight $n_j + \frac{|T_2(x)|}{nsav(x)}$ if a non-singleton edge in $G(x)$ has endpoint in $v_j$ and weight $n_j$ otherwise. Balancing the tree with these weights ensures that the depth of any leaf $l$ corresponding to node $v_j \in R(x)$ is $O(log\frac{|T_2(x)|}{n_j})$. When searching for an ordered subset of $k$ leaves in $\mathcal{T}$ as specified in the previous section, the structure of $\mathcal{T}$ also ensures that the number of nodes visited is $O(k*log \dfrac{nsav(x)}{k})$. The reasoning behind these claims can be found in \cite{nlogn}.
 
 \subsection{Computing the Largest Weight Agreement Matchings}
-Computing the LWAM for the graph $G(x)$ is done by processing each node of $L(x)$ in order starting with the bottom node. For each node $u_i \in L(x)$, we process each edge incident on it. Recall that we will compute the LWAM containing only edges from $u_i$ and nodes below $u_i$ in $L(x)$, for each $u_i \in L(x)$. This is done by maintaining all that information in $\mathcal{T}$ while processing the nodes of $L(x)$.
+Computing the LWAM for the graph $G(x)$ is done by processing each node of $L(x)$ in order starting with the bottom node. Recall that we will compute the LWAM containing only edges from $u_i$ and nodes below $u_i$ in $L(x)$, for each $u_i \in L(x)$. This is done by adding that information to $\mathcal{T}$ while processing the nodes of $L(x)$. 
 
-First, we will describe the information that needs to be stored in $\mathcal{T}$. Next, we will show how to process each colour edge and afterwards explain the order that the edges need to be processed in. Then we will show how to extract the LWAMs from $\mathcal{T}$ and finally explain the total time complexity of this step.
+First, we will describe the information that needs to be stored in $\mathcal{T}$. Next, we will explain how nodes are processed and show how to process each colour edge and afterwards explain the order that the edges need to be processed in. Then we will show how to extract the LWAMs from $\mathcal{T}$ and finally explain the total time complexity of this step.
 
 \subsubsection{Auxiliary Information in $\mathcal{T}$}
 While processing the edges of $G(x)$ we will maintain information at each node of $\mathcal{T}$ about the LWAM of the currently processed edges. For a node $z \in \mathcal{T}$, we define $anc(z)$ as the set of ancestors of $z$, including $z$ itself in order top to bottom. $lfringe(z)$ is defined as the left children of the vertices in $anc(z)$ which are not in $anc(z)$ themselves. $lfringe$ will only contain nodes with indices less than $index(z)$. $rfringe(z)$ is defined analogously where the nodes all have indices greater or equal to $index(z)$. $anc(z)$ need not be stored in $\mathcal{T}$, but can be created while searching for $z$ in $\mathcal{T}$. Likewise, $lfringe(z)$ and $rfringe(z)$ can be created by iterating through $anc(z)$. After processing an edge $(u,v)$, we say that the edge is in $\mathcal{T}$. For a node $z \in \mathcal{T}$ we also say that $(u,v)$ is in $T(z)$ if $T(z)$ contains the node corresponding to $v$.
@@ -308,11 +313,14 @@ The following information is maintained at each vertex $z \in \mathcal{T}$. This
 	\subitem However, $g(z)$ is not maintained at all times, but the correct edge can be retrieved from $max_{z' \in anc(z)}g(z')$.
 	\subitem If there are no red edges in $\mathcal{T}(z)$ when updating $g(z)$, then $g(z)$ will be the heaviest green edge in $\mathcal{T}(z')$, for all $z' \in rfringe(z)$.
 	\item $x(z)$: This is the largest weight proper crossing, that is not a single red edge, among the edges in $\mathcal{T}(z)$.
-	\item $m(z)$: This is largest weight agreement matching containing a white edge
+	\item $m(z)$: This is the largest weight agreement matching containing a white edge
 	such that the topmost white edge is in $\mathcal{T}(z)$.
 	\item $y(z)$: This the largest weight proper crossing, which is not a single edge, such that the green edge is in $\mathcal{T}$ but not in $\mathcal{T}(z)$, the red edge is in $\mathcal{T}(z)$, and the green edge does not form a proper crossing with all the red edges in $\mathcal{T}(z)$.
 	\item $r(z)$: This is simply the heaviest red edge in $\mathcal{T}(z)$.
 \end{itemize}
+
+\subsubsection{Processing Nodes}
+For each node $u_i \in L(x)$, starting from the bottommost, we need to process each edge $e = (u_i, v_j)$ incident on it. This is done by searching for the leaf corresponding to $v_j$ in $\mathcal{T}$ and updating information at nodes in $\mathcal{T}$ so that $e$ is contained in $\mathcal{T}$. Leaves are searched for as described in section \ref{st_searching}, where a standard search is used if $d_x(u_i) = 1$ and a sequential search is used if $d_x(u_i) > 1$.
 
 In the following, we will explain how each colour edge is processed. Let $e=(u_i,v_j)$ be the edge in $G(x)$ that should be processed and $l$ be the leaf in $\mathcal{T}$ corresponding to $v_j$. We know that all edges incident on nodes below $u_i$ in $L(x)$ have already been processed.
 
@@ -329,7 +337,9 @@ The only values that might change in $\mathcal{T}$ when adding a white edge is $
 	This matching is given by $max_{z \in rfringe(l)} y(z)$
 \end{itemize}
 
-These cases cover all possible LWAMs, so the LWAM containing only edges incident on nodes below $u_i$ in $L(x)$ and nodes below $v_j$ in $R(x)$ must be the largest.
+These cases cover all possible LWAMs containing only edges dominated by $e$, so adding $e$ as the topmost white edge to the largest of these agreement matchings, gives us the LWAM that should replace $m(z), z \in anc(l)$ if it has larger weight than the agreement matching already stored.
+
+In order to avoid copying the agreement matching just found, which would take linear time w.r.t. the number of edges, the new agreement matching can be stored as the white edge $e$ and a pointer to the other agreement matching. This will also minimize the amount of space needed.
 
 \subsubsection{Processing red edges}
 The values that might change in $\mathcal{T}$ when adding a red edge is $y(z), g(z)$ and $r(z), z \in anc(l)$. Since none of the green edges in $\mathcal{T}$ can form a proper crossing with $e$, $y(z)$ might change for $z \in anc(l)$. So $y(z)$ is updated to $max{y(z), (max_{z' \in anc(z)} g(z')) + r(z)}$. Now $g(z)$ should be reset for all $z \in anc(l)$. However, in order to maintain all $g$ values in $\mathcal{T}$, $g(y)$ needs to be updated to $max_{y' \in anc(y)} g(y')$ for each $y \in lfringe(l)$ and $y \in rfringe(l)$ before resetting. Finally, $r(z)$ need to be updated for $z \in anc(l)$ if the weight $wt(e)$ of the new edge is greater than that the current value of $r(z)$. $r(z)=max{r(z), wt(e)}$.
@@ -354,7 +364,13 @@ For node $v_j \in R(x)$, let $l$ be the leaf in $\mathcal{T}$ corresponding to $
 After having computed the LWAMs for all matching graphs, the LWAM corresponding to the MAST between $T_1$ and $T_2$ can be retrieved in constant time from the root $u_1$ of $T_1$ and the root $v_1$ of $T_2$. This was extracted from the search tree for the matching graph $G(v_j)$ and is the LWAM containing edges from $u_1$ and nodes below $u_1$ in $L(v_j)$ which is all possible edges and therefore corresponds to the MAST between $T_1$ and $T_2$.
 
 \subsubsection{Time Complexity}
-A search tree $\mathcal{T}$ is created such that a leaf $v_j$ has weight $n_j + \frac{|T_2(x)|}{nsav(x)}$ if a non-singleton edge in $G(x)$ has endpoint in $v_j$ and weight $n_j$ otherwise. Balancing the tree with these weights ensures that searching for a leaf $v_j$ in $\mathcal{T}$ takes $O(log\frac{|T_2(x)|}{n_j})$ time, and searching for an ordered subset of $k$ leaves in $\mathcal{T}$ takes $O(k*log \dfrac{nsav(x)}{k})$ time. Processing a node $u_i \in L(x)$ for a matching graph $G(x)$ is done by searching for the leaves in $\mathcal{T}$ that corresponds to the nodes in $R(x)$ incident on edges from $u_i$. Processing an edge $(u_i, v_j)$ after having found the leaf $l \in \mathcal{T}$ corresponding to $v_j$ is simply done by iterating through one or more of $anc(l), lfringe(l)$ and $rfringe(l)$, doing constant time operations on the nodes. Given the time taken to search for leaves in $\mathcal{T}$, it can be proved that the total time taken to process each node $u_i \in \pi$ over all matching graphs is $O(m_ilog\dfrac{n}{m_i})$. The analysis giving these results can be found in \cite{nlogn}. Extracting the LWAM for edges from $u_i$ and nodes below $u_i$ in $L(x)$, for each $u_i \in L(x)$ takes constant time after having processed $u_i$. Extracting the LWAM for edges from $v_j$ and nodes below $v_j$ in $R(x)$, for each $v_j \in R(x)$ is done through a single traversal of $\mathcal{T}$ in $O(|R(x)|)$ time. This means that the total time for computing the largest weight agreement matchings is $O(\sum_{i=1}^p m_ilog\dfrac{n}{m_i}) \le O(nlogn)$.
+Searching for a single leaf corresponding to $v_j \in R(x)$ takes $O(log\frac{|T_2(x)|}{n_j})$ time since that is the depth of the leaf and searching for an ordered subset of $k$ leaves takes $O(k*log \dfrac{nsav(x)}{k})$ time since that is the amount of nodes visited using sequential search and each node is visited at most twice.
+
+Since updating information in $\mathcal{T}$ is only done at the nodes visited when searching, and children of these nodes, and updating a node takes constant time, the time complexity is the same as for searching.
+
+In \cite{nlogn}, an analysis shows that the total time taken to process each node $u_i \in \pi$ over all matching graphs is actually $O(m_ilog\dfrac{n}{m_i})$.
+
+Extracting the LWAM for edges from $u_i$ and nodes below $u_i$ in $L(x)$, for each $u_i \in L(x)$ takes constant time after having processed $u_i$. Extracting the LWAM for edges from $v_j$ and nodes below $v_j$ in $R(x)$, for each $v_j \in R(x)$ is done through a single traversal of $\mathcal{T}$ in $O(|R(x)|)$ time. This means that the total time for computing the largest weight agreement matchings is $O(\sum_{i=1}^p m_ilog\dfrac{n}{m_i}) \le O(nlogn)$.
 
 \section{Creating the Maximum Agreement Subtree}
 The last step of the algorithm is to construct the maximum agreement subtree from the LWAMs that have been computed.

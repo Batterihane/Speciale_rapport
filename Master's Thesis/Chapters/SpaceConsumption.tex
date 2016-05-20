@@ -1,5 +1,40 @@
 As we will later explain from our experiments \todo{ref}, it turns out that the amount of space used by the algorithm is an important factor for the runtime when running the algorithm in practice. We will therefore in this section try to get an overview of how much space is needed by the algorithm. (and whether it can be reduced?)
 
-We will walk through each step of the algorithm and give an analysis of the amount of space needed by that step.
+We will walk through each step of the algorithm and give an analysis of the amount of space that is needed.
 
 \subsection{Centroid Decompositions}
+When creating centroid decompositions, each node of $T_1$ and $T_2$ will be part of at most one centroid path which is all that needs to be stored. The amount of space needed is therefore $O(n)$.
+
+\subsection{Induced Subtrees}
+\subsubsection{Preprocessing}
+Before inducing subtrees, $T_2$ needs to be preprocessed for finding LCAs in $O(1)$ time. This requires storing a constant amount of data at each node of $T_2$ and creating a new tree of size $O(n)$ where a constant amount of data is also stored at each node.
+
+Preprocessing $T_2$ for inducing subtrees in linear time is also done by storing a constant amount of data at each node of $T_2$, giving a space consumption of $O(n)$.
+
+\subsubsection{Inducing Subtrees}
+Inducing the subtree of $T_2$ from a set of leaves $L$ only requires storing data for each node of the final subtree which will have size $O(|L|)$.
+
+For each side tree $M_i, 1 \le i \le p-1$ of $\pi$, the subtree $S_i$ is induced from the leaves of $T_2$ that are twins of the leaves of $M_i$. The total amount of leaves used to induce subtrees is therefore $\sum_{i=1}^{p-1} m_i < n$ and the space needed is $O(n)$.
+\\
+\\
+In order to create the sets of leaves used to induce subtrees, the leaves of the side trees of $\pi$ should be sorted, which could be done using bucket sort, giving a space consumption of $O(n)$.
+
+\subsection{Constructing LWAMs recursively}
+
+\subsection{Matching Graphs}
+Recall that a matching graph $G(x)$ consists of two sets of nodes $L(x)$ and $R(x)$ with edges between them. Only a constant amount of data needs to be stored at each node and each edge. As mentioned earlier, the total number of edges in all matching graphs is $O(nlogn)$ and since $|L(x)| \le n$ and $|R(x)| \le n$, the total amount of space needed for the matching graphs must be $O(nlogn)$.
+
+\subsection{Agreement Matchings}
+\subsubsection{The Weighted Search Tree}
+For each matching graph $G(x)$ a binary search tree is created. The search tree gets a leaf for each node in $R(x)$, so the amount of space needed for a single search tree is $O(|R(x)|)$. Each node of $T_2$ can only be contained in one matching graph so the amount of nodes used to create search trees is $\sum_{x \in X} |R(x)| \le n$. Thus the total amount of space used on search trees is $O(n)$.
+
+\subsubsection{Largest Weight Agreement Matchings}
+Recall that for each matching graph $G(x)$, we compute and store the LWAM containing only edges from $u_i$ and nodes below $u_i$ in $L(x)$, for each $u_i \in L(x)$, and we compute and store the LWAM containing only edges from $v_j$ and nodes below $v_j$ in $R(x)$, for each $v_j \in R(x)$. The LWAMs are constructed while processing the edges of $G(x)$ and saved in the search tree. Recall that when updating a node in the search tree, only a constant amount of information is added. Either an edge or a proper crossing is updated, or an agreement matching is updated which is either a proper crossing or a white edge and a pointer to an agreement matching. So the amount of space needed to store the LWAMs is proportional to the amount of nodes in search trees that are updated.
+
+Now consider the node $u_i \in L(x)$ from the matching graph $G(x)$. If $d_x(u_i) = 1$ and $(u_i, v_j)$ is the edge incident on $u_i$, then only the nodes from $anc(l)$, and children of these nodes can be updated, where $l$ is the leaf in the search tree that corresponds to $v_j$. The size of $anc(l)$ is equal to the depth of $l$ in the search tree, i.e. $O(log(\dfrac{T_2(x)}{n_j}))$. Otherwise if $d_x(u_i) = k > 1$, let ${l_1, l_2, ..., l_k}$ be the leaves in the search tree that are searched for when processing $u_i$. The only nodes in the search tree that needs to be updated are nodes from the set ${anc(l_1) \cup anc(l_2) \cup ... \cup anc(l_k)}$ which are the nodes visited when searching for ${l_1, l_2, ..., l_k}$. This set has size $O(k*log \dfrac{nsav(x)}{k})$.
+
+
+
+
+
+
