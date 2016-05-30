@@ -243,12 +243,12 @@ We will start by describing some definitions used in agreement matchings.
 \subsubsection{Vertices and Edges}
 For vertices and edges in the graph $G(x)$ we have the following definitions:
 \begin{itemize}
-	\item $d_x(u_i)$: The 'degree' of a vertex $u_i \in L(x)$ is the number of white edges incident on it.
-	\subitem A vertex in $L(x)$ is a 'singleton' vertex if it has degree 1.
-	\subitem White edges incident on singleton vertices are called 'singleton' edges.
+	\item $d_x(u_i)$: The 'degree' of a node $u_i \in L(x)$ is the number of white edges incident on it.
+	\subitem A node in $L(x)$ is a 'singleton' node if it has degree 1.
+	\subitem Edges incident on singleton nodes are called 'singleton' edges.
 	\item $nswe(x)$: The number of non-singleton white edges in $G(x)$.
-	\item $nsav(x)$: The number of vertices in $R(x)$ having at least one incident non-singleton edge.
-	\item $SV(x)$: The set of singleton vertices.
+	\item $nsav(x)$: The number of nodes in $R(x)$ having at least one incident non-singleton edge.
+	\item $SV(x)$: The set of singleton nodes.
 \end{itemize}
 
 For any edge $(u_i, v_j)$, we say that $u_i$ and $v_j$ are adjacent. For two edges $(a,b)$ and $(a',b')$ in $G(x)$, we will say they 'cross' if $a$ is above $a'$ in $L(x)$ and $b$ is below $b'$ in $R(x)$. The two edges 'touch' if they are either crossing or $a=a'$ or $b=b'$. Finally $(a,b)$ 'dominates' $(a',b')$ if $a$ is above $a'$ and $b$ is above $b'$.
@@ -318,7 +318,7 @@ Let $F(N)$ be the time taken to construct a search tree with $N$ internal nodes.
 
 $F(N) \le max\{A + Blog(k) + F(k-1) + F(N-k), 1 \le k \le (N+1)/2\}$
 
-where $A$ and $B$ are constants. This function can be proven to grow at most linearly with $N$, thus constructing a search tree has linear runtime w.r.t. the number of internal nodes. \todo{Proof?} $|R(x)|$ is greater than the number of internal nodes, so a weight balanced binary search tree can be constructed in $O(|R(x)|)$ time.
+where $A$ and $B$ are constants. This function can be proven to grow at most linearly with $N$, thus constructing a search tree has linear runtime w.r.t. the number of internal nodes. The proof can be seen in section \ref{searchTreeProof}. $|R(x)|$ is greater than the number of internal nodes, so a weight balanced binary search tree can be constructed in $O(|R(x)|)$ time.
 
 \subsubsection{Searching}
 \label{st_searching}
@@ -334,96 +334,7 @@ Given the subset ${v_i, ..., v_j}$ of $R(x)$ in bottom to top order, let ${index
 A search tree $\mathcal{T}$ is created such that a leaf $l$ corresponding to $v_j \in R(x)$ has weight $n_j + \frac{|T_2(x)|}{nsav(x)}$ if a non-singleton edge in $G(x)$ has endpoint in $v_j$ and weight $n_j$ otherwise. Balancing the tree with these weights ensures that the depth of any leaf $l$ corresponding to node $v_j \in R(x)$ is $O(log\frac{|T_2(x)|}{n_j})$. When searching for an ordered subset of $k$ leaves in $\mathcal{T}$ as specified in the previous section, the structure of $\mathcal{T}$ also ensures that the number of nodes visited is $O(k*log \dfrac{nsav(x)}{k})$. The reasoning behind these claims can be found in \cite{nlogn}.
 
 \subsection{Computing the Largest Weight Agreement Matchings}
-Computing the LWAM for the graph $G(x)$ is done by processing each node of $L(x)$ in order starting with the bottom node. Recall that we will compute the LWAM containing only edges from $u_i$ and nodes below $u_i$ in $L(x)$, for each $u_i \in L(x)$. This is done by adding that information to $\mathcal{T}$ while processing the nodes of $L(x)$. 
-
-First, we will describe the information that needs to be stored in $\mathcal{T}$. Next, we will explain how nodes are processed and show how to process each colour edge and afterwards explain the order that the edges need to be processed in. Then we will show how to extract the LWAMs from $\mathcal{T}$ and finally explain the total time complexity of this step.
-
-\subsubsection{Auxiliary Information in $\mathcal{T}$}
-While processing the edges of $G(x)$ we will maintain information at each node of $\mathcal{T}$ about the LWAM of the currently processed edges. For a node $z \in \mathcal{T}$, we define $anc(z)$ as the set of ancestors of $z$, including $z$ itself in order top to bottom. $lfringe(z)$ is defined as the left children of the vertices in $anc(z)$ which are not in $anc(z)$ themselves. $lfringe$ will only contain nodes with indices less than $index(z)$. $rfringe(z)$ is defined analogously where the nodes all have indices greater or equal to $index(z)$. $anc(z)$ need not be stored in $\mathcal{T}$, but can be created while searching for $z$ in $\mathcal{T}$. Likewise, $lfringe(z)$ and $rfringe(z)$ can be created by iterating through $anc(z)$. After processing an edge $(u,v)$, we say that the edge is in $\mathcal{T}$. For a node $z \in \mathcal{T}$ we also say that $(u,v)$ is in $T(z)$ if $T(z)$ contains the node corresponding to $v$.
-
-The following information is maintained at each vertex $z \in \mathcal{T}$. This is taken directly from \cite{nlogn}, but slightly elaborated.
-\begin{itemize}
-	\item $g(z)$: After updating $g(z)$, it will hold the heaviest green edge in $\mathcal{T}$ which	forms a proper crossing with each red edge in $\mathcal{T}(z)$.
-	\subitem However, $g(z)$ is not maintained at all times, but the correct edge can be retrieved from $max_{z' \in anc(z)}g(z')$.
-	\subitem If there are no red edges in $\mathcal{T}(z)$ when updating $g(z)$, then $g(z)$ will be the heaviest green edge in $\mathcal{T}(z')$, for all $z' \in rfringe(z)$.
-	\item $x(z)$: This is the largest weight proper crossing, that is not a single red edge, among the edges in $\mathcal{T}(z)$.
-	\item $m(z)$: This is the largest weight agreement matching containing a white edge
-	such that the topmost white edge is in $\mathcal{T}(z)$.
-	\item $y(z)$: This the largest weight proper crossing, which is not a single edge, such that the green edge is in $\mathcal{T}$ but not in $\mathcal{T}(z)$, the red edge is in $\mathcal{T}(z)$, and the green edge does not form a proper crossing with all the red edges in $\mathcal{T}(z)$.
-	\item $r(z)$: This is simply the heaviest red edge in $\mathcal{T}(z)$.
-\end{itemize}
-
-\subsubsection{Processing Nodes}
-For each node $u_i \in L(x)$, starting from the bottommost, we need to process each edge $e = (u_i, v_j)$ incident on it. This is done by searching for the leaf corresponding to $v_j$ in $\mathcal{T}$ and updating information at nodes in $\mathcal{T}$ so that $e$ is contained in $\mathcal{T}$. Leaves are searched for as described in section \ref{st_searching}, where a standard search is used if $d_x(u_i) = 1$ and a sequential search is used if $d_x(u_i) > 1$.
-
-In the following, we will explain how each colour edge is processed. Let $e=(u_i,v_j)$ be the edge in $G(x)$ that should be processed and $l$ be the leaf in $\mathcal{T}$ corresponding to $v_j$. We know that all edges incident on nodes below $u_i$ in $L(x)$ have already been processed.
-
-\subsubsection{Processing white edges}
-The only values that might change in $\mathcal{T}$ when adding a white edge is $m(z), z \in anc(l)$. First, $anc(l)$ is found while searching for $l$ in $\mathcal{T}$ and $rfringe(l)$ is subsequently created. Now the LWAM with $e$ as topmost edge needs to be determined. This is done by finding the LWAM containing only edges dominated by $e$ and then adding $e$ as the topmost white edge. Since the nodes of $L(x)$ are processed starting from the bottom, we know that $\mathcal{T}$ does not contain any edges incident on nodes above $u_i$ in $L(x)$. The subtrees of nodes in $rfringe(l)$ contains exactly the edges in $\mathcal{T}$ only incident on nodes below $v_j$ in $R(x)$. By the order we process the edges, we also make sure that the edges from $u_i$ are processed such that $rfringe(l)$ contains no edge incident on $u_i$. There are four cases of LWAMs:
-\begin{itemize}
-	\item The LWAM contains one or more white edges.
-	\subitem This matching is given by $max_{z \in rfringe(l)} m(z)$
-	\item The LWAM is a single green edge or a green-red crossing where both edges are in the subtree $\mathcal{T}(z)$ for some $z \in rfringe(l)$.
-	\subitem This matching is given by $max_{z \in rfringe(l)} x(z)$
-	\item The LWAM is a single red edge or a green-red crossing where the red edge is in the subtree $\mathcal{T}(z)$ for some $z \in rfringe(l)$. The green edge forms a proper crossing with all red edges in $\mathcal{T}(z)$.
-	\subitem This matching is given by $max_{z \in rfringe(l)} (max_{z' \in anc(z)} g(z')) + r(z)$
-	\item The LWAM is a green-red crossing where the red edge is in the subtree $\mathcal{T}(z)$ for some $z \in rfringe(l)$. The green edge is not in $\mathcal{T}(z)$ and does not for a proper crossing with all red edges in $\mathcal{T}(z)$.
-	This matching is given by $max_{z \in rfringe(l)} y(z)$
-\end{itemize}
-
-These cases cover all possible LWAMs containing only edges dominated by $e$, so adding $e$ as the topmost white edge to the largest of these agreement matchings, gives us the LWAM that should replace $m(z), z \in anc(l)$ if it has larger weight than the agreement matching already stored.
-
-In order to avoid copying the agreement matching just found, which would take linear time w.r.t. the number of edges, the new agreement matching can be stored as the white edge $e$ and a pointer to the other agreement matching. This will also minimize the amount of space needed.
-
-\subsubsection{Processing red edges}
-The values that might change in $\mathcal{T}$ when adding a red edge is $y(z), g(z)$ and $r(z), z \in anc(l)$. Since none of the green edges in $\mathcal{T}$ can form a proper crossing with $e$, $y(z)$ might change for $z \in anc(l)$. So $y(z)$ is updated to $max{y(z), (max_{z' \in anc(z)} g(z')) + r(z)}$. Now $g(z)$ should be reset for all $z \in anc(l)$. However, in order to maintain all $g$ values in $\mathcal{T}$, $g(y)$ needs to be updated to $max_{y' \in anc(y)} g(y')$ for each $y \in lfringe(l)$ and $y \in rfringe(l)$ before resetting. Finally, $r(z)$ need to be updated for $z \in anc(l)$ if the weight $wt(e)$ of the new edge is greater than that the current value of $r(z)$. $r(z)=max{r(z), wt(e)}$.
-
-\subsubsection{Processing green edges}
-Adding a green edge to $\mathcal{T}$ might change the values $g(z), z \in lfringe(l)$ and $x(z), z \in anc(l)$. When adding the green edge $e$, it will form proper crossings with all red edges in $\mathcal{T}$ incident on nodes in $R(x)$ above $v_j$. This is true since each red edge in $\mathcal{T}$ is either incident on a node in $L(x)$ below $u_i$ or is incident on both $u_i$ and $v_j$. This is guaranteed by the processing order of the edges. Therefore $g(z), z \in lfringe(l)$ is updated to $e$ if the weight $wt(e)$ of $e$ is greater than that of the currently heaviest green edge forming a proper crossing with all red edges in $\mathcal{T}(z)$. $g(z)=max{wt(e), max_{z' \in anc(z)} g(z')}, z \in lfringe(l)$. The value $x(z), z \in anc(l)$ might also need to be updated if the proper crossing between $e$ and a red edge in $\mathcal{T}(z)$ is heavier than the current value of $x(z)$. $x(z)=max{x(z), wt(e) + max(r(z'))}, z \in anc(l)$. Here $max(r(z'))$ maximizes over the vertices $z' \in lfringe(l)$ which are descendants of $z$.
-
-\subsubsection{Processing order}
-Recall that we process the edges by iterating through $L(x)$ starting from the bottommost node, and process the edges incident on each of these nodes. For a node $u_i \in L(x)$ we will start by processing the white edges incident on $u_i$ in order, starting from the topmost edge, i.e. the edge incident on the topmost node in $R(x)$. For these edges, the leaves in $\mathcal{T}$ that needs to be searched for, are found with a sequential search as described in \ref{st_searching}. Starting with the white edges in top-down order means that when processing the white edge $e=(u_i,v_j)$, no other edge incident on $u_i$ or below $e$ has been processed.
-
-Next, we process the red and green edges incident on $u_i$ in order, starting from the bottommost edge. This ensures that when processing a green edge $e=(u_i,v_j)$, no red edges incident on $u_i$ and above e has been processed. Searching for leaves in $\mathcal{T}$ is done as described in \ref{st_searching}.
-
-\subsubsection{Extracting the Largest Weight Agreement Matchings}
-First, we need to compute the LWAM containing only edges from $u_i$ and nodes below $u_i$ in $L(x)$, for each $u_i \in L(x)$. For any $u_i \in L(x)$, all the information needed to compute such a matching is stored at the root $r$ of $\mathcal{T}$ after having processed the edges incident on $u_i$ and before processing edges incident on the above nodes in $L(x)$. The LWAM is extracted in the following way:
-
-If the LWAM contains a white edge it is simply given by $m(r)$. If the LWAM is a proper crossing, but not a single red edge, it is given by $x(r)$. And finally, if the LWAM is a single red edge, it is given by $r(r)$. Therefore the LWAM is the heaviest of these three matchings. This LWAM is saved, such that it can be retrieved in constant time given $u_i$ and $x$. 
-
-For each $v_j \in R(x)$, we also need to compute the LWAM containing only edges incident on $v_j$ and nodes below $v_j$ in $R(x)$. For leaf $v_j \in R(x)$, such a matching will correspond to the MAST between $T_1$ and $T_2(v_j)$, so this is the LWAM that needs to be stored at $v_j \in T_2$. The LWAMs are extracted from $\mathcal{T}$, after all edges in $G(x)$ have been processed, in the following way:
-
-For node $v_j \in R(x)$, let $l$ be the leaf in $\mathcal{T}$ corresponding to $v_j$ and let $M(v_j)$ be the LWAM containing only edges incident on $v_j$ and nodes below $v_j$ in $R(x)$. $M(v_j)$ is either equal to $M(v_{j+1}), j \ne |R(x)|$ (-1?), or it is the LWAM having a white edge incident on $v_j$ as the topmost edge, or it is the largest proper crossing having a red edge incident on $v_j$, or it is a single green edge incident on $v_j$. Thus, $M(v_j)$ is given by $max\{M(v_{j+1}), m(l), y(l), max_{z \in anc(l)}g(z) + r(l), x(l)\}$ where $M(v_{|R(x)|+1}) = 0$.
-
-After having computed the LWAMs for all matching graphs, the LWAM corresponding to the MAST between $T_1$ and $T_2$ can be retrieved in constant time from the root $u_1$ of $T_1$ and the root $v_1$ of $T_2$. This was extracted from the search tree for the matching graph $G(v_j)$ and is the LWAM containing edges from $u_1$ and nodes below $u_1$ in $L(v_j)$ which is all possible edges and therefore corresponds to the MAST between $T_1$ and $T_2$.
-
-\subsubsection{Analysis}
-\label{lwam_analysis}
-In \cite{nlogn}, Cole et. al. proves two important lemmas:
-
-Lemma 4.1: Consider matching graph $G(x)$. Then
-
-$\sum_{i|d_x(u_i)>1} d_x(u_i)log\dfrac{nsav(x)}{d_x(u_i)} \le \sum_{i|d_x(u_i)>1} d_x(u_i)log\dfrac{n}{m_i}$
-
-Lemma 4.2: Consider node $u_i \in \pi$. Then
-
-$\sum_{x \in X | d_x(u_i)>1} d_x(u_i) = O(m_i)$
-
-From these two lemmas the following can be deduced.
-\\
-\\
-Consider the matching graph $G(x)$ with search tree $\mathcal{T}$ and a node $u_i \in L(x)$. If $d_x(u_i) > 1$ and $L$ is the ordered set of leaves in $\mathcal{T}$ that corresponds to the nodes in $R(x)$ incident on the edges from $u_i$, then the amount of nodes in the search tree that is visited when searching for the leaves of $L$ is $O(d_x(u_i)log(\dfrac{n}{m_i}))$.
-
-Considering node $u_i \in \pi$ the amount of nodes visited in all search trees over all matching graphs $G(x)$ with $d_x(u_i) > 1$ is $O(m_ilog\dfrac{n}{m_i})$.
-
-For each node $u_i \in \pi$ over all matching graphs $G(x)$ with $d_x(u_i) = 1$, it turns out that the amount of nodes visited in all search trees is also $O(m_ilog\dfrac{n}{m_i})$. This can be seen from the analysis in \cite{nlogn}.
-
-Thus the total amount of nodes visited in all search trees, for any node $u_i \in \pi$, is $O(m_ilog\dfrac{n}{m_i})$.
-
-\subsubsection{Time Complexity}
-When searching for leaves in a search tree, each node is visited at most twice and updating information in a search tree is only done at the nodes visited when searching, and children of these nodes. So for any node $u_i \in \pi$, the time taken to process $u_i$ over all matching graphs is $O(m_ilog\dfrac{n}{m_i})$.
-
-Extracting the LWAM for edges from $u_i$ and nodes below $u_i$ in $L(x)$, for each $u_i \in L(x)$ takes constant time after having processed $u_i$. Extracting the LWAM for edges from $v_j$ and nodes below $v_j$ in $R(x)$, for each $v_j \in R(x)$ is done through a single traversal of $\mathcal{T}$ in $O(|R(x)|)$ time. This means that the total time for computing the largest weight agreement matchings is $O(\sum_{i=1}^p m_ilog\dfrac{n}{m_i}) \le O(nlogn)$.
+\input{./Chapters/ComputingLWAMs.tex}
 
 \section{Creating the Maximum Agreement Subtree}
 The last step of the algorithm is to construct the maximum agreement subtree from the LWAMs that have been computed.
@@ -510,6 +421,8 @@ Creating the MAST from the MLIS, is simply done by iterating through the MLIS wh
 \section{LCA}
 \label{lcaSection}
 A requirement for the algorithm is that any tree $T$ can be preprocessed in $O(|T|)$ time such that the Least Common Ancestor of any two leaves in $T$ can be computed in constant time. Gusfield \todo{ref "Algorithms on String, Trees and Sequences"} explains in detail an algorithm for how this can be done. Our implementation directly follows this approach.
+
+\section{Linear Time Search Tree Construction Proof?}
 
 \section{Time Complexity}
 Throughout this chapter, we explained the runtime of each step of the algorithm, aside from the step making recursive calls. Since each step satisfies the time complexity of $O(nlogn)$ and there is a constant number of steps, we can show that the total runtime of the algorithm is $O(nlogn)$.
