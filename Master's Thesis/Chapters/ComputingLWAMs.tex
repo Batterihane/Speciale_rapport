@@ -20,7 +20,7 @@ The following information is maintained at each node $z \in \mathcal{T}$. This i
 \subsubsection{Processing Nodes}
 For each node $u_i \in L(x)$, starting from the bottommost, we need to process each edge $e = (u_i, v_j)$ incident on it. This is done by searching for the leaf corresponding to $v_j$ in $\mathcal{T}$ and updating information at nodes in $\mathcal{T}$ so that $e$ is contained in $\mathcal{T}$. Leaves are searched for as described in section \ref{st_searching}, where a standard search is used if $d_x(u_i) = 1$ and a sequential search is used if $d_x(u_i) > 1$.
 
-In the following, we will explain how each colour edge is processed when $d_x(u_i) = 1$. Let $e=(u_i,v_j)$ be the edge in $G(x)$ that should be processed and $l$ be the leaf in $\mathcal{T}$ corresponding to $v_j$. We know that all edges incident on nodes below $u_i$ in $L(x)$ have already been processed.
+In the following, we will explain how each colour edge is processed when $d_x(u_i) = 1$ and afterwards when $d_x(u_i) > 1$. Let $e=(u_i,v_j)$ be the edge in $G(x)$ that should be processed and $l$ be the leaf in $\mathcal{T}$ corresponding to $v_j$. We know that all edges incident on nodes below $u_i$ in $L(x)$ have already been processed.
 
 \subsubsection{Processing singleton white edges}
 The only values that might change in $\mathcal{T}$ when adding a white edge is $m(z), z \in anc(l)$. First, $anc(l)$ is found while searching for $l$ in $\mathcal{T}$ and $rfringe(l)$ is subsequently created. Now the LWAM with $e$ as topmost edge needs to be determined. This is done by finding the LWAM containing only edges dominated by $e$ and then adding $e$ as the topmost white edge. Since the nodes of $L(x)$ are processed starting from the bottom, we know that $\mathcal{T}$ does not contain any edges incident on nodes above $u_i$ in $L(x)$. The subtrees of nodes in $rfringe(l)$ contain exactly the edges in $\mathcal{T}$ only incident on nodes below $v_j$ in $R(x)$. %By the order we process the edges, we also make sure that the edges from $u_i$ are processed such that $rfringe(l)$ contains no edge incident on $u_i$.
@@ -32,7 +32,7 @@ There are four cases of LWAMs:
 	\subitem This matching is given by $max_{z \in rfringe(l)} x(z)$
 	\item The LWAM is a single red edge or a green-red crossing where the red edge is in the subtree $\mathcal{T}(z)$ for some $z \in rfringe(l)$. The green edge forms a proper crossing with all red edges in $\mathcal{T}(z)$.
 	\subitem This matching is given by $max_{z \in rfringe(l)} (max_{z' \in anc(z)} g(z')) + r(z)$
-	\item The LWAM is a green-red crossing where the red edge is in the subtree $\mathcal{T}(z)$ for some $z \in rfringe(l)$. The green edge is not in $\mathcal{T}(z)$ and does not for a proper crossing with all red edges in $\mathcal{T}(z)$.
+	\item The LWAM is a green-red crossing where the red edge is in the subtree $\mathcal{T}(z)$ for some $z \in rfringe(l)$. The green edge is not in $\mathcal{T}(z)$ and does not form a proper crossing with all red edges in $\mathcal{T}(z)$.
 	This matching is given by $max_{z \in rfringe(l)} y(z)$
 \end{itemize}
 
@@ -41,13 +41,13 @@ These cases cover all possible LWAMs containing only edges dominated by $e$, so 
 In order to avoid copying the agreement matching just found, which would take linear time w.r.t. the number of edges, the new agreement matching can be stored as the white edge $e$ and a pointer to the other agreement matching. This will also minimize the amount of space needed.
 
 \subsubsection{Processing singleton red edges}
-The values that might change in $\mathcal{T}$ when adding a red edge is $y(z), g(z)$ and $r(z), z \in anc(l)$ and $g(z'), z' \in lfringe(l) \cup rfringe(l)$. Since none of the green edges in $\mathcal{T}$ can form a proper crossing with $e$, $y(z)$ might change for $z \in anc(l)$. So $y(z)$ is updated to $max\{y(z), (max_{z' \in anc(z)} g(z')) + r(z)\}$. Now $g(z)$ should be reset for all $z \in anc(l)$. However, in order to maintain all $g$ values in $\mathcal{T}$, $g(y)$ needs to be updated to $max_{y' \in anc(y)} g(y')$ for each $y \in lfringe(l) \cup rfringe(l)$ before resetting. Finally, $r(z)$ need to be updated for $z \in anc(l)$ if the weight of the new edge is greater than that the current value of $r(z)$. $r(z)=max{r(z), e}$.
+The values that might change in $\mathcal{T}$ when adding a red edge is $y(z), g(z)$ and $r(z), z \in anc(l)$ and $g(z'), z' \in lfringe(l) \cup rfringe(l)$. Since none of the green edges in $\mathcal{T}$ can form a proper crossing with $e$, $y(z)$ might change for $z \in anc(l)$. So $y(z)$ is updated to $max\{y(z), (max_{z' \in anc(z)} g(z')) + r(z)\}$. Now $g(z)$ should be reset for all $z \in anc(l)$. However, in order to maintain all $g$ values in $\mathcal{T}$, $g(z')$ needs to be updated to $max_{z'' \in anc(z')} g(z'')$ for each $z' \in lfringe(l) \cup rfringe(l)$ before resetting. Finally, $r(z)$ need to be updated for $z \in anc(l)$ if the weight of $e$ is greater than that the current value of $r(z)$. $r(z)=max\{r(z), e\}$.
 
 \subsubsection{Processing singleton green edges}
 Adding a green edge to $\mathcal{T}$ might change the values $g(z), z \in lfringe(l)$ and $x(z), z \in anc(l)$. When adding the green edge $e$, it will form proper crossings with all red edges in $\mathcal{T}$ incident on nodes in $R(x)$ above $v_j$. This is true since each red edge in $\mathcal{T}$ is incident on a node in $L(x)$ below $u_i$. Therefore $g(z), z \in lfringe(l)$ is updated to $e$ if the weight of $e$ is greater than that of the currently heaviest green edge forming a proper crossing with all red edges in $\mathcal{T}(z)$. $g(z)=max\{e, max_{z' \in anc(z)} g(z')\}, z \in lfringe(l)$. The value $x(z), z \in anc(l)$ might also need to be updated if the proper crossing between $e$ and a red edge in $\mathcal{T}(z)$ is heavier than the current value of $x(z)$. $x(z)=max\{x(z), e + max(r(z'))\}, z \in anc(l)$. Here $max(r(z'))$ maximizes over the vertices $z' \in lfringe(l)$ which are descendants of $z$.
 
 \subsubsection{Processing nodes with degree > 1}
-Recall that we process the edges by iterating through $L(x)$ starting from the bottommost node, and process the edges incident on each of these nodes. For a node $u_i \in L(x)$ we will start by processing the white edges incident on $u_i$ in order, starting from the topmost edge, i.e. the edge incident on the topmost node in $R(x)$. For these edges, the leaves in $\mathcal{T}$ that needs to be searched for, are found with a sequential search as described in \ref{st_searching}.
+Recall that we process the edges by iterating through $L(x)$ starting from the bottommost node, and process the edges incident on each of these nodes. For a node $u_i \in L(x)$ we will start by processing the white edges incident on $u_i$ in order, starting from the topmost edge, i.e. the edge incident on the topmost node in $R(x)$. The reason for doing top-down processing is explained later. For these edges, the leaves in $\mathcal{T}$ that needs to be searched for, are found with a sequential search as described in section \ref{st_searching}.
 
 Next, we process the red and green edges incident on $u_i$ in order, starting from the bottommost edge. This ensures that when processing a green edge $e=(u_i,v_j)$, no red edges incident on $u_i$ and on a node in $R(x)$ above $v_j$ has been processed. Searching for leaves in $\mathcal{T}$ is also done with sequential search.
 
@@ -58,23 +58,22 @@ In the following, we will explain how each colour edge is processed when $d_x(u_
 \subsubsection{Processing white non-singleton edges}
 For processing white non-singleton edges, we will introduce some extra information that should be stored in $\mathcal{T}$, but only while processing the white edges incident on $u_i$.
 
-The following information is stored at each node $z \in {anc(l_1) \cup anc(l_2) \cup ... }$ as they are being visited.
+The following information is stored at each node $z \in {anc(l_1) \cup anc(l_2) \cup ... }$ as they are being visited the first time.
 
 \begin{itemize}
-	\item $rm(z)$: This is the heaviest of the agreement matchings $m(z'), z' \in rfringe(z)$.
+	\item $rm(z)$: This is the heaviest of the agreement matching of $m(z'), z' \in rfringe(z)$.
 		\subitem $rm(z) = max_{z'\in rfringe(z)} m(z')$
-	\item $rx(z)$: This is the heaviest of the agreement matchings $x(z'), z' \in rfringe(z)$.
+	\item $rx(z)$: This is the heaviest of the agreement matching of $x(z'), z' \in rfringe(z)$.
 		\subitem $rx(z) = max_{z'\in rfringe(z)} x(z')$
-	\item $ry(z)$: This is the heaviest of the agreement matchings $y(z'), z' \in rfringe(z)$.
+	\item $ry(z)$: This is the heaviest of the agreement matching of $y(z'), z' \in rfringe(z)$.
 		\subitem $ry(z) = max_{z'\in rfringe(z)} y(z')$
 	\item $ag(z)$: This is the heaviest of the edges $g(z'), z' \in anc(z)$.
 		\subitem $ag(z) = max_{z'\in anc(z)} g(z')$
 	\item $gr(z)$: This is the heaviest single red edge or green-red proper crossing where the red edge is in the subtree $\mathcal{T}(z')$ for some $z' \in rfringe(z)$. The green edge forms a proper crossing with all red edges in $\mathcal{T}(z')$.
 		\subitem $gr(z) = max_{z'\in rfringe(z)} (max_{z''\in anc(z')} g(z'')) + r(z')$
-			\subsubitem $ = max_{z'\in rfringe(z)} ag(z') + r(z')$
 \end{itemize}
 
-Searching for leaves in $\mathcal{T}$ is done by starting from the root of $\mathcal{T}$. Thus finding the above values can be done in constant time for each node $z$ in the following way:
+Searching for leaves in $\mathcal{T}$ is done by starting from the root of $\mathcal{T}$. Thus finding the above values can be done in constant time for each node $z$ in the following way, where $p(z)$ is the parent node of $z$:
 \begin{itemize}
 	\item $ag(z) = max\{ag(p(z)), g(z)\}$
 	\item If $z$ is the left child of its parent $p(z)$ and $z'$ is the right child, then
@@ -91,7 +90,7 @@ Searching for leaves in $\mathcal{T}$ is done by starting from the root of $\mat
 
 Processing the white edges in top-down order ensures that when processing a white edge $e_{j'}=(u_i,v_j)$, no other edge incident on $u_i$ and on a node in $R(x)$ below $v_j$ has been processed. This means that the agreement matchings $rm(l_{j'}), rx(l_{j'}), ry(l_{j'})$ and $gr(l_{j'})$ only contains edges dominated by $e_{j'}$.
 
-When processing the topmost edge $e_1$, we will search for leaf $l_1$ in $\mathcal{T}$ with a standard search while storing the above values at the nodes of $anc(l_1)$. Now as when processing singleton white edges, we need to find the LWAMs containing only edges dominated by e and then adding e as the topmost white edge. These LWAMs are exactly the ones we have now stored at $l$: $rm(l), rx(l), ry(l)$ and $gr(l)$. The largest weight agreement matching with $e_1$ as topmost white edge is therefore the heaviest of these agreement matchings with $e_1$ added as topmost white edge. Now the values $m(z), z \in anc(l)$ needs to be updated with this LWAM, but since the remaining edges incident on $u_i$ might have some of the same ancestors, we will instead update the values while searching for these edges.
+When processing the topmost edge $e_1$, we will search for leaf $l_1$ in $\mathcal{T}$ with a standard search while storing the above values at the nodes of $anc(l_1)$. Now as when processing singleton white edges, we need to find the LWAMs containing only edges dominated by $e_1$ and then adding $e_1$ as the topmost white edge. These LWAMs are exactly the ones we have now stored at $l_1$: $rm(l_1), rx(l_1), ry(l_1)$ and $gr(l_1)$. The largest weight agreement matching with $e_1$ as topmost white edge is therefore the heaviest of these agreement matchings with $e_1$ added as topmost white edge. Now the values $m(z), z \in anc(l_1)$ needs to be updated with this LWAM, but since the remaining edges incident on $u_i$ might have some of the same ancestors, we will instead update the values while searching for these edges.
 
 When searching for a leaf $l_{j'}, j' > 1$, starting at $l_{j'-1}$, we first go up through the tree until reaching the first node which is an ancestor of both $l_{j'}$ and $l_{j'-1}$ and afterwards search for $l_{j'}$ in the standard way while updating values at the nodes visited as before. While going up through the tree, we can update the nodes visited with the LWAM found when processing the previous edge $e_{j'-1}$, since these nodes are all ancestors of $l_{j'-1}$. Reaching a node $z$ where $m(z)$ is heavier than the agreement matching we are currently updating with, means that it is an agreement matching found when processing one of the previous edges, so the following nodes should instead be updated with that matching.
 
@@ -100,19 +99,19 @@ Having processed the last edge, we will continue to the root of $\mathcal{T}$ in
 \subsubsection{Processing red and green non-singleton edges} 
 The only extra information that should be stored in $\mathcal{T}$ while processing red and green edges incident on $u_i$ is $ag(z)$ for each node $z \in {anc(l_1) \cup anc(l_2) \cup ... }$. $ag(z)$ is defined as when processing white non-singleton edges and found the same way while searching for leaves in $\mathcal{T}$.
 
-The procedure is similar to processing white non-singleton edges. The leaves of $\mathcal{T}$ are searched for using sequential search, but starts from the bottommost edge. In the end, we return to the root of the tree.
+The procedure is similar to processing white non-singleton edges. The leaves of $\mathcal{T}$ are searched for using sequential search, but starts from the bottommost edge. In the end, we return to the root of $\mathcal{T}$.
 \\
 \\
 As when processing singleton edges, adding a red edge $e_{j'}$ to $\mathcal{T}$ might changes the values $y(z), g(z)$ and $r(z), z \in anc(l_{j'})$ and $g(z'), z' \in lfringe(l_{j'}) \cup rfringe(l_{j'})$. For $z \in anc(l_{j'})$, $y(z)$ should be updated to $max\{y(z), (max_{z' \in anc(z)} g(z')) + r(z)\} = max\{y(z), ag(z) + r(z)\}$. For each $z \in lfringe(l_{j'}) \cup rfringe(l_{j'})$, $g(z)$ should be updated to $max_{z' \in anc(z)} g(z') = ag(z)$ and for $z \in anc(l_{j'})$, $g(z)$ should be reset and $r(z)$ updated to $max\{r(z), e_{j'}\}$.
 
-Having stored $ag(z)$ at each node visited while searching, all of the above values can be updated in constant time for each node while going up through the tree.
+Having stored $ag(z)$ at each node $z$ visited while searching, all of the above values can be updated in constant time for each node while going up through the tree.
 
 Notice that when resetting $g(z)$ for some node $z$, $ag(z)$ also needs to be reset since $z$ might be visited again and the value of $ag(z)$ is no longer valid.
 \\
 \\
-Adding a green edge $e_{j'}$ to $\mathcal{T}$ might changes the values $g(z), z \in lfringe(l)$ and $x(z), z \in anc(l)$. 
+Adding a green edge $e_{j'}$ to $\mathcal{T}$ might changes the values $g(z), z \in lfringe(l_{j'})$ and $x(z), z \in anc(l_{j'})$. For $z \in lfringe(l_{j'})$, $g(z)$ is updated to $max\{e_{j'}, max_{z' \in anc(z)} g(z')\} = max\{e_{j'}, ag(z)\}$. Since $ag(z)$ is stored at each node $z$ visited while searching, $g(z), z \in lfringe(l_{j'})$ is updated in constant time for each node while going up through the tree. For $z \in anc(l_{j'})$, $x(z)$ should be updated to $max\{x(z), e_{j'} + max(r(z'))\}$, where $max(r(z'))$ maximizes over the vertices $z' \in lfringe(l_{j'})$ which are descendants of $z$. This is also done in constant time for node $z \in anc(l_{j'})$ while going up through the tree by keeping track of the heaviest red edge $hre$ of $r(z'), z' \in lfringe(l_{j'})$, where $z'$ is a descendant of $z$.
 
-\todo{finish section}
+If $z$ is the first node which is an ancestor of both $l_{j'}$ and $l_{j'+1}$ (assuming that $l_{j'+1}$ exists), we will store $e_{j'}$ at $z$ as $ge(z)$. Now when going up through the tree after having reached leaf $l_{j'}$, we will also keep track of which green edge $hge$, incident on $u_i$ is the heaviest that has been added to the subtree rooted at the current node $z$. When at $l_{j'}$, $hge$ is obviously $e_{j'}$, and when at a node $z \in anc(l_{j'})$ it is simply the heaviest edge of $hge$ and $ge(z)$. $x(z)$ can now be updated to $max\{x(z), hge + hre\}$.
 
 \subsubsection{Extracting the Largest Weight Agreement Matchings}
 First, we need to compute the LWAM containing only edges from $u_i$ and nodes below $u_i$ in $L(x)$, for each $u_i \in L(x)$. For any $u_i \in L(x)$, all the information needed to compute such a matching is stored at the root $r$ of $\mathcal{T}$ after having processed the edges incident on $u_i$ and before processing edges incident on the above nodes in $L(x)$. The LWAM is extracted in the following way:
@@ -136,19 +135,17 @@ $\sum_{i|d_x(u_i)>1} d_x(u_i)log\dfrac{nsav(x)}{d_x(u_i)} \le \sum_{i|d_x(u_i)>1
 Lemma 4.2: Consider node $u_i \in \pi$. Then
 
 $\sum_{x \in X | d_x(u_i)>1} d_x(u_i) = O(m_i)$
-
-From these two lemmas the following can be deduced.
 \\
 \\
-Consider the matching graph $G(x)$ with search tree $\mathcal{T}$ and a node $u_i \in L(x)$. If $d_x(u_i) > 1$ and $L$ is the ordered set of leaves in $\mathcal{T}$ that corresponds to the nodes in $R(x)$ incident on the edges from $u_i$, then the amount of nodes in the search tree that is visited when searching for the leaves of $L$ is $O(d_x(u_i)log(\dfrac{n}{m_i}))$.
+Consider the matching graph $G(x)$ with search tree $\mathcal{T}$ and a node $u_i \in L(x)$. If $d_x(u_i) > 1$ and $L$ is the ordered set of leaves in $\mathcal{T}$ that corresponds to the nodes in $R(x)$ incident on the edges from $u_i$, then it follows from the claims in section \ref{stProperties} and Lemma 4.1 that the amount of nodes in the search tree that is visited when searching for the leaves of $L$ is $O(d_x(u_i)log(\dfrac{n}{m_i}))$.
 
-Considering node $u_i \in \pi$ the amount of nodes visited in all search trees over all matching graphs $G(x)$ with $d_x(u_i) > 1$ is $O(m_ilog\dfrac{n}{m_i})$.
+Considering node $u_i \in \pi$, it follows from Lemma 4.2 that the amount of nodes visited in all search trees over all matching graphs $G(x)$ with $d_x(u_i) > 1$ is $O(m_ilog\dfrac{n}{m_i})$.
 
 For each node $u_i \in \pi$ over all matching graphs $G(x)$ with $d_x(u_i) = 1$, it turns out that the amount of nodes visited in all search trees is also $O(m_ilog\dfrac{n}{m_i})$. This can be seen from the analysis in \cite{nlogn}.
 
 Thus the total amount of nodes visited in all search trees, for any node $u_i \in \pi$, is $O(m_ilog\dfrac{n}{m_i})$.
 
 \subsubsection{Time Complexity}
-When searching for leaves in a search tree, each node is visited at most twice and updating information in a search tree is only done at the nodes visited when searching, and children of these nodes. So for any node $u_i \in \pi$, the time taken to process $u_i$ over all matching graphs is $O(m_ilog\dfrac{n}{m_i})$.
+When searching for an ordered set of leaves in a search tree, each node is visited at most thrice and updating information in a search tree is done at the visited nodes and children of these nodes while searching. So for any node $u_i \in \pi$, the time taken to process $u_i$ over all matching graphs is $O(m_ilog\dfrac{n}{m_i})$.
 
 Extracting the LWAM for edges from $u_i$ and nodes below $u_i$ in $L(x)$, for each $u_i \in L(x)$ takes constant time after having processed $u_i$. Extracting the LWAM for edges from $v_j$ and nodes below $v_j$ in $R(x)$, for each $v_j \in R(x)$ is done through a single traversal of $\mathcal{T}$ in $O(|R(x)|)$ time. This means that the total time for computing the largest weight agreement matchings is $O(\sum_{i=1}^p m_ilog\dfrac{n}{m_i}) \le O(nlogn)$.

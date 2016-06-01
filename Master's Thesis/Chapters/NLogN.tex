@@ -82,7 +82,7 @@ To induce the subtree of $T$ from $L$ in $O(|L|)$ time, two requirements must be
 
 Both of these requirements can be achieved in $O(|T|)$ time.
 
-The node depths can be set in $O(|T|)$ time by a simple pre-order tree traversal (REF?), where the depth of each node is set to its parent's depth plus one. The depth of the root is initialized to zero.  
+The node depths can be set in $O(|T|)$ time by a simple pre-order tree traversal, where the depth of each node is set to its parent's depth plus one. The depth of the root is initialized to zero.  
 
 Computing LCA in $O(1)$ time is possible after having preprocessed $T$ in $O(|T|)$ time. This is however a more complicated matter, and is covered in section \ref{lcaSection}.
 
@@ -98,22 +98,22 @@ The algorithm works in 3 steps:
 
 Since the LCA between two leaves can be computed in constant time, the first step takes $O(|L|)$ time.
 
-The challenge was to perform step 2 in linear time. We did this by realizing that for any node $v$ in $L'$ that has greater depth than the node immediately to the right of it in $L'$, $v_l$ and $v_r$ are the nodes immediately to the left and right in $L'$ (because of how the LCAs were added to the set). By not considering these nodes any more, the same will be the case for the nodes that now has greater depth than the node to the right of it in $L'$. This resulted in the approach for step 2 seen in listing \ref{lst:induceSubtreeCode}. Here, each node $v$ of $L'$ will eventually be added to $S$ and removed when $v_l$ and $v_r$ has been updated correctly. For each node, a constant amount of computation needs to be performed, so the time complexity is $O(|L'|) = O(|L|)$.
+The challenge here was to perform step 2 in linear time, which is not covered by Cole et. al \cite{nlogn}. We did this by realizing that for any node $v$ in $L'$ that has greater depth than the node immediately to the right of it in $L'$, $v_l$ and $v_r$ are the nodes immediately to the left and right in $L'$ (because of how the LCAs were added to the set). By not considering these nodes any more, the same will be the case for the nodes that now has greater depth than the node to the right of it in $L'$. This resulted in the approach for step 2 seen in listing \ref{lst:induceSubtreeCode}. Here, each node $v$ of $L'$ will eventually be added to $S$ and removed when $v_l$ and $v_r$ has been updated correctly. For each node, a constant amount of computation needs to be performed, so the time complexity is $O(|L'|) = O(|L|)$.
 
-Step three is done in a single iteration through $L'$ where the parent of each vertex is found in constant time, giving a runtime of $O(|L'|) = O(|L|)$.
+Step three is done in a single iteration through $L'$ where the parent of each node is found in constant time, giving a runtime of $O(|L'|) = O(|L|)$.
 
 \begin{lstlisting}[language=Java, caption=Step 2 of induceSubtree, label={lst:induceSubtreeCode}]
 Function induceSubtree(inputLeaves)
 {
 	...
 	
-	L' = The list of nodes computed in step 1;
-	for each node v in L'
-		v_l = the node to the left of v in L';
-		// if v is the leftmost node in L', v_l = null
-		v_r = the node to the right of v in L';
-		// if v is the rightmost node in L', v_r = null
-	S = Stack initially containing only the first node in L';
+	L` = The list of nodes computed in step 1;
+	for each node v in L`
+		v_l = the node to the left of v in L`;
+		// if v is the leftmost node in L`, v_l = null
+		v_r = the node to the right of v in L`;
+		// if v is the rightmost node in L`, v_r = null
+	S = Stack initially containing only the first node in L`;
 
 	while(S is not empty)
 	{
@@ -159,7 +159,7 @@ When having computed the $S_i$ subtrees, we can recursively construct the larges
 After having constructed the LWAMs for $M_i$ and $S_i$, each node $v$ of $S_i$ will hold the LWAM and its weight for $M_i$ and the subtree $S_i(v)$. We will explain later how this is achieved.
 
 \section{Matching Graphs}
-The next step of the algorithm is to compute the matching graphs. For each path $\pi(x), x \in X$ in the centroid decomposition for $T_2$, a matching graph $G(x)$ is created that will contain all edges that can be part of largest weight agreement matchings between subtrees of $T_1$ and $T_2(x)$.
+The next step of the algorithm is to compute the matching graphs. For each path $\pi(x), x \in X$ in the centroid decomposition for $T_2$, a matching graph $G(x)$ is created that will contain all edges that can be part of the largest weight agreement matchings between subtrees of $T_1$ and $T_2(x)$.
 
 Let $x$ be the start node of the centroid path $\pi(x)$ in $T_2$ with side trees $N_j, 1 \le j \le q$. Then the graph $G(x)$ is defined as follows:
 
@@ -180,7 +180,7 @@ Consider the trees in figure \ref{Fig:InputTrees} where $\pi = \{u_1,u_2,u_3,u_4
 	\label{matchingGraphFigure}
 \end{figure}
 
-A matching graph $G(x)$ is used to create a Largest Weight Agreement Matching (LWAM) which can be translated directly to the MAST of $T_1$ and $T_2(x)$. For each $u_i \in L(x)$, starting from the bottom, we compute the LWAM containing only edges from $u_i$ and nodes below $u_i$ in $L(x)$. This will be covered in detail in section \ref{agreementMatchingSection}.
+A matching graph $G(x)$ is used to create a Largest Weight Agreement Matching which can be translated directly to the MAST of $T_1$ and $T_2(x)$. For each $u_i \in L(x)$, starting from the bottom, we compute the LWAM containing only edges from $u_i$ and nodes below $u_i$ in $L(x)$. This will be covered in detail in section \ref{agreementMatchingSection}.
 
 \subsection{Creating the Matching Graphs}
 First of all, a graph is created for each centroid path in $T_2$, where all nodes in the path is added to the right set. In order to get access to such a graph in constant time from a node in the path, we will make each start node of the paths point to the corresponding graph.
@@ -240,15 +240,13 @@ This will be done for all matching graphs in order bottom to top, where a graph 
 \subsection{Definitions}
 We will start by describing some definitions used in agreement matchings.
 
-\subsubsection{Vertices and Edges}
-For vertices and edges in the graph $G(x)$ we have the following definitions:
+\subsubsection{Nodes and Edges}
+For nodes and edges in the graph $G(x)$ we have the following definitions:
 \begin{itemize}
 	\item $d_x(u_i)$: The 'degree' of a node $u_i \in L(x)$ is the number of white edges incident on it.
 	\subitem A node in $L(x)$ is a 'singleton' node if it has degree 1.
 	\subitem Edges incident on singleton nodes are called 'singleton' edges.
-	\item $nswe(x)$: The number of non-singleton white edges in $G(x)$.
 	\item $nsav(x)$: The number of nodes in $R(x)$ having at least one incident non-singleton edge.
-	\item $SV(x)$: The set of singleton nodes.
 \end{itemize}
 
 For any edge $(u_i, v_j)$, we say that $u_i$ and $v_j$ are adjacent. For two edges $(a,b)$ and $(a',b')$ in $G(x)$, we will say they 'cross' if $a$ is above $a'$ in $L(x)$ and $b$ is below $b'$ in $R(x)$. The two edges 'touch' if they are either crossing or $a=a'$ or $b=b'$. Finally $(a,b)$ 'dominates' $(a',b')$ if $a$ is above $a'$ and $b$ is above $b'$.
@@ -287,7 +285,9 @@ $\mathcal{T}$ is created from the nodes in $R(x)$ such that $\mathcal{T}$ will h
 Recall that for each $u_i \in L(x)$, we want to compute the LWAM containing only edges from $u_i$ and nodes below $u_i$ in $L(x)$. This is done by processing each node $u_i \in L(x)$ in order bottom-to-top, where each node in $R(x)$, that has an edge to $u_i$, is searched for in $\mathcal{T}$, while storing information about the edges in $\mathcal{T}$.  After processing $u_i$, the LWAM can be extracted from $\mathcal{T}$. 
 
 \subsubsection{Constructing the Weighted Search Tree}
-A search tree can be constructed in $O(|R(x)|)$ time using the following algorithm which is a customized version of the algorithm described by \todo{[Mehlhorn (, Fredman)]}. Each node in the tree will get an index number which is used for searching.
+Constructing the weighted search tree in $O(|R(x)|)$ time is not covered by Cole et. al. \cite{nlogn}. However, in the paper \cite{fredman} by Fredman, it it described how a balanced search tree can be constructed in $O(N)$ time, given $O(N)$ probabilities which should be associated with the nodes of the tree.
+
+Though not completely applicable to our situation, we used it as a basis for the following algorithm. Each node in the tree will get an index number which is used for searching.
 
 \begin{itemize}
 	\item Given weights ${w_0, w_1, ..., w_{|R(x)|-1}}$, construct two lists of sums ${L_0, ..., L_{|R(x)|}}$ and ${R_0, ..., R_{|R(x)|}}$, where
@@ -303,15 +303,14 @@ A search tree can be constructed in $O(|R(x)|)$ time using the following algorit
 	\subsubitem If $k=j$, the right child is just a node with index $j$.
 \end{itemize}
 
-Determining $k$ from the weights ${w_i, ..., w_j}$ is done by finding the smallest $k$ satisfying $L_k-L_i \ge R_k-R_{j+1}$. This can be done in time $O(log(k))$ as follows:
+Determining $k$ from the weights ${w_i, ..., w_j}$ is done by finding the smallest $k$ satisfying $L_k-L_i \ge R_k-R_{j+1}$. This can be done in $O(log(k))$ time as follows:
 
 \begin{itemize}
 	\item For the middle index $k=i+(j-i+1)/2$, determine whether $L_k-L_i \ge R_k-R_{j+1}$
-	\item If not, let $k=i+1, k=i+2, k=i+4, k=i+8$ until $L_k-L_i \ge R_k-R_{j+1}$
+	\item If not, let $k=i+1, k=i+2, k=i+4, k=i+8, ...$ until $L_k-L_i \ge R_k-R_{j+1}$
 	\subitem In the interval between $k$ and the previous value of $k$, use binary search to find the smallest $k$ satisfying $L_k-L_i \ge R_k-R_{j+1}$
-	\item The case where $L_k-L_i \ge R_k-R_{j+1}$ is treated symmetrically
+	\item The case where $L_k-L_i \ge R_k-R_{j+1}$ is treated symmetrically\\
 \end{itemize}
-
 The linear time complexity can be explained as follows:
 
 Let $F(N)$ be the time taken to construct a search tree with $N$ internal nodes. $F(N)$ satisfies the following inequality
@@ -331,7 +330,8 @@ Each node $v$ will also hold the lowest index number $low(v)$ and largest index 
 Given the subset ${v_i, ..., v_j}$ of $R(x)$ in bottom to top order, let ${index(v_i), ..., index(v_j)}$ be the corresponding indices. Searching for the leaves with these indices in $\mathcal{T}$ is done with a sequential search by first searching for the leaf $l$ with index $index(v_i)$ in the standard way. Then search for the leaf with index $index(v_{i+1)}$ by starting at $l$ and go up through the tree until reaching a node whose lowest index number is less than $index(v_{i+1)}$. The leaf with index $index(v_{i+1)}$ is now found by searching in the standard way starting at the node just reached. Given a subset of $R(x)$ in top to bottom order, searching for the corresponding leaves in $\mathcal{T}$ is done similarly, but using the largest index numbers instead of the lowest.
 
 \subsubsection{Properties of the Search Tree}
-A search tree $\mathcal{T}$ is created such that a leaf $l$ corresponding to $v_j \in R(x)$ has weight $n_j + \frac{|T_2(x)|}{nsav(x)}$ if a non-singleton edge in $G(x)$ has endpoint in $v_j$ and weight $n_j$ otherwise. Balancing the tree with these weights ensures that the depth of any leaf $l$ corresponding to node $v_j \in R(x)$ is $O(log\frac{|T_2(x)|}{n_j})$. When searching for an ordered subset of $k$ leaves in $\mathcal{T}$ as specified in the previous section, the structure of $\mathcal{T}$ also ensures that the number of nodes visited is $O(k*log \dfrac{nsav(x)}{k})$. The reasoning behind these claims can be found in \cite{nlogn}.
+\label{stProperties}
+A search tree $\mathcal{T}$ is created such that a leaf $l$ corresponding to $v_j \in R(x)$ has weight $n_j + \frac{|T_2(x)|}{nsav(x)}$ if a non-singleton edge in $G(x)$ has endpoint in $v_j$ and weight $n_j$ otherwise. Balancing the tree with these weights ensures that the depth of any leaf $l$ corresponding to node $v_j \in R(x)$ is $O(log\frac{|T_2(x)|}{n_j})$. When searching for an ordered subset of $k$ leaves in $\mathcal{T}$ as specified in the previous section, the structure of $\mathcal{T}$ also ensures that the number of nodes visited is $O(k*log \dfrac{nsav(x)}{k})$ and each node is visited a most thrice. The reasoning behind these claims can be found in \cite{nlogn}.
 
 \subsection{Computing the Largest Weight Agreement Matchings}
 \input{./Chapters/ComputingLWAMs.tex}
@@ -425,7 +425,7 @@ A requirement for the algorithm is that any tree $T$ can be preprocessed in $O(|
 \section{Linear Time Search Tree Construction Proof?}
 
 \section{Time Complexity}
-Throughout this chapter, we explained the runtime of each step of the algorithm, aside from the step making recursive calls. Since each step satisfies the time complexity of $O(nlogn)$ and there is a constant number of steps, we can show that the total runtime of the algorithm is $O(nlogn)$.
+Throughout this chapter, we explained the runtime of each step of the algorithm, aside from the step of making recursive calls. Since each step satisfies the time complexity of $O(nlogn)$ and there is a constant number of steps, we can show that the total runtime of the algorithm is $O(nlogn)$.
 
 For the two input trees $T_1$ and $T_2$, we recursively create LWAMs for each pair $(M_i, S_i)$ of size $m_i, 1 \le i \le p-1$. We will inductively assume that each recursive call takes $O(m_ilogm_i)$ time. Then, since $\sum_{i=1}^p m_i = n$, the runtime of the recursive calls is $O(\sum_{i=1}^{p-1} m_ilogm_i) \le O(\sum_{i=1}^{p-1} m_ilogn) = O((\sum_{i=1}^{p-1} m_i)logn) = O(nlogn)$. Since each other step of the algorithm is limited by $O(nlogn)$, the total runtime of the algorithm is $O(nlogn)$.
 
