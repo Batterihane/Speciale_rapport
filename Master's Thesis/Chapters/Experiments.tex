@@ -9,10 +9,15 @@ All the experiments were performed on a Lenovo G50-80 laptop with the following 
 \end{itemize}
 
 The experiments were performed from IntelliJ with a maximum memory heap size of 2048 MB.
-In all experiments, the algorithm was run five times on each input and we plotted the median runtime in the graph. By using the median value instead of the mean value, we avoid outliers affecting the graph. Such outliers could among other things be caused by the OS prioritizing other processes so ignoring these will give a more representative graph. Before each experiment, we ran the algorithm to be tested with random inputs \todo{20? or 100?} times in order to warm up the cache.
+In all experiments, the algorithm was run five times on each input and we plotted the median runtime in the graph. By using the median value instead of the mean value, we avoid outliers affecting the graph. Such outliers could among other things be caused by the OS prioritizing other processes so ignoring these will give a more representative graph. Before each experiment, we ran the algorithm under test with random inputs 100 times in order to warm up the cache.
 
-\section{The NLogN Algorithm}
-We know that the runtime of the algorithm is $O(nlogn)$ for $n$ sized trees. However, we would like to find out how the algorithm runs in practice. How is the average runtime for random looking trees? What kind of trees give the best runtime? What kind of trees give the worst?
+\section{The $O(N^2)$ Algorithm}
+The algorithm by Goddard et. al. \cite{nsquared} produces an $n*n$ table no matter the topology of the input trees The runtime of the algorithm must therefore be $O(n^2)$ for any input and we don't expect any significant difference in runtime when inputting trees of different topologies. \todo{verify?}.
+
+In order to verify the runtime of $O(n^2)$, we ran the algorithm on randomly created trees and measured the runtime. The result is shown in \todo{figure}. \todo{move gc section here?}
+
+\section{The $O(nlogn)$ Algorithm}
+We know that the runtime of the algorithm by Cole et. al. \cite{nlogn} is $O(nlogn)$ for $n$ sized trees. However, we would like to find out how the algorithm runs in practice. How is the average runtime for random looking trees? What kind of trees give the best runtime? What kind of trees give the worst?
 
 In the following sections we will walk through some of the experiments we did in order to answer these questions.
 
@@ -104,9 +109,11 @@ By choosing this tree structure, we tried to maximize the space consumption of t
 	\label{completeIdenticalTreesGCGraph}
 \end{figure}
 
-\todo{Graph with all experiment results}
-
 \todo{Experiment for each step of the algorithm?}
+
+\section{Comparing Algorithms}
+In \todo{Graph with all experiment results - gc subtracted?} we see the runtime of each of the two algorithms \todo{include naive?}, given identical complete trees as input. Clearly, there is a huge improvement from the $O(n^2)$ algorithm to the $O(nlogn)$ algorithm and even for small input trees, the $O(nlogn)$ algorithm is dominant.
+
 
 \section{MLIS}
 The small algorithm that we described in section \ref{mlisSection} only works for input trees of a special structure; the same tree structure that we evaluated would give the shortest runtime for the algorithm by Cole et. al. It is expected to run in $O(nlogn)$ time, but because of its simplicity, we expect it to be faster than the algorithm by Cole et. al. in practice. We tested this through an experiment where we ran the two algorithms with the exact same input trees and plotted the results in the graphs seen in figure \ref{baseCaseTreesColeVsLIS}

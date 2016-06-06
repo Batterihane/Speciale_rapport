@@ -12,14 +12,12 @@ Before inducing subtrees, $T_2$ needs to be preprocessed for finding LCAs in $O(
 Preprocessing $T_2$ for inducing subtrees in linear time is also done by storing a constant amount of data at each node of $T_2$, giving a space consumption of $O(n)$.
 
 \subsubsection{Inducing Subtrees}
-Inducing the subtree of $T_2$ from a set of leaves $L$ only requires storing data for each node of the final subtree which will have size $O(|L|)$.
+Inducing a subtree of $T_2$ from a set of leaves $L$ only requires storing data for each node of the subtree which will have size $O(|L|)$.
 
 For each side tree $M_i, 1 \le i \le p-1$ of $\pi$, the subtree $S_i$ is induced from the leaves of $T_2$ that are twins of the leaves of $M_i$. The total amount of leaves used to induce subtrees is therefore $\sum_{i=1}^{p-1} m_i < n$ and the space needed is $O(n)$.
 \\
 \\
-In order to create the sets of leaves used to induce subtrees, the leaves of the side trees of $\pi$ should be sorted, which could be done using bucket sort, giving a space consumption of $O(n)$.
-
-\subsection{Constructing LWAMs recursively}
+In order to create the sets of leaves used to induce subtrees, the leaves of the side trees of $\pi$ should be sorted, which can be done using bucket sort, giving a space consumption of $O(n)$.
 
 \subsection{Matching Graphs}
 Recall that a matching graph $G(x)$ consists of two sets of nodes $L(x)$ and $R(x)$ with edges between them. Only a constant amount of data needs to be stored at each node and each edge. As mentioned earlier, the total number of edges in all matching graphs is $O(nlogn)$ and since $|L(x)| \le n$ and $|R(x)| \le n$, the total amount of space needed for the matching graphs must be $O(nlogn)$.
@@ -29,10 +27,31 @@ Recall that a matching graph $G(x)$ consists of two sets of nodes $L(x)$ and $R(
 For each matching graph $G(x)$ a binary search tree is created. The search tree gets a leaf for each node in $R(x)$, so the amount of space needed for a single search tree is $O(|R(x)|)$. Each node of $T_2$ can only be contained in one matching graph so the amount of nodes used to create search trees is $\sum_{x \in X} |R(x)| \le n$. Thus the total amount of space used on search trees is $O(n)$.
 
 \subsubsection{Largest Weight Agreement Matchings}
-Recall that for each matching graph $G(x)$, we compute and store the LWAM containing only edges from $u_i$ and nodes below $u_i$ in $L(x)$, for each $u_i \in L(x)$, and we compute and store the LWAM containing only edges from $v_j$ and nodes below $v_j$ in $R(x)$, for each $v_j \in R(x)$. The LWAMs are constructed while processing the edges of $G(x)$ and saved in the search tree. Recall that when updating a node in the search tree, only a constant amount of information is added. Either an edge or a proper crossing is updated, or an agreement matching is updated which is either a proper crossing or a white edge and a pointer to an agreement matching. So the amount of space needed to store the LWAMs is proportional to the amount of nodes in search trees that are updated.
+Recall that for each matching graph $G(x)$, we compute and store the LWAM containing only edges from $u_i$ and nodes below $u_i$ in $L(x)$, for each $u_i \in L(x)$, and we compute and store the LWAM containing only edges from $v_j$ and nodes below $v_j$ in $R(x)$, for each $v_j \in R(x)$. The LWAMs are constructed while processing the edges of $G(x)$ and saved in the search tree. When updating a node in the search tree, only a constant amount of information is added. Either an edge or a proper crossing is updated, or an agreement matching is updated which is either a proper crossing or a white edge and a pointer to an agreement matching. So the amount of space needed to store the LWAMs is proportional to the amount of nodes in search trees that are updated.
 
-Now consider the node $u_i \in L(x)$ from the matching graph $G(x)$. If $d_x(u_i) = 1$ and $(u_i, v_j)$ is the edge incident on $u_i$, then only the nodes from $anc(l)$, and children of these nodes can be updated, where $l$ is the leaf in the search tree that corresponds to $v_j$. The size of $anc(l)$ is equal to the depth of $l$ in the search tree, i.e. $O(log(\dfrac{T_2(x)}{n_j}))$. Otherwise if $d_x(u_i) = k > 1$, let ${l_1, l_2, ..., l_k}$ be the leaves in the search tree that are searched for when processing $u_i$. The only nodes in the search tree that needs to be updated are nodes from the set ${anc(l_1) \cup anc(l_2) \cup ... \cup anc(l_k)}$ which are the nodes visited when searching for ${l_1, l_2, ..., l_k}$. This set has size $O(k*log \dfrac{nsav(x)}{k})$.
+In section \ref{lwam_analysis} we concluded that the total amount of nodes visited when searching for leaves in the search trees, for any node $u_i \in \pi$, is $O(m_ilog\dfrac{n}{m_i})$. The only nodes that need to be updated are the visited nodes and children of these nodes, which is done while searching, so the total amount of nodes that are updated must be $O(\sum_{i=1}^p m_ilog\dfrac{n}{m_i}) \le O(nlogn)$.
 
+\subsection{Creating the MAST}
+Creating the final MAST requires no more space than the size of the tree which can't be larger than $n$, so the amount of space used is $O(n)$.
+
+\subsection{\todo{Total}}
+We will show that the total amount of space needed for storing the LWAMs that are recursively constructed is $O(nlogn)$. We can inductively assume that each recursive call $computeLWAM(M_i, S_i)$ uses $O(m_ilogm_i)$ space, $1 \le i \le p-1$. Creating centroid decompositions, inducing subtrees and creating the final MAST uses $O(n)$ space and creating matching graphs and LWAMs uses $O(nlogn)$ space, so the total amount of space used by the algorithm is $O(n) + O(nlogn) + O(\sum_{i=1}^{p-1} m_ilogm_i) = O(nlogn)$.
+
+Table \ref{spaceTable} gives an overview.
+\begin{table}[]
+	\centering
+	\begin{tabular}{l|l}
+		Creating Centroid Decompositions & O(n)     \\
+		Inducing Subtrees                & O(n)     \\
+		Construct LWAMs recursively		 & O(nlogn) \\
+		Creating Matching Graphs         & O(nlogn) \\
+		Computing LWAMs                  & O(nlogn) \\
+		Creating the MAST                & O(n)     \\ \hline
+		Total                            & O(nlogn)
+	\end{tabular}
+	\caption{Runtime}
+	\label{spaceTable}
+\end{table}
 
 
 
