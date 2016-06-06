@@ -125,7 +125,7 @@ Two example trees have been provided in Figure \ref{Fig:Binary1}. We now wish to
 Extending the solution for computing the size of the MAST to include the computation of the actual MAST is fairly simple in this case. We found two different ways of going about it. 
 \\
 \\
-\textbf{Option 1: Continual Tree Construction}
+\textbf{Option 1: Continual Tree Construction} \\
 The first option is to extend the size algorithm simply by attaching the MAST responsible for the size of each cell in the size table. This cannot be done by copying subtrees from the input trees, since that would break our time constraints. For this reason, we store the pointer to the root of the subtree for each cell, and hence mutiple cells/masts will refer to the same subtrees. This means that we will end up creating a Directed Acyclic Graph, where the root node of the maximum sized MAST is saved in the bottom right corner of the size table. Usually a traversal fixing parent/child pointers is needed in the end.
 More concretely, the algorithm is described as follows: 
 
@@ -135,10 +135,9 @@ The first case is that $a$ and $w$ are both leaves. If the leaves are equal, i.e
 
 The second case is that we have a leaf and an internal node. Let's say $w$ is the internal node having $x$ and $y$ as children. If the leaf corresponding to $a$ is contained in $T_w$, it will also be contained in either $T_x$ or $T_y$ and $A_{a,w}$ will be the same as either $A_{a,x}$ or $A_{a,y}$. Since we do a postorder traversal of the trees, $A_{a,x}$ and $A_{a,y}$ have already been computed and $A_{a,w}$ can just be set to the largest of the two.
 
-The third case is that both $a$ and $w$ are internal nodes, where $a$ have children $b$ and $c$ and $w$ have children $x$ and $y$. In this case we can use Lemma 1. Again, all the agreement subtrees to consider have already been computed. If the largest subtree is either $A_{b,x} + A_{c,y}$ or $A_{b,y} + A_{c,x}$, $A_{a,w}$ will be the tree having the two subtrees as children.
-
-
-\textbf{Option 2: Recursive Backtracking}
+The third case is that both $a$ and $w$ are internal nodes, where $a$ have children $b$ and $c$ and $w$ have children $x$ and $y$. In this case we can use Lemma 1. Again, all the agreement subtrees to consider have already been computed. If the largest subtree is either $A_{b,x} + A_{c,y}$ or $A_{b,y} + A_{c,x}$, $A_{a,w}$ will be the tree having the two subtrees as children. \\
+\\
+\textbf{Option 2: Recursive Backtracking} \\
 While the first option is fairly simple to implement and understand, it can consume quite a bit of memory due to all the trees we save that ultimately end up being irrelevant for the final result. Backtracking tries to rectify this problem by only computing and storing exactly the relevant subtrees for the final MAST. This is done by observing that the formula in Figure \ref{Fig:Function1}, on which the algorithm is based, is a maximization function. Therefore, the table is deterministicly constructed, allowing us for each cell to determine what cells were responsible for the size it contains. By computing the entire size table first, we can start with the bottom right cell and recursively run back through the table determining all cells responsible for the MAST size. The tree is then constructed following the same logic used in Option 1. 
 \\
 Java inspired pseudo-code for the backtracking algorithm can be seen in Figure \ref{Code:Backtracking1}. Notice that the order of the if-cases in the pseudo code are significant, which was not previously the case when only computing the MAST size. The reason is simply that several of the cases might actually lead to the same MAST size, but not all will lead to a valid binary tree. For instance the second and third recursive case might lead to the same size, but if you choose the third case, then you will end up will a null-branch in the produced MAST, since this branch does not contribute to the MAST size. 
