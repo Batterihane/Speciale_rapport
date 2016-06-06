@@ -21,24 +21,23 @@ Goddard et. al.\cite{nsquared} describes a $O(n^2)$ algorithm for finding the la
 	\underline{Case 4}: Only $T_y$ contributes to $A_{aw}$.
 	If this is the case, then the agreement subtree can only exist between $T_y$ and $T_a$,
 	\#$(T_a,T_y)$.\\
-	\underline{Case 5}: Only $T_y$ contributes to $A_{aw}$.
-	If this is the case, then the agreement subtree can only exist between $T_y$ and $T_a$,
-	\#$(T_a,T_y)$.
-	
-	  
+	\underline{Case 5}: This case covers all that case 1 through 4 doesn't, which means that all children b, c, x and y contibute to the MAST.
+	Consider the agreement tree, $A_r$, rooted in r and with children j and l. We claim that a child of r cannot contain a leaf, $b'$, from $T_b$ and a leaf, $c'$, from $T_c$ at the same time. If this is the case, then we only need to find the MAST size of child pairing permutations across $T_a\ and\ T_w$: $max\{\#(T_b, T_x)+\#(T_c, T_y), \#(T_b, T_y)+\#(T_c, T_x)\}$.
+	Let us now prove our claim to be correct by assuming it doesn't hold, and use that to reach a  contradiction. Suppose that $A_j$ contains a leaf , $b'$, from $T_b$ and a leaf, $c'$, from $T_c$. Let f be another leaf from $T_b$. We now see that the subtree induced by $b', f and c'$ differs for $A_r$ and $T_a$ as illustrated in Figure \ref{Fig:Lemma1Binary}. This is clearly contradictory to the definition of an agreement tree, which is why we must conclude our claim to be correct.
+	\qed   	  
 \end{Lemma}
 
 \begin{figure}
 	\begin{enumerate}
 		
-		\item[]  \Tree [.r [.s b' c' ].s [.t f ].t ].r
+		\item[]  \Tree [.r [.j b' c' ].j [.l f ].l ].r
 		\hskip 0.4in
 		 \Tree [.a [.b b' f ].b [.c c' ].c ].a
 		
 	\end{enumerate}	
 	
 	\caption{Two example binary trees for, and they resulting MAST}
-	\label{Fig:Binary1}	
+	\label{Fig:Lemma1Binary}	
 \end{figure}
 
 
