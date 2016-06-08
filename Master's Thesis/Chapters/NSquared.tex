@@ -1,8 +1,8 @@
 \chapter{\todo{The NSquared algorithm}}
-Goddard et. al.\cite{nsquared} describes a $O(n^2)$ algorithm for finding the largest agreement subtree for two rooted binary trees. Given two trees T and U of size m and n, the idea is to iteratively find the largest agreement subtree and its size for every pair of subtrees from T and U. This can be done in quadratic time by using Lemma 1. 
+Goddard et. al.\cite{nsquared} describes a $O(n^2)$ algorithm for finding the maximum agreement subtree for two rooted binary trees. Given two trees T and U of size m and n, the idea is to iteratively find the largest agreement subtree and its size for every pair of subtrees from T and U. This can be done in quadratic time by using Lemma 1. 
 
 \begin{Lemma}
-	Let $T_a$ be a tree rooted at vertex a with the children b and c; And let $T_w$ be rooted at w with children x and y. We now define $\#(T_a,T_x)$ as the size of the maximum agreement subtree of $T_a$ and $T_w$.  $\#(T_a,T_x)$ is given by the maximum of the following six numbers: \#$(T_b,T_x)+(T_c,T_y)$,
+	Let $T_a$ be a tree rooted at vertex a with the children b and c; And let $T_w$ be rooted at w with children x and y. We now define $\#(T_a,T_w)$ as the size of the maximum agreement subtree of $T_a$ and $T_w$.  $\#(T_a,T_w)$ is given by the maximum of the following six numbers: \#$(T_b,T_x)+(T_c,T_y)$,
 	\#$(T_b,T_y)+(T_c,T_x)$,
 	\#$(T_a,T_x)$,
 	\#$(T_a,T_y)$,
@@ -10,15 +10,15 @@ Goddard et. al.\cite{nsquared} describes a $O(n^2)$ algorithm for finding the la
 	\#$(T_c,T_w)$.\\
 	\textbf{Proof.}\\
 	This is a proof by case over the possible subtrees contributing to the agreement subtree for $T_a$ and $T_w$, $A_{aw}$.\\
-	\underline{Case 1}: Only $T_b$ contributes to $A_{aw}$.
+	\underline{Case 1}: Only $T_b$ of $T_a$ contributes to $A_{aw}$.
 	If this is the case, then the agreement subtree can only exist between $T_b$ and $T_w$, \#$(T_b,T_w)$.\\
-	\underline{Case 2}: Only $T_c$ contributes to $A_{aw}$.
+	\underline{Case 2}: Only $T_c$ of $T_a$ contributes to $A_{aw}$.
 	If this is the case, then the agreement subtree can only exist between $T_c$ and $T_w$,
 	\#$(T_c,T_w)$.\\
-	\underline{Case 3}: Only $T_x$ contributes to $A_{aw}$.
+	\underline{Case 3}: Only $T_x$ of $T_w$ contributes to $A_{aw}$.
 	If this is the case, then the agreement subtree can only exist between $T_x$ and $T_a$,
 	\#$(T_a,T_x)$.\\
-	\underline{Case 4}: Only $T_y$ contributes to $A_{aw}$.
+	\underline{Case 4}: Only $T_y$ of $T_w$ contributes to $A_{aw}$.
 	If this is the case, then the agreement subtree can only exist between $T_y$ and $T_a$,
 	\#$(T_a,T_y)$.\\
 	\underline{Case 5}: This case covers all that case 1 through 4 doesn't, which means that all children b, c, x and y contibute to the MAST.
@@ -42,7 +42,7 @@ Goddard et. al.\cite{nsquared} describes a $O(n^2)$ algorithm for finding the la
 
 
 What Lemma 1 essentially states is twofold. First, if the MAST contains children from all subtrees (a,b,x,y), then its size is given by the largest combination of these. Secondly, if the MAST does not include all subtrees, then its size is given by the largest combination of subtrees excluding at least one of them.    
-This gives rise to a recursive solution for finding the size of the maximum agreement subtree. The recursive function is defined as follows: 
+This gives rise to a recursive solution for finding the size of the maximum agreement subtree. The recursive function is defined in figure \ref{Fig:Function1}.
 
 \begin{figure}
 	\begin{equation*}
@@ -75,7 +75,7 @@ This gives rise to a recursive solution for finding the size of the maximum agre
 
 Like many similar recursive definitions in bioinformatics, we run into the problem that the recursive function computes the same partial results multiple times. This problem is rectified by the method of dynamic programming. Specifically, we wish to store the partial results in a $|T_a| \times |T_w|$ table. We seek to fill out the table with our partial results, and end up with the maximum size in the bottom right corner.
 Looking at the function in Figure \ref{Fig:Function1} we see that the partial result for each tree node is dependent on the results of its children. This implies that we must list the table nodes in postorder, thereby ensuring that the partial results, on which a given node is dependent, has already been calculated when we reach it. 
-By introducing such a table we also introduce a requirement of $O(n^2)$ space and time, making it a quadratic algorithm. Simple techniques for reducing the space requirement, like only storing a few number of rows in the table at a time, cannot be applied in this case, since the computation of a new row may depend on all the previous rows in the worst case scenario.  
+By introducing such a table we also introduce a requirement of $O(n^2)$ space and time, making it a quadratic algorithm. Simple techniques for reducing the space requirement, like only storing a few number of rows in the table at a time, cannot be applied in this case, since the computation of a new row may depend on any of the previous rows.  
 \\
 We will in the following sections show how one can extend this method for calculation the size of the MAST to computing the actual tree.
 
@@ -122,7 +122,7 @@ Two example trees have been provided in Figure \ref{Fig:Binary1}. We now wish to
 
 
 \subsection{Computing the MAST}
-Extending the solution for computing the size of the MAST to include the computation of the actual MAST is fairly simple in this case. We found two different ways of going about it. 
+Extending the solution for computing the size of the MAST to include the computation of the actual MAST is not covered in the article \cite{nsquared}, but is fairly simple in this case. We found two different ways of going about it. 
 \\
 \\
 \textbf{Option 1: Continual Tree Construction} \\
@@ -135,7 +135,7 @@ The first case is that $a$ and $w$ are both leaves. If the leaves are equal, i.e
 
 The second case is that we have a leaf and an internal node. Let's say $w$ is the internal node having $x$ and $y$ as children. If the leaf corresponding to $a$ is contained in $T_w$, it will also be contained in either $T_x$ or $T_y$ and $A_{a,w}$ will be the same as either $A_{a,x}$ or $A_{a,y}$. Since we do a postorder traversal of the trees, $A_{a,x}$ and $A_{a,y}$ have already been computed and $A_{a,w}$ can just be set to the largest of the two.
 
-The third case is that both $a$ and $w$ are internal nodes, where $a$ have children $b$ and $c$ and $w$ have children $x$ and $y$. In this case we can use Lemma 1. Again, all the agreement subtrees to consider have already been computed. If the largest subtree is either $A_{b,x} + A_{c,y}$ or $A_{b,y} + A_{c,x}$, $A_{a,w}$ will be the tree having the two subtrees as children. \\
+The third case is that both $a$ and $w$ are internal nodes, where $a$ have children $b$ and $c$ and $w$ have children $x$ and $y$. In this case we can use Lemma 1 and determine which of the six cases gives the largest size. Again, all the agreement subtrees to consider have already been computed. If the largest size is $\#A_{b,x} + \#A_{c,y}$, then $A_{a,w}$ will be a tree where the root has the roots of $A_{b,x}$ and $A_{c,y}$ as children. Similarly if the largest size is $\#A_{b,y} + \#A_{c,x}$.\\
 \\
 \textbf{Option 2: Recursive Backtracking} \\
 While the first option is fairly simple to implement and understand, it can consume quite a bit of memory due to all the trees we save that ultimately end up being irrelevant for the final result. Backtracking tries to rectify this problem by only computing and storing exactly the relevant subtrees for the final MAST. This is done by observing that the formula in Figure \ref{Fig:Function1}, on which the algorithm is based, is a maximization function. Therefore, the table is deterministicly constructed, allowing us for each cell to determine what cells were responsible for the size it contains. By computing the entire size table first, we can start with the bottom right cell and recursively run back through the table determining all cells responsible for the MAST size. The tree is then constructed following the same logic used in Option 1. 

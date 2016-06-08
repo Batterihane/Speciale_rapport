@@ -58,7 +58,7 @@ Creating the centroid decompositions can be done in $O(n)$ time in the following
 
 First, at each node $v$ in the two trees we need to store the number of leaves in the subtree having $v$ as root. This can be done in a single post-order traversal of each tree. For a leaf, the number is 1. For an internal node, it is the sum of the numbers stored at its two children. Clearly this takes $O(n)$ time.
 
-Now for the centroid decomposition of the first tree, we simply start with the root node and add the child node with the highest number stored. For the second tree, the same thing is done, but when adding a child node, another path is started at the child that wasn't added if it's not a leaf.
+Now for the centroid decomposition of the first tree, we simply start with the root node and add the child node with the highest number stored. For the second tree, the same thing is done, but when adding a child node, another path is started at the child that wasn't added if it's not a leaf. While creating the paths for $T_2$ we will make each node on a path point to the start node of that path. This will be useful later in the algorithm.
 
 Each node is not visited more than once so the time complexity is $O(n)$.
 
@@ -168,7 +168,8 @@ Let $x$ be the start node of the centroid path $\pi(x)$ in $T_2$ with side trees
 	\item $R(x)$ consists of the nodes from $\pi(x)$.
 	\item $L(x)$ contains nodes from the centroid path $\pi$ in $T_1$, for which there is an edge to some node in $R(x)$.
 	\item The nodes of each set are in the order that they appear in the path that they are created from. I.e. the topmost node of a set is the node closest to the root and the bottommost is the one farthest from the root.
-	\item An edge $(u_i, v_j), 1 \le i \le p-1, 1 \le j \le q$ exists if and only if $S_i \cap N_j \ne \emptyset$
+	\item An edge $(u_i, v_j), 1 \le i \le p-1, 1 \le j \le q$ exists if and only if $S_i \cap N_j \ne \emptyset$.
+	\subitem Where $S_i \cap N_j$ is the intersection between the nodes of $N_j$ and the nodes of $T_2$ corresponding to the nodes of $S_i$.
 	\item An edge $(u_p, v_j), 1 \le j \le q$ exists if and only if the twin of $u_p$ is in $N_j$.
 \end{itemize}
 
@@ -183,23 +184,27 @@ Consider the trees in figure \ref{Fig:InputTrees} where $\pi = \{u_1,u_2,u_3,u_4
 A matching graph $G(x)$ is used to create a Largest Weight Agreement Matching which can be translated directly to the MAST of $T_1$ and $T_2(x)$. For each $u_i \in L(x)$, starting from the bottom, we compute the LWAM containing only edges from $u_i$ and nodes below $u_i$ in $L(x)$. This will be covered in detail in section \ref{agreementMatchingSection}.
 
 \subsection{Creating the Matching Graphs}
-First of all, a graph is created for each centroid path in $T_2$, where all nodes in the path is added to the right set. In order to get access to such a graph in constant time from a node in the path, we will make each start node of the paths point to the corresponding graph.
-Since the left set of each graph only contains nodes from $\pi$ we can add these nodes and all edges by doing a walk through $\pi$. This walkthrough contains the following steps for each node $z \in S_i$ for each $u_i \in \pi, 1 \le i \le p-1$:
+First of all, a graph is created for each centroid path in $T_2$, where all nodes in the path is added to the right set. In order to get access to such a graph in constant time from a node in the path, we will make each start node of the paths point to the corresponding graph. Recall that each node of a path points to the start node.
+
+Since the left set of each graph only contains nodes from $\pi$ we can add these nodes and all edges by doing a walk through $\pi$. This walkthrough contains the following steps for each node $z \in S_i$ for each $u_i \in \pi, 1 \le i \le p-1$, where the nodes of $S_i$ are traversed in preorder.
 
 \begin{enumerate}
 	\item Find the corresponding node $z'$ in $T_2$.
+	\subitem This takes constant time since $z$ has a reference to $z'$.
 	\item If $z'$ is on a centroid path $\pi(z')$ (this is the case if $z'$ has a pointer to the start node of a path), do the following:
 	\subitem Find the graph $G(z')$ that corresponds to the path $\pi(z')$. This is done in constant time since $z'$ has a pointer to the start node $start(\pi(z'))$ which has a pointer to the graph.
 	\subitem Add $u_i$ to $L(z')$ if it has not already been added.
 	\subitem Add an edge between $u_i$ and $z'$ in $G(z')$.
-	\subitem Repeat from step 1 using the parent of $start(\pi(z'))$ as node $z$.
-	\item If $z'$ is not on a centroid path, repeat from step 1 using the parent of $z$.
+	\subitem Repeat from step 2 using the parent of $start(\pi(z'))$ as node $z'$.
+	\item If $z'$ is not on a centroid path, repeat from step 2 using the parent of $z'$.
 \end{enumerate}
-The loop stops either when reaching the root of $T_2$ or when reaching a node which is on the same path as the node in $T_2$ that corresponds to the parent of $z$ in $S_i$. The second case means that the rest of the processing has already been done by the parent. This ensures that for each node visited in $T_2$, an edge is added to some graph, meaning that the process of adding all edges takes linear time with respect to the total number of edges in the graphs. In the article \cite{nlogn}, an analysis proves that the total number of edges is bound by the sizes of the side trees of $\pi$ namely $O(\sum_{i=1}^{p-1}m_ilog\dfrac{n}{m_i}) \le O(nlogn)$.
+The loop stops either when reaching the root of $T_2$ or when reaching a node which is on the same path as the node in $T_2$ that corresponds to the parent of $z$ in $S_i$. The second case means that the rest of the processing has already been done by the parent. This ensures that for each node visited in $T_2$, an edge is added to some graph, meaning that the process of adding all edges takes linear time with respect to the total number of edges in the graphs. In the article \cite{nlogn}, an analysis proves that the total number of edges is bound by the sizes of the side trees of $\pi$ namely $O(\sum_{i=1}^{p-1}m_ilog\dfrac{n}{m_i})$ which is bound by $O(nlogn)$ since $\sum_{i=1}^{p} m_i = n$.
 
-For the last node $u_p$ in $\pi$, the process is very similar. $z$ starts being the twin of $u_p$ and the loop continues until reaching the root of $T_2$.\\
+For the last node $u_p$ in $\pi$, the process is very similar. $z'$ starts being the twin of $u_p$ and the loop continues until reaching the root of $T_2$.\\
 
-For a node $s$ in a subtree $S_i, 1 \le i \le p-1$, every node $v_j$ visited in the iteration, will be the node that is the closest ancestor of $s$ in some path, which means that either $s \in N_j$ or $s=v_j$. Both cases means that $S_i \cap N_j \ne \emptyset$ so an edge should be added.
+For any node $z \in S_i, 1 \le i \le p-1$, $z'$ being the corresponding node in $T_2$, every node $v_j$ visited in the iteration will be the node that is the closest ancestor of $z'$ in the path that $v_j$ is on, which means that either $z' \in N_j$ or $z'=v_j$. Both cases mean that $S_i \cap N_j \ne \emptyset$ so an edge should be added.
+
+For $u_p$, $z'$ being the twin of $u_p$, if node $v_j$ is visited in the iteration, then $z' \in N_j$ so an edge should be added.
 
 \subsection{Edge Weights}
 Each edge in a graph is a multiedge consisting of a white, green and red edge, each with its own weight. The weights are defined as follows:
@@ -213,12 +218,12 @@ Let's again consider the input trees of figure \ref{Fig:InputTrees}. The edges o
 
 The thing to notice about the edge weights is first that the size of a MAST is equal to the weight of the corresponding LWAM, and second that $LWAM(M_i, T_2) = LWAM(M_i, S_i), 1 \le i \le p-1$ which have already been computed in the recursive calls, so each node $v$ of $S_i$ holds the LWAM and its weight for $M_i$ and $S_i(v)$.
 
-In order to compute the weight of each edge in constant time, a node $map(i,j)$ is defined for the multiedge $(u_i,v_j)$. $map(i,j)$ is the node of $S_i$ which is closest to the root and either a descendant of or equal to $v_j$ in $T_2$. The edge $(u_i,v_j)$ is added to a graph during an iteration of a node in $S_i$, as described in the previous section. That node is exactly the node closest to the root in $S_i$ which is also a descendant or equal to $v_j$ in $T_2$, so a reference to $map(i,j)$ is added in constant time and doesn't change the time complexity.
+In order to compute the weight of each edge in constant time, a node $map(i,j)$ is defined for the multiedge $(u_i,v_j)$. $map(i,j)$ is the node of $S_i$ which is closest to the root and its corresponding node in $T_2$ is either a descendant of or equal to $v_j$. The edge $(u_i,v_j)$ is added to a graph during an iteration of a node in $S_i$, as described in the previous section. That node is exactly the node closest to the root in $S_i$ which is also a descendant or equal to $v_j$ in $T_2$, so a reference to $map(i,j)$ is added in constant time and doesn't change the time complexity.
 
 First, if one of $u_i$ and $v_j$ is a leaf, then the weight of all three edges is 1. Otherwise, let $y=map(i,j)$.
 
 \subsubsection{White Edge Weight}
-$y$ is either a descendant of or equal to $v_j$. In the former case, we know that $y \in N_j$ or the edge would not have been added. So the weight of the white edge is the weight of $LWAM(M_i, S_i(y))$, which can be looked up in $y$ in constant time. In the latter case, one of $y's$ children is in $N_j$. That child $z$ is then the node closest to the root of $S_i$ which is in $N_j$, so the weight is equal to the weight of $LWAM(M_i, S_i(z))$, which is looked up in $z$. Since all nodes on a path of $T_2$ has a reference to the topmost node of that path, $z$ can be found in constant time by picking the child of $v_j$ that does not have a reference to the same node as $v_j$, i.e. the root of $N_j$. If that node is the first child of $v_j$, then $z$ is the first child of $y$ and vice versa.
+$y$ is either a descendant of or equal to $v_j$. In the former case, we know that $y \in N_j$ or the edge would not have been added. So the weight of the white edge is the weight of $LWAM(M_i, S_i(y))$, which can be looked up at $y$ in constant time. In the latter case, one of $y's$ children is in $N_j$. That child $z$ is then the node closest to the root of $S_i$ which is in $N_j$, so the weight is equal to the weight of $LWAM(M_i, S_i(z))$, which is looked up in $z$. Since all nodes on a path of $T_2$ has a reference to the start node of that path, $z$ can be found in constant time by picking the child of $v_j$ that does not have a reference to the same node as $v_j$, i.e. it must be the root of $N_j$. If that node is the first child of $v_j$, then $z$ is the first child of $y$ and vice versa.
 
 \subsubsection{Green Edge Weight}
 The green edge weight is equal to the weight of $LWAM(M_i,T_2(v_j))$. $S_i(y)$ is the subtree of $T_2(v_j)$ containing only leaves of $M_i$, so the weight is equal to the weight of $LWAM(M_i, S_i(y))$ which is looked up at $y$ in constant time.
@@ -254,7 +259,7 @@ For any edge $(u_i, v_j)$, we say that $u_i$ and $v_j$ are adjacent. For two edg
 \subsubsection{Agreement Matchings}
 In the graph $G(x)$, a 'Proper Crossing' is either a single red edge, a single green edge or a crossing of a red edge $(u_i,v_j)$ and a green edge $(u_i',v_j')$ where $u_i'$ is above $u_i$ in $L(x)$.
 
-Now an agreement matching is defined as a proper crossing and zero or more white edges, where all white edges dominate the edge(s) in the proper crossing and no white edge touches any other edge in the matching.
+Now an agreement matching is defined as a proper crossing and zero or more white edges, where all white edges dominate the edge(s) in the proper crossing and no white edge touches any other edge in the agreement matching.
 
 This definition makes sure that an agreement matching holds exactly the information needed to uniquely determine the corresponding agreement subtree.
 
@@ -294,12 +299,12 @@ All possible cases of $\mathcal{A}$ has been covered and in each case the the su
 \subsection{The Weighted Search Tree}
 In order to compute the LWAMs in $O(nlogn)$ time, we will create a weight balanced binary search tree $\mathcal{T}$ for each matching graph $G(x)$. This tree will be used to store the information needed to determine which edges of $G(x)$ forms the LWAMs. The structure of the tree will ensure that filling the tree and extracting the LWAMs will not take more than $O(nlogn)$ time.
 
-$\mathcal{T}$ is created from the nodes in $R(x)$ such that $\mathcal{T}$ will have a leaf for each node in $R(x)$ and are in the same order as they are in $R(x)$. Leaf $v_j$ is given weight $n_j + \frac{|T_2(x)|}{nsav(x)}$ if a non-singleton edge in $G(x)$ has endpoint in $v_j$ and weight $n_j$ otherwise. The reason for choosing these weights is explained later.
+$\mathcal{T}$ is created from the nodes in $R(x)$ such that $\mathcal{T}$ will have a leaf for each node in $R(x)$. The order of the leaves from left to right should correspond to the top-down order of the nodes in $R(x)$ such that the leftmost leaf in $\mathcal{T}$ corresponds to the topmost node in $R(x)$. Leaf $v_j$ is given weight $n_j + \frac{|T_2(x)|}{nsav(x)}$ if a non-singleton edge in $G(x)$ has endpoint in $v_j$ and weight $n_j$ otherwise. The reason for choosing these weights is explained later.
 
 Recall that for each $u_i \in L(x)$, we want to compute the LWAM containing only edges from $u_i$ and nodes below $u_i$ in $L(x)$. This is done by processing each node $u_i \in L(x)$ in order bottom-to-top, where each node in $R(x)$, that has an edge to $u_i$, is searched for in $\mathcal{T}$, while storing information about the edges in $\mathcal{T}$.  After processing $u_i$, the LWAM can be extracted from $\mathcal{T}$. 
 
 \subsubsection{Constructing the Weighted Search Tree}
-Constructing the weighted search tree in $O(|R(x)|)$ time is not covered by Cole et. al. \cite{nlogn}. However, in the paper \cite{fredman} by Fredman, it it described how a balanced search tree can be constructed in $O(N)$ time, given $O(N)$ probabilities which should be associated with the nodes of the tree.
+For a matching graph $G(x)$, the weighted search tree can be constructed in $O(|R(x)|)$ time. Since $\sum_{x \in X} |R(x)| = n$, all the search trees needed for the matching graphs can be constructed in $O(n)$ time. This is not covered by Cole et. al. \cite{nlogn}, but in the paper \cite{fredman} by Fredman, it it described how a balanced search tree can be constructed in $O(N)$ time, given $O(N)$ probabilities which should be associated with the nodes of the tree.
 
 Though not completely applicable to our situation, we used it as a basis for the following algorithm. Each node in the tree will get an index number which is used for searching.
 
@@ -309,21 +314,25 @@ Though not completely applicable to our situation, we used it as a basis for the
 	\subitem $R_j=\sum_{k=j}^{|R(x)|-1} w_k$, $R_{|R(x)|}=0$
 	\item Construct the tree using the recursive procedure $constructST(w_0, w_1, ..., w_{|R(x)|-1})$ which returns the root of the search tree.
 	\item $constructST(w_i, ..., w_j)$ has the following steps:
-	\subitem If $i+1=j$ then create and return a node with index $j$ and children with indexes $i$ and $j$.
+	\subitem If $i+1=j$ then create and return a node with index $j$ having a left child with index i and a right child with index j.
 	\subitem Otherwise, determine the smallest $k, i<k\le j$ such that
 	\subsubitem $L_k-L_i \ge R_k-R_{j+1}$
-	\subitem Define a node with index $k$ and the two children $constructST(w_i, ..., w_{k-1})$ and $constructST(w_k, ..., w_j)$.
-	\subsubitem If $i=k-1$, the left child is just a node with index $i$.
-	\subsubitem If $k=j$, the right child is just a node with index $j$.
+	\subitem Define a node with index $k$ having $constructST(w_i, ..., w_{k-1})$ as left child and $constructST(w_k, ..., w_j)$ as right child.
+	\subsubitem If $i=k-1$, the left child is just a leaf with index $i$.
+	\subsubitem If $k=j$, the right child is just a leaf with index $j$.
 \end{itemize}
 
-Determining $k$ from the weights ${w_i, ..., w_j}$ is done by finding the smallest $k$ satisfying $L_k-L_i \ge R_k-R_{j+1}$. This can be done in $O(log(k))$ time as follows:
+Determining $k$ from the weights ${w_i, ..., w_j}$ is done by finding the smallest $k$ satisfying $L_k-L_i \ge R_k-R_{j+1}$. This can be done in $O(log(k-i))$ time as follows:
 
 \begin{itemize}
-	\item For the middle index $k=i+(j-i+1)/2$, determine whether $L_k-L_i \ge R_k-R_{j+1}$
-	\item If not, let $k=i+1, k=i+2, k=i+4, k=i+8, ...$ until $L_k-L_i \ge R_k-R_{j+1}$
-	\subitem In the interval between $k$ and the previous value of $k$, use binary search to find the smallest $k$ satisfying $L_k-L_i \ge R_k-R_{j+1}$
-	\item The case where $L_k-L_i \ge R_k-R_{j+1}$ is treated symmetrically\\
+	\item For the middle index $k'=i+(j-i+1)/2$, determine whether $L_{k'}-L_i \ge R_{k'}-R_{j+1}$.
+	\item If so, let $k'=i+1, k'=i+2, k'=i+4, k'=i+8, ...$ until $L_{k'}-L_i \ge R_{k'}-R_{j+1}$.
+	\subsubitem This takes $O(log(k'-i))$ time for the final value of $k'$.
+	\subsubitem $k'-i \le 2(k-i)$, so $O(log(k'-i)) = O(log(k-i))$.
+	\subitem In the interval between $k'$ and the previous value of $k'$, use binary search to find the smallest $k'$ satisfying $L_{k'}-L_i \ge R_{k'}-R_{j+1}$.
+	\subsubitem This takes $O(log(k-i))$ time.
+	\subitem Then $k=k'$.
+	\item The case where $L_{k'}-L_i < R_{k'}-R_{j+1}$ is treated symmetrically.\\
 \end{itemize}
 The linear time complexity can be explained as follows:
 
@@ -331,17 +340,19 @@ Let $F(N)$ be the time taken to construct a search tree with $N$ internal nodes.
 
 $F(N) \le max\{A + Blog(k) + F(k-1) + F(N-k), 1 \le k \le (N+1)/2\}$
 
-where $A$ and $B$ are constants. This function can be proven to grow at most linearly with $N$, thus constructing a search tree has linear runtime w.r.t. the number of internal nodes. The proof can be seen in section \ref{searchTreeProof}. $|R(x)|$ is greater than the number of internal nodes, so a weight balanced binary search tree can be constructed in $O(|R(x)|)$ time.
+where $A$ and $B$ are constants and $N$ and $k$ are natural numbers. This function can be proven to grow at most linearly with $N$, thus constructing a search tree has linear runtime w.r.t. the number of internal nodes. The proof can be seen in section \ref{searchTreeProof}. $|R(x)|$ is greater than the number of internal nodes, so a weight balanced binary search tree can be constructed in $O(|R(x)|)$ time.
 
 \subsubsection{Searching}
 \label{st_searching}
-In order to minimize the runtime when searching for leaves in the search tree, we will specify how two kinds of searches should be performed.
+In order to minimize the runtime when searching for leaves in the search tree $\mathcal{T}$, we will specify how two kinds of searches should be performed.
 
-In the final tree, each node $v$ will hold an index number $index(v)$. Searching for a leaf in $\mathcal{T}$ with index number $i$, is done in the standard way by starting at the root and picking the left child if $i < the$ $current$ $node$ $index$, and the right child otherwise until reaching the desired leaf.
+In a search tree $\mathcal{T}$, each node $v$ will hold an index number $index(v)$. Searching for a leaf in $\mathcal{T}$ with index number $i$, is done in the standard way by starting at the root and picking the left child if $i < the$ $current$ $node$ $index$, and the right child otherwise until reaching the desired leaf.
 
 Each node $v$ will also hold the lowest index number $low(v)$ and largest index number $high(v)$ in its subtree, which is used when searching for an ordered subset of $R(x)$. These numbers are added while creating the tree. For the root $r$, $low(r)$ is 0 and $high(r)$ is $|R(x)|-1$. For a left child $v$, $low(v)=low(parent(v))$ and $high(v)=index(parent(v))-1$. For a right child $v$, $low(v)=index(parent(v))$ and $high(v)=high(parent(v))$.
 
-Given the subset ${v_i, ..., v_j}$ of $R(x)$ in bottom to top order, let ${index(v_i), ..., index(v_j)}$ be the corresponding indices. Searching for the leaves with these indices in $\mathcal{T}$ is done with a sequential search by first searching for the leaf $l$ with index $index(v_i)$ in the standard way. Then search for the leaf with index $index(v_{i+1)}$ by starting at $l$ and go up through the tree until reaching a node whose lowest index number is less than $index(v_{i+1)}$. The leaf with index $index(v_{i+1)}$ is now found by searching in the standard way starting at the node just reached. Given a subset of $R(x)$ in top to bottom order, searching for the corresponding leaves in $\mathcal{T}$ is done similarly, but using the largest index numbers instead of the lowest.
+Given the subset ${v_i, ..., v_j}$ of $R(x)$ in bottom to top order, let ${l_i, ..., l_j}$ be the corresponding leaves in $\mathcal{T}$. Searching for these leaves is done with a sequential search by first searching for the leaf $l_i$ in the standard way. When at a leaf $l_{i'}, i' < j$, searching for $l_{i'+1}$ is done by starting at $l_{i'}$ and go up through the tree until reaching a node whose lowest index number is less than or equal to $index(l_{i'+1})$. $l_{i'+1}$ is now found by searching in the standard way starting at the node just reached.
+
+Given a subset of $R(x)$ in top to bottom order, searching for the corresponding leaves in $\mathcal{T}$ is done similarly, but considering the largest index numbers instead of the lowest.
 
 \subsubsection{Properties of the Search Tree}
 \label{stProperties}

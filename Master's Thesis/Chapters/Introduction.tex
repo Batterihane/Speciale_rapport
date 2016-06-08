@@ -1,13 +1,14 @@
 \chapter{Introduction}
 \label{ch:intro}
-The Maximum Agreement Subtree problem (MAST) provides mutual information between rooted trees, and is defined as such: Given two rooted trees, T1 and T2, created over the same leaf-set \{1,2,3...,n\}, determine the largest possible subset of leaves inducing an agreeing subtree of T1 and T2. For a set of leaves to induce an agreeing subtree for T1 and T2, the subtrees restricted to the set of leaves must be isomorphic, implying structural equivalency.
+The Maximum Agreement Subtree problem (MAST) provides mutual information between rooted trees, and is defined as such: Given two rooted trees, $T_1$ and $T_2$, created over the same leaf-set $\{1,2,3...,n\}$, determine the largest possible subset of leaves inducing an agreeing subtree of $T_1$ and $T_2$. For a set of leaves to induce an agreeing subtree for $T_1$ and $T_2$, the subtrees restricted to the set of leaves must be isomorphic, implying structural equivalence.
 \\
 
-Let us start by motivating the interest in MAST by giving an example of its application. Suppose that we are interested in inspecting the relationship between DNA obtained from different animal species. This is typically done by the use of  Hierachical Clustering (REF) or Neighbor Joining (REF) to construct evolutionary trees. However, finding the true evolutionary tree is often an elusive task, and evidence is required to support any suggested tree topology. Finding the Maximum Agreement Subtree will present the information that both trees agree on, which makes the information more reliable, given that multiple sources support it. 
+Let us start by motivating the interest in MAST by giving an example of its application. Suppose that we are interested in inspecting the relationship between DNA obtained from different animal species. This is typically done by the use of  Hierarchical Clustering (REF) or Neighbour Joining (REF) to construct evolutionary trees. However, finding the true evolutionary tree is often an elusive task, and evidence is required to support any suggested tree topology. Finding the Maximum Agreement Subtree will present the information that both trees agree on, which makes the information more reliable, given that multiple sources support it. 
 
 The MAST problem applies to all trees, but we will choose to focus on the rooted, binary trees given that the motivation for the problem is primarily rooted in biology and linguistics, where these trees are most common.
 
 Several different algorithms have been developed for solving the MAST problem with different time complexities. One of these is the algorithm described by Cole et. al. \cite{nlogn} which is proved to have a time complexity of $O(nlogn)$, where $n$ is the number of leaves in each of the two input trees.
+
 In the paper, we will specifically focus on this algorithm. We will give a detailed description of how the algorithm works and how it can be implemented. We will also walk through the algorithm described by Goddard et. al.\cite{nsquared} with time complexity $O(n^2)$ and compare the two algorithms in order to clarify strengths and weaknesses of each in theory and in practice.
 
 \section{Thesis Structure}
