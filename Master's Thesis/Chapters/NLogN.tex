@@ -366,18 +366,18 @@ The last step of the algorithm is to construct the maximum agreement subtree fro
 
 As mentioned earlier, the Largest Weight Agreement Matching constructed from a matching graph $G(x)$ corresponds to the Maximum Agreement Subtree between $T_1$ and $T_2(x)$. We will show how the MAST $\mathcal{A}$ can be constructed given the LWAM with white edges ${we_1, we_2, ...}$ and proper crossing with edges ${ge, re}$ or single edge $ge$ or $re$ (See figure \ref{lwam_mast_figure}).
 
-Recall that a white edge $(u_i, v_j)$ corresponds to the subtree $MAST(M_i,N_j)$, a green edge corresponds to $MAST(M_i,T_2(v_j))$ and a red edge corresponds to $MAST(T_1(u_i),N_j)$. These subtrees will appear in $\mathcal{A}$ in the same order that the edges appear in the matching. $\mathcal{A}$ will have an internal node for each white edge which forms a path ${p_1, p_2, ...}$ through $\mathcal{A}$. These nodes will be in the same order that the white edges appear in the matching. The off-path child of node $p_i$ will then be the root of the subtree corresponding to edge $we_i$. The second off-path child $c$ of the last node in the path will hold the subtree(s) corresponding to the edge(s) in the proper crossing. If the proper crossing is a single edge, $c$ will be the root of the subtree corresponding to that edge. Otherwise $c$ will have two children, one being the root of the subtree corresponding to $ge$ and one being the root of the subtree corresponding to $re$.
+Recall that a white edge $(u_i, v_j)$ corresponds to the subtree $MAST(M_i,N_j)$, a green edge corresponds to $MAST(M_i,T_2(v_j))$ and a red edge corresponds to $MAST(T_1(u_i),N_j)$. These subtrees will appear in $\mathcal{A}$ in the same order that the edges appear in the matching. $\mathcal{A}$ will have an internal node for each white edge which forms a path ${p_1, p_2, ...}$ through $\mathcal{A}$. These nodes will be in the same order that the white edges appear in the matching. The off-path child of node $p_i$ will then be the root of the subtree corresponding to edge $we_i$. The second child $c$ of the last node in the path will hold the subtree(s) corresponding to the edge(s) in the proper crossing. If the proper crossing is a single edge, $c$ will be the root of the subtree corresponding to that edge. Otherwise $c$ will have two children, one being the root of the subtree corresponding to $ge$ and one being the root of the subtree corresponding to $re$.
 
 \begin{figure}
-	\label{lwam_mast_figure}
 	\includegraphics[width=\textwidth]{LWAMAndMAST}
 	\caption{An Agreement Matching with the Associated Agreement Subtree. \cite{nlogn}}
+	\label{lwam_mast_figure}
 \end{figure}
 
-What we need now is to find the subtrees corresponding to the edges in the matching. All the LWAMs corresponding to these subtrees have already been computed. Each is found in constant time the same way as the edge weights were found. \todo{explain?} \todo{store subtrees/matchings at edges??}. The subtrees can now be constructed recursively.
+What we need now is to find the subtrees corresponding to the edges in the matching. All the LWAMs corresponding to these subtrees have already been computed. Each is found in constant time by the same procedure as the edge weights were determined. \todo{explain?} \todo{store subtrees/matchings at edges??}. The subtrees can now be constructed recursively.
 
 \subsection{Challenges} \todo{Maybe a whole section for challenges?}
-Our first approach to construct the MAST for the two input trees, was to construct and save the MAST for each of the LWAMs created in the algorithm. When constructing the MAST for a LWAM, the subtrees corresponding to each edge had already been created and could be looked up in constant time. However, this gave rise to a runtime complexity of $O(n^2)$. Consider a tree where each internal node, except for the bottommost, has a leaf as one of its children. If the input trees are of this structure and have size $n$, the algorithm would create $n$ LWAMs, one for each $u_i \in \pi$, with sizes $1, ..., n$ each of which should be used to construct a MAST. Constructing the MAST from a LWAM takes time linear w.r.t. to the size of the LWAM giving a total runtime of $O(n^2)$.
+Our first approach to construct the MAST for the two input trees, was to construct and save the MAST for each of the LWAMs created in the algorithm. When constructing the MAST for a LWAM, the subtrees corresponding to each edge had already been created and could therefore be looked up in constant time. However, this gave rise to a runtime complexity of $O(n^2)$. Consider a tree where each internal node, except for the bottommost, has a leaf as one of its children. If the input trees are of this structure and have size $n$, the algorithm would create $n$ LWAMs, one for each $u_i \in \pi$, with sizes $1, ..., n$ each of which should be used to construct a MAST. Constructing the MAST from a LWAM takes time linear w.r.t. to the size of the LWAM giving a total runtime of $O(n^2)$.
 
 Instead, we chose to only create and store the LWAMs in the algorithm and construct the final MAST recursively after having created every LWAM.
 
@@ -385,64 +385,7 @@ Instead, we chose to only create and store the LWAMs in the algorithm and constr
 Creating the MAST is done by iterating through all LWAMs that correspond to each part of the MAST. For each white edge and each proper crossing, at least one node is added to the resulting tree, so the time taken to create the MAST is linear w.r.t. the number of nodes in the tree. The MAST can't be larger than the input trees, so the runtime is $O(n)$.
 
 \section{The Base Case}
-The base case for finding the maximum agreement subtree of $T_1$ and $T_2$ is when each tree consists of a single leaf. Then the LWAM is simply a green edge between the leaf of $T_1$ and the leaf of $T_2$ with weight 1. The LWAM could also be a single red edge. Either way, it will be translated to the MAST consisting of a single leaf, corresponding to the leaf that both trees hold.
-
-\section{An Alternative Base Case}
-An alternative base case is when the two input trees have a structure such that the internal nodes of each tree form a single path through its tree. In this case the maximum agreement subtree can be computed by using a modified version of the $O(nlogn)$ solution to the Longest Increasing Subsequence (LIS) Problem. Even though this procedure works, it can't be part of the final algorithm since it does not compute the LWAMs that is needed for the rest of the algorithm to work. However, we chose to implement it anyway in order to find out if it would be faster for these kind of tree inputs.
-
-We will first describe the $O(nlogn)$ solution the the LIS problem and afterwards describe how we modified it to help us find the MAST of $T_1$ and $T_2$.
-
-\subsection{Solving the Longest Increasing Subsequence Problem}
-Given a list $L$ of integers, we want to compute the longest increasing subsequence of integers from that list.
-
-\todo{reference Bespamyatnikh or Knuth?}
-
-The idea of this solution is to compute a list $I$ where the last index holds the smallest integer that ends a longest increasing subsequence of $L$. By having each number point to the number which was previous to it in $I$ when it was added (we will refer to this number as the parent), the LIS can be constructed by iterating through these pointers starting from the last number in $I$.
-
-The procedure is as follows:
-
-\begin{itemize}
-	\item Initialize list $I$ and add the first number of $L$.
-	\item For every other number $x$ in $L$ do the following:
-	\subitem If $x$ is greater than the last number of $I$, add $x$ to the end of $I$.
-	\subitem Otherwise, find the smallest number in $I$ which is greater than $x$ and replace it with $x$. This number can be found in $O(logn)$ time using binary search.
-	\item Construct the list $LIS$.
-	\subitem The last number of $LIS$ is the last number $x$ of $I$.
-	\subitem The second last number is the parent $x'$ of $x$.
-	\subitem The third last number is the parent of $x'$.
-	\subitem ...
-\end{itemize}
-
-\subsection{The Modified Longest Increasing Subsequence Problem}
-\label{mlisSection}
-Having the two trees $T_1$ and $T_2$, we can number the leaves of $T_1$ top to bottom, where the ordering of the bottommost two leaves is arbitrary, and number the leaves of $T_2$ such that twins have the same number. This can be done in linear time since each leaf of $T_1$ has a pointer to its twin. By iterating through the leaves of $T_2$ top to bottom, again the ordering of the bottommost two leaves is arbitrary, we get a list $L$ of possibly non-increasing numbers. Since all internal nodes except from the bottommost have exactly one leaf as a child and the numbers of the leaves in $T_1$ are increasing top to bottom, we can construct a MAST from the two trees by finding the longest increasing subsequence of $L$ where the last number need only be greater than the third last number. Since the ordering of the bottommost two leaves of the result doesn't change the topology of the tree, the ordering of the last two numbers of the LIS shouldn't change the result either.
-
-This gives rise to our modified version of the Longest Increasing Subsequence Problem (MLIS):
-
-Given a list $L$ of integers, we want to compute the longest increasing subsequence of integers from that list, but where the last integer only needs to be greater than the third last.
-
-Our solution to this problem is just a modification to the solution described in the previous section.
-
-The list $I$ is constructed similarly, but the last number of $I$ might not be greater than the previous number. Besides having a parent, the last number $x$ of $I$ will also have a pointer to the number which preceded the parent when $x$ was added to $I$ (We will refer to this number as the grandparent of $x$).
-
-Initially, the first two numbers of $L$ is added to $I$. For every other number $x$ in $L$ there are 2 cases:
-
-\begin{itemize}
-	\item Case 1: The last number $y$ of $I$ is greater than its parent $p(y)$.
-	\subitem If $x > p(y)$, then $x$ is added at the end of $I$.
-	\subitem Otherwise, find the smallest number in $I$ which is greater than $x$ and replace it with $x$.
-	\item Case 2: The last number $y$ of $I$ is smaller than its parent.
-	\subitem If $x$ is greater than one of the two last numbers of $I$, $y$ and $y'$, then $x$ is put at the last index and the smallest of $y$ and $y'$ at the second last.
-	\subsubitem If $y < y'$, then the parent of $y$ is updated so that it now points to its grandparent.
-	\subitem Otherwise, find the smallest number in $I$ which is greater than $x$ and replace it with $x$.
-\end{itemize}
-
-\todo{explain each case?}
-
-As in the LIS solution, the result is constructed by iterating through the parent pointers starting from the last number in $I$.\\
-\\
-Creating the MAST from the MLIS, is simply done by iterating through the MLIS while adding the leaves with those numbers to the result tree. The first child of the root should be the leaf with the number that comes first in the MLIS, the second child should be an internal node whose first child is the leaf with the number that comes second in the MLIS, and so forth.
-
+The base case for finding the largest weight agreement matching of $T_1$ and $T_2$ is when each tree consists of a single leaf. Then the LWAM is simply a green edge between the leaf of $T_1$ and the leaf of $T_2$ with weight 1. The LWAM could also be a single red edge. Either way, it will be translated to the MAST consisting of a single leaf, corresponding to the leaf that both trees hold.
 
 \section{Time Complexity}
 Throughout this chapter, we explained the runtime of each step of the algorithm, aside from the step of making recursive calls. Since each step satisfies the time complexity of $O(nlogn)$ and there is a constant number of steps, we can show that the total runtime of the algorithm is $O(nlogn)$.
@@ -473,12 +416,12 @@ Table \ref{runtimeTable} gives an overview.
 A requirement for the algorithm is that any tree $T$ can be preprocessed in $O(|T|)$ time such that the Least Common Ancestor of any two leaves in $T$ can be computed in constant time. Gusfield \cite{gusfield} explains in detail an algorithm for how this can be done. Our implementation directly follows this approach.
 
 \section{Linear Time Search Tree Construction Proof?}
-Let us start by reminding ourselves that the function F(N) for the weighted search tree construction satisfies the following inequality. 
+Let us start by reminding ourselves that the function F(N) for the weighted search tree construction satisfies the following inequality, where $A$ and $B$ are constants and $N$ and $j$ are natural numbers. 
 \begin{equation}
 F(N) \le Max\{A + Blog(j) + F(j-1) + F(N-j); 1 \le j \le (N+1)/2)\}
 \label{FNinequality}	
 \end{equation}
-Initially it is not obivous that this type of function grows at most linearly with N. As such, we need to prove that it does. For this reason, we first investigate the function F(N) by defining a secondary function G(N) that is defined over the constants of F: A, B and F(0).
+Initially it is not obvious that this type of function grows at most linearly with N. As such, we need to prove that it does. For this reason, we first investigate the function F(N) by defining a secondary function G(N) that is defined over the constants of F: A, B and F(0).
 \begin{equation*}
 \begin{aligned}
 G(N)=
@@ -509,7 +452,7 @@ F(N) \le AN + F(0)(N+1) + B(Nlog(2)-log(N+1))
 \end{equation}
 Let us now prove that this inequality indeed holds.
 \subsection{Proof}
-We prove inquality (1.2) by the use of strong induction. Strong induction consists of a base case, and an inductive case. The base case proves the inequality for a starting point, and the inductive case proves that whenever the inequality holds for a set of sequential integers starting from the base case, then it will also hold for the next integer. Together the base case and inductive case induce the inquality to hold for all N. 
+We prove inequality \ref{FNinequality} by the use of strong induction.
 \subsubsection{Base case}
 Our base case is defined for the lowest value, N=0. We simply insert this value into the inequality.
 \begin{align*}
@@ -517,7 +460,7 @@ F(0)\ \le&\ \  A*0 + F(0)(0+1) + B(0*log(2)-log(0+1)) & \Rightarrow \\
 F(0)\ \le&\ \  0 + F(0) + B(0-0) & \Rightarrow \\
 F(0)\ \le&\ \  F(0) &
 \end{align*}
-Clearly, the inequaliity holds in the base case.
+Clearly, the inequality holds in the base case.
 
 \subsubsection{Inductive case}
 We are now given an Integer N, and we assume in the spirit of strong induction our Induction Hypothesis to be
@@ -530,7 +473,7 @@ and use that to prove that
 F(N) \le AN + F(0)(N+1) + B(Nlog(2)-log(N+1))
 \label{InequalityToProve} 	
 \end{equation}
-Let J be the integer that maximizes $A + Blog(j) + F(j-1) + F(N-j)$ in inequality (1.1). From the Induction Hypothesis (1.3), we now have for $x=J-1$ and $x=N-J$ the following two inequalities.
+Let J be the value of j that maximizes $A + Blog(j) + F(j-1) + F(N-j)$ in inequality \ref{FNinequality}. From the Induction Hypothesis \ref{IH}, we now have for $x=J-1$ and $x=N-J$ the following two inequalities.
 \begin{equation}
 F(J-1) \le A(J-1) + F(0)((J-1)+1) + B((J-1)log(2)-log((J-1)+1))
 \label{IHJ1} 	
@@ -568,12 +511,12 @@ We expand $F(J-1)$ and $F(N-J)$ according to \ref{IHJ1} and \ref{IHNJ}, and simp
 &-log(N-J+1)                                             &\le \\
 &log(2)-log(N+1)                                         &  \\	
 & & \\
-&\Rightarrow (\text{Add log(N+1) and apply log rule})    & \\
+&\Rightarrow (\text{Add log(N+1) and apply the log rule of division})    & \\
 & & \\			
 &log(\frac{N+1}{N-J+1}) \  \le \  log(2)                 & 	
 \end{aligned}
 \end{equation*}
-We know from (1.1) that $1 \le J \le \frac{N+1}{2}$, and that $J=\frac{N+1}{2}$ maximizes $log(\frac{N+1}{N-J+1})$. If the inquality holds for the maximum J, then it will hold for the entire interval: 
+We know from \ref{FNinequality} that $1 \le J \le \frac{N+1}{2}$, meaning that $J=\frac{N+1}{2}$ maximizes $log(\frac{N+1}{N-J+1})$. If the inequality holds for the maximum J, then it will hold for the entire interval: 
 \begin{equation*}	
 \begin{aligned}	
 &log(\frac{N+1}{N-\frac{N+1}{2}+1}) = log(2) \  \le \  log(2);  & N \ge 0 	
@@ -581,6 +524,61 @@ We know from (1.1) that $1 \le J \le \frac{N+1}{2}$, and that $J=\frac{N+1}{2}$ 
 \end{equation*}
 As such, the inductive case in \ref{InequalityToProve} is proven to hold, which completes the proof. $\qed$
 
+\section{An Alternative Base Case}
+An alternative base case could be when the two input trees have a structure such that the internal nodes of each tree form a single path through its tree. In this case the maximum agreement subtree can be computed by using a modified version of the $O(nlogn)$ solution to the Longest Increasing Subsequence (LIS) Problem. Even though this procedure works, it can't be part of the final algorithm since it does not compute the LWAMs that are needed for the rest of the algorithm to work. However, we chose to implement it anyway in order to find out if it would be faster for these kind of tree inputs.
+
+We will first describe the $O(nlogn)$ solution the the LIS problem and afterwards describe how we modified it to help us find the MAST of $T_1$ and $T_2$.
+
+\subsection{Solving the Longest Increasing Subsequence Problem}
+Given a list $L$ of integers, we want to compute the longest increasing subsequence of integers from that list.
+
+\todo{reference Bespamyatnikh or Knuth?}
+
+The idea of this solution is to compute a list $I$ where the last index holds the smallest integer that ends a longest increasing subsequence of $L$. By having each number point to the number which was previous to it in $I$ when it was added (we will refer to this number as the parent), the LIS can be constructed by iterating through these pointers starting from the last number in $I$.
+
+The procedure is as follows:
+
+\begin{itemize}
+	\item Initialize list $I$ and add the first number of $L$.
+	\item For every other number $x$ in $L$ do the following:
+	\subitem If $x$ is greater than the last number of $I$, add $x$ to the end of $I$.
+	\subitem Otherwise, find the smallest number in $I$ which is greater than $x$ and replace it with $x$. This number can be found in $O(logn)$ time using binary search.
+	\item Construct the list $LIS$.
+	\subitem The last number of $LIS$ is the last number $x$ of $I$.
+	\subitem The second last number is the parent $x'$ of $x$.
+	\subitem The third last number is the parent of $x'$.
+	\subitem ...
+\end{itemize}
+
+\subsection{The Modified Longest Increasing Subsequence Problem}
+\label{mlisSection}
+Having the two trees $T_1$ and $T_2$, we can number the leaves of $T_1$ top to bottom, where the ordering of the bottommost two leaves is arbitrary, and number the leaves of $T_2$ such that twins have the same number. This can be done in linear time by having each leaf of $T_1$ point to its twin. By iterating through the leaves of $T_2$ top to bottom, again the ordering of the bottommost two leaves is arbitrary, we get a list $L$ of possibly non-increasing numbers. Since all internal nodes except from the bottommost have exactly one leaf as a child and the numbers of the leaves in $T_1$ are increasing top to bottom, we can construct a MAST from the two trees by finding the longest increasing subsequence of $L$ where the last number need only be greater than the third last number. Since the ordering of the bottommost two leaves of the result doesn't change the topology of the tree, the ordering of the last two numbers of the LIS shouldn't change the result either.
+
+This gives rise to our modified version of the Longest Increasing Subsequence Problem (MLIS):\\
+\\
+Given a list $L$ of integers, we want to compute the longest increasing subsequence of integers from that list, but where the last integer only needs to be greater than the third last.
+
+Our solution to this problem is simply a modification to the solution described in the previous section.
+
+The list $I$ is constructed similarly, but the last number of $I$ might not be greater than the previous number. Besides having a parent, the last number $x$ of $I$ will also have a pointer to the number which preceded the parent when $x$ was added to $I$ (We will refer to this number as the grandparent of $x$).
+
+Initially, the first two numbers of $L$ is added to $I$. For every other number $x$ in $L$ there are 2 cases:
+
+\begin{itemize}
+	\item Case 1: The last number $y$ of $I$ is greater than its parent $p(y)$.
+	\subitem If $x > p(y)$, then $x$ is added at the end of $I$.
+	\subitem Otherwise, find the smallest number in $I$ which is greater than $x$, using binary search, and replace it with $x$.
+	\item Case 2: The last number $y$ of $I$ is smaller than its parent.
+	\subitem If $x$ is greater than one of the two last numbers of $I$, $y$ and $y'$, then $x$ is put at the last index and the smallest of $y$ and $y'$ at the second last.
+	\subsubitem If $y < y'$, then the parent of $y$ is updated so that it now points to its grandparent.
+	\subitem If x is smaller than both of the two last numbers of I, find the smallest number in $I$ which is greater than $x$, using binary search, and replace it with $x$.
+\end{itemize}
+
+\todo{explain each case?}
+
+\noindent As in the LIS solution, the result is constructed by iterating through the parent pointers starting from the last number in $I$.\\
+\\
+Creating the MAST from the MLIS, is simply done by iterating through the MLIS while adding the leaves with those numbers to the result tree. The first child of the root should be the leaf with the number that comes first in the MLIS, the second child should be an internal node whose first child is the leaf with the number that comes second in the MLIS, and so forth.
 
 
 
