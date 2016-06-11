@@ -12,13 +12,16 @@ The experiments were performed from IntelliJ with a maximum memory heap size of 
 In all experiments, the algorithm was run five times on each input and we plotted the median runtime in the graphs. By using the median value instead of the mean value, we avoid outliers affecting the graph. Such outliers could among other things be caused by the OS prioritizing other processes so ignoring these will give a more representative graph. Before each experiment, we ran the algorithm under test with random inputs 100 times in order to warm up the cache.
 
 \section{The $O(N^2)$ Algorithm}
-The algorithm by Goddard et. al. \cite{nsquared} produces an $n*n$ table no matter the topology of the input trees The runtime of the algorithm must therefore be $O(n^2)$ for any input and we don't expect any significant difference in runtime when inputting trees of different topologies. We verified this with an experiment where we measured the runtime of the algorithm when inputting trees of different topologies. Two of the graphs that we created is seen in figure \ref{nsquaredRuntimeGraphs}, where the difference in runtime is minimal. These graphs should also verify the runtime of $O(n^2)$. However, it is not obvious that this is the case. Especially because of the huge increment in runtime for input trees of size greater than \textasciitilde 6000. At size \textasciitilde 6400, the JVM ran out of memory and the program terminated. A reason for the increment in runtime could be that the runtime is affected by the garbage collector working while the program is running. The garbage collector used in the execution is the default garbage collector for the JVM. This garbage collector pauses the program execution when collecting and therefore directly affects its runtime.
+The algorithm by Goddard et. al. \cite{nsquared} produces an $n*n$ table no matter the topology of the input trees The runtime of the algorithm must therefore be $O(n^2)$ for any input and we don't expect any significant difference in runtime when inputting trees of different topologies. We verified this with an experiment where we measured the runtime of the algorithm when inputting trees of different topologies. Two of the graphs that we created is seen in figure \ref{nsquaredBestCaseTreesGraph} and \ref{nsquaredIdenticalCompleteTreesGraph}, where the difference in runtime is minimal. These graphs should also verify the runtime of $O(n^2)$. However, it is not obvious that this is the case. Especially because of the huge increment in runtime for input trees of size greater than \textasciitilde 6000. At size \textasciitilde 6400, the JVM ran out of memory and the program terminated. A reason for the increment in runtime could be that the runtime is affected by the garbage collector working while the program is running. The garbage collector used in the execution is the default garbage collector for the JVM. This garbage collector pauses the program execution when collecting and therefore directly affects its runtime.
 
-\todo{best case tree graph}
 \begin{figure}
+	\includegraphics[width=\textwidth]{nsquaredBestCaseTreesTimeDivided}
+	\caption{The runtime of the $O(n^2)$ algorithm given trees where each internal node has at least one leaf as a child.}
+	\label{nsquaredBestCaseTreesGraph}
+	
 	\includegraphics[width=\textwidth]{nsquaredIdenticalCompleteTreesTimeDivided}
 	\caption{The runtime of the $O(n^2)$ algorithm given identical complete trees.}
-	\label{nsquaredRuntimeGraphs}
+	\label{nsquaredIdenticalCompleteTreesGraph}
 \end{figure}
 
 \subsection{Garbage Collecting}
@@ -112,19 +115,29 @@ Now let's consider the structure of $T_1$. Since the process of creating edges i
 
 To see the runtime of these kind of input trees, we created an experiment for running the algorithm with only complete binary trees as input. We explained earlier that if the input trees are similar, the LWAMs will be larger. However it also means that there will be fewer edges in the matching graphs, since the leaves of a side tree in $T_1$ will be split out over fewer side trees in $T_2$, so that might affect the runtime even more.
 
-The graphs in figure \ref{completeIdenticalTreesGraph} shows the result of the experiment when the input trees are identical and when the leaves are randomly distributed in the trees. \todo{nonidentical trees}. From these graphs, we see that the runtime is slightly better when the input trees are similar. In both cases, it is easily seen that the runtime is worse than when inputting random trees, and again we see sudden increases in runtime when reaching certain tree sizes. Already at tree size \textasciitilde 42000, the JVM ran out of memory and could not continue the execution. 
-By choosing this tree topology, we tried to maximize the space consumption of the algorithm and the garbage collector therefore needs to run more often and causes the increase in runtime. The graph in figure \ref{completeIdenticalTreesGCGraph} shows the runtime of the garbage collector during the experiment and \todo{Figure ??} shows the runtime of the algorithm after having subtracted the runtime of the garbage collector. \todo{explain?}
+The graphs in figure \ref{completeIdenticalTreesGraph} and \ref{completeNonidenticalTreesGraph} shows the result of the experiment when the input trees are identical and when the leaves are randomly distributed in the trees. From these graphs, we see that there is not a significant difference in runtime between the two. In both cases, it is easily seen that the runtime is worse than when inputting random trees, and again we see sudden increases in runtime when reaching certain tree sizes. Already at tree size \textasciitilde 42000, the JVM ran out of memory and could not continue the execution. 
+By choosing this tree topology, we tried to maximize the space consumption of the algorithm and the garbage collector therefore needs to run more often and causes the increase in runtime. The graph in figure \ref{completeIdenticalTreesGCGraph} shows the runtime of the garbage collector during the experiment and figure \ref{completeIdenticalTreesGCSubtractedGraph} shows the runtime of the algorithm after having subtracted the runtime of the garbage collector. As expected, the algorithm still seems to satisfy the runtime upper bound of $O(nlogn)$.
 
 \begin{figure}
 	\includegraphics[width=\textwidth]{completeIdenticalTreesGraph}
 	\caption{The runtime of the $nlogn$ algorithm given two identical complete trees.}
 	\label{completeIdenticalTreesGraph}
 \end{figure}
+\begin{figure}
+	\includegraphics[width=\textwidth]{completeNonidenticalTrees}
+	\caption{The runtime of the $nlogn$ algorithm given two nonidentical complete trees.}
+	\label{completeNonidenticalTreesGraph}
+\end{figure}
 
 \begin{figure}
 	\includegraphics[width=\textwidth]{completeIdenticalTreesGCGraph}
 	\caption{The runtime of the garbage collector when running the $nlogn$ algorithm given two identical complete trees.}
 	\label{completeIdenticalTreesGCGraph}
+\end{figure}
+\begin{figure}
+	\includegraphics[width=\textwidth]{completeIdenticalTreesGCSubtracted}
+	\caption{The runtime of the $nlogn$ algorithm given two identical complete trees after having subtracted the runtime of the garbage collector.}
+	\label{completeIdenticalTreesGCSubtractedGraph}
 \end{figure}
 
 \section{Comparing Algorithms}
