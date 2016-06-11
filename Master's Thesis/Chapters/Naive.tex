@@ -65,6 +65,8 @@ Our pruning algorithm can be seen in Figure \ref{Code:Prune1}, where the sibling
 	      else
 	        /*make the leaf sibling a child of
 	          the leaf grandparent */
+	        Leaf sibling = leaf.getSibling().
+	        sibling.setParent(leaf.getParent().getParent());
 	    }
 	  }
 	  return result; 

@@ -102,34 +102,34 @@ The challenge was to perform step 2 in linear time, which is not covered by Cole
 
 Step three is done in a single iteration through $L'$ where the parent of each node is found in constant time, giving a total runtime of $O(|L'|) = O(|L|)$.
 
-\begin{lstlisting}[language=Java, caption=Step 2 of induceSubtree, label={lst:induceSubtreeCode}]
-Function induceSubtree(inputLeaves)
-{
+\begin{lstlisting}[language=Java, caption=Step 2 of induceSubtree, label={lst:induceSubtreeCode}, mathescape]
+Function induceSubtree(inputLeaves) {
 	...
 	
 	L` = The list of nodes computed in step 1;
 	for each node v in L`
-		v_l = the node to the left of v in L`;
-		// if v is the leftmost node in L`, v_l = null
-		v_r = the node to the right of v in L`;
-		// if v is the rightmost node in L`, v_r = null
-	S = Stack initially containing only the first node in L`;
-
+		$v_l$ = the node to the left of v in L`;
+		// if v is the leftmost node in L`, $v_l$ = null
+		$v_r$ = the node to the right of v in L`;
+		// if v is the rightmost node in L`, $v_r$ = null
+		
+	//Stack containing the first node in L`	
+	S = new Stack();
+	push L`.get(0) on S;
 	while(S is not empty)
 	{
 		v = S.peek();
-		if(v_r == null || depth(v) > depth(v_r))
+		if($v_r$ == null || depth(v) > depth($v_r$))
 		{
 			remove v from S;
-			if(v_l != null) (v_l)_r = v_r;
-			if(v_r != null) (v_r)_l = v_l;
+			if($v_l$ != null) $(v_l)_r$ = $v_r$;
+			if($v_r$ != null) $(v_r)_l$ = $v_l$;
 			
-			if(S is empty) push v_r on S;
+			if(S is empty) push $v_r$ on S;
 		}
 		else
-			push v_r on S;
+			push $v_r$ on S;
 	}
-
 	...
 }
 \end{lstlisting}
@@ -416,12 +416,12 @@ Table \ref{runtimeTable} gives an overview.
 A requirement for the algorithm is that any tree $T$ can be preprocessed in $O(|T|)$ time such that the Least Common Ancestor of any two leaves in $T$ can be computed in constant time. Gusfield \cite{gusfield} explains in detail an algorithm for how this can be done. Our implementation directly follows this approach.
 
 \section{Linear Time Search Tree Construction Proof?}
-Let us start by reminding ourselves that the function F(N) for the weighted search tree construction satisfies the following inequality, where $A$ and $B$ are constants and $N$ and $j$ are natural numbers. 
+Let us start by reminding ourselves that the function F(N) for the weighted search tree construction satisfies the following inequality, where $A$ and $B$ are constants, while $N$ and $j$ are natural numbers. 
 \begin{equation}
 F(N) \le Max\{A + Blog(j) + F(j-1) + F(N-j); 1 \le j \le (N+1)/2)\}
 \label{FNinequality}	
 \end{equation}
-Initially it is not obvious that this type of function grows at most linearly with N. As such, we need to prove that it does. For this reason, we first investigate the function F(N) by defining a secondary function G(N) that is defined over the constants of F: A, B and F(0).
+Initially it is not obvious that F(N) grows at most linearly with N. As such, we want to prove that any function restricted by inquality \ref{FNinequality} is at most linear in complexity. For the sake of generality, let F(N) denote an undefined function that fulfils \ref{FNinequality}. We will start by investigating the function F(N) by defining a secondary function G(N) that is defined over the constants of F: A, B and F(0).
 \begin{equation*}
 \begin{aligned}
 G(N)=
@@ -444,7 +444,7 @@ From this definition it follows that $G(1)= A + 2G(0)$, and $G(2)=A + G(0) + G(1
 	G(4) &=& max\{4A + 5F(0), 4A + Blog(2) + 5F(0)\} \\
 	&=& 4A + Blog(2) + 5F(0)
 \end{eqnarray*}
-From these first few terms it quickly becomes apparent that the coefficient of A is N, and the coefficient of F(0) is N+1. However, the coefficient of B is not clear. To determine the growth of B, quite a few more terms are needed to gain a clear picture. We will not include all of those here, but simply state that some investigative work revealed the coefficient of B to be $Nlog(2)-log(N+1)$. It is not immediately apparent that this coefficient is in fact at most linear in complexity. However, the following limit clear shows that it is indeed the case.
+From these first few terms it quickly becomes apparent that the coefficient of A is N, and the coefficient of F(0) is N+1. However, the coefficient of B is not clear. To determine the growth of B, quite a few more terms are needed to gain a clear picture. We will not include all of those here, but simply state that some investigative work revealed the coefficient of B to be $Nlog(2)-log(N+1)$. It is not immediately apparent that this coefficient is in fact at most linear in complexity. However, the following limit clearly shows that it is indeed the case.
 $$\lim_{N\to\infty} \frac{Nlog(2)-log(N+1)}{N} = log(2)$$
 This means that if the claims we made about the coefficients of A, B and F(0) are true, then the following inequality will show that F(N) can at most grow linearly as a function of N.
 \begin{equation}

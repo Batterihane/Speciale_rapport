@@ -104,9 +104,9 @@ Two example trees have been provided in Figure \ref{Fig:Binary1}. We now wish to
 	\centering
 	\begin{tabular}{|c|c|c|c|c|c|c|c|}
 		\hline
-		\textbf{}        & \textbf{leaf\_1} & \textbf{leaf\_2} & \textbf{C} & \textbf{...} & \textbf{G} & \textbf{E} & \textbf{A} \\ \hline
-		\textbf{leaf\_1} & 1                & 0                & 1          & ...            & 0          & 0          & 1          \\ \hline
-		\textbf{leaf\_8} & 0                & 0                & 0          & ...            & 1          & 1          & 1          \\ \hline
+		\textbf{}        & $\mathbf{leaf_1}$ & $\mathbf{leaf_2}$ & \textbf{C} & \textbf{...} & \textbf{G} & \textbf{E} & \textbf{A} \\ \hline
+		$\mathbf{leaf_1}$ & 1                & 0                & 1          & ...            & 0          & 0          & 1          \\ \hline
+		$\mathbf{leaf_8}$ & 0                & 0                & 0          & ...            & 1          & 1          & 1          \\ \hline
 		\textbf{J}       & 1                & 0                & 1          & ...            & 1          & 1          & 2          \\ \hline
 		\textbf{...}     & ...              & ...              & ...        & ...            & ...        & ...        & ...        \\ \hline
 		\textbf{F}       & 0                & 0                & 0          & ...            & 0          & 0          & 2          \\ \hline
@@ -188,13 +188,13 @@ Java inspired pseudo-code for the backtracking algorithm can be seen in Figure \
 	    if(Score = Score1 + Score2) {
 	      Tree subTree1 = RecBackTrack(Tree1.Child1, Tree2.Child1);
 	      Tree subTree2 = RecBackTrack(Tree1.Child2, Tree2.Child2);
-	      /*Return internal node with subTree1 and 
+	      return /*internal node with subTree1 and 
 	        subTree2 as children */
 	    }
 	    else if (Score1 = Score3 + Score4) {
 	      Tree subTree1 = RecBackTrack(Tree1.Child1, Tree2.Child2);
           Tree subTree2 = RecBackTrack(Tree1.Child2, Tree2.Child1);
-	      /*Return internal node with subTree1 and 
+	      return /*internal node with subTree1 and 
 	        subTree2 as children */
 	    }
 	  }
@@ -205,7 +205,4 @@ Java inspired pseudo-code for the backtracking algorithm can be seen in Figure \
 \end{figure}	
 
 \section{Evaluation}
-All in all, the $O(n^2)$ algorithm is fairly simple to implement and understand, but it also has its practical limitations when working with large trees. As we will see in the testing section, the algorithm starts having trouble with binary trees of size \todo{size?} in terms of time and memory consumption. The main problem with the algorithm is that is considers too many combinations of subtrees that end up being irrelevant. Effectively most of the time spent filling out the size table is wasted. In our previous example of filling out the size table of 225 cells, only 11 cells ended up ultimately having an impact on the produced MAST. The $O(nlogn)$ algorithm that we are about to examine improves on the 'wasted' work by only considering more relevant information between subtrees.
-  
-
-\todo{\dots show some trees output from the program?}
+All in all, the $O(n^2)$ algorithm is fairly simple to implement and understand, but it also has its practical limitations when working with large trees. As we will see in the testing section, the algorithm starts having trouble with binary trees of size 600 in terms of time and memory consumption. The main problem with the algorithm is that is considers too many combinations of subtrees that end up being irrelevant. Effectively most of the time spent filling out the size table is wasted. In our previous example of filling out the size table of 225 cells, only 25 cells ended up ultimately having an impact on the produced MAST, since those were the only ones accesed by the backtracking algorithm. The $O(nlogn)$ algorithm that we are about to examine improves on the 'wasted' work by only considering more relevant information between subtrees.
