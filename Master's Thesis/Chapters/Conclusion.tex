@@ -10,6 +10,6 @@ Given more time, we would have liked to explore the following subjects further.\
 
 \noindent\textbf{Multiple Trees:} The MAST problem is defined between two trees, but how, if possible, can one efficiently handle MAST calculated between multiple trees. Given a number of trees, a quick solution is to compute the MAST between the first two trees, prune the appropriate leaves from the next tree in line, and then run the algorithm on the MAST and the next tree in line. This initially gives a complexity of $O(knlogn)$, where k denotes the number of trees. \\   
 
-\noindent\textbf{Non-Binary Trees:} While binary trees are most commonly used, it would be interesting to research how the $O(nlogn)$ algorithm might be expanded for degrees larger than two. The existence of an algorithm with complexity $O(n\sqrt{d}logn)$ has been conjectured, but is yet to be created. \\
+\noindent\textbf{Non-Binary Trees:} While binary trees are most commonly used, it would be interesting to research how the $O(nlogn)$ algorithm might be expanded for degrees larger than two. The existence of an algorithm with complexity $O(n\sqrt{d}logn)$ for trees of degree d was conjectured in \cite{nlogn}, and was later followed up by \cite{FastMatch}. \\
 
 \noindent\textbf{Memory:} The consumption, allocation and deallocation of memory is a major factor is the $O(nlogn)$ algorithm's running time. As such, we would like to investigate whether any data structures could improve the running time in practice, while the overall complexity stays the same. 
