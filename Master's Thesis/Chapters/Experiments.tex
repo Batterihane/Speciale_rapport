@@ -141,12 +141,17 @@ By choosing this tree topology, we tried to maximize the space consumption of th
 \end{figure}
 
 \section{Comparing Algorithms}
-In figure \ref{nsquaredVsNlognGraph} we see the runtime of the two algorithms, given identical complete trees as input. Clearly, there is a huge improvement from the $O(n^2)$ algorithm to the $O(nlogn)$ algorithm and even for small input trees, the $O(nlogn)$ algorithm is dominant.
+In figure \ref{nsquaredVsNlognGraph} we see the runtime of the two algorithms, given identical complete trees as input. Clearly, there is a huge improvement from the $O(n^2)$ algorithm to the $O(nlogn)$ algorithm and even for small input trees, the $O(nlogn)$ algorithm is dominant. In figure \ref{nsquaredVsNlognSmallTreesGraph}, we can see the difference in runtime for smaller input trees. For input trees of size smaller than \textasciitilde 60, the runtime of the two algorithms are very similar.
 
 \begin{figure}
 	\includegraphics[width=\textwidth]{nsquaredVsNlogn}
 	\caption{The runtime of the $O(n^2)$ algorithm and the $O(nlogn)$ algorithm given identical complete trees after having subtracted the runtime of the garbage collector.}
 	\label{nsquaredVsNlognGraph}
+\end{figure}
+\begin{figure}
+	\includegraphics[width=\textwidth]{nsquaredVsNlognSmallTrees}
+	\caption{The runtime of the $O(n^2)$ algorithm and the $O(nlogn)$ algorithm given identical complete trees after having subtracted the runtime of the garbage collector.}
+	\label{nsquaredVsNlognSmallTreesGraph}
 \end{figure}
 
 \section{MLIS}
