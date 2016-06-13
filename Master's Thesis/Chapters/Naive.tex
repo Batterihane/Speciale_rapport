@@ -1,8 +1,8 @@
 \chapter{The Naive algorithm}
-The MAST problem is not inherently hard to solve since a quite simple, although slow, algorithm can quickly be constructed. The naive solution to the problem is to run through all possible subsets of leaves, inducing the two resulting subtrees from the input trees for the leaf subset in question and recording the largest existing agreement subtree seen. In other words, we simply look through all possible soltutions and pick the largest one. In order to do so, one must find a reasonably elegant way of iterating through all subsets of leaves, and a way of comparing two induced subtrees to see if they structurally agree over a given leafset. 
+The MAST problem is not inherently hard to solve since a quite simple, although slow, algorithm can quickly be constructed. The naive solution to the problem is to run through all possible subsets of leaves. For each subset, induce the subtrees of the input trees according to the subset of leaves in question. Should the subtrees match, we have an agreement subtree. The largest agreement subtree is simply the largest agreement subtree seen. In other words, we simply look through all possible solutions and pick the largest one. In order to do so, one must find a reasonably elegant way of iterating through all subsets of leaves, and a way of comparing two induced subtrees to see if they structurally agree over a given leafset. 
 \\
 \\
-We chose to represent a leaf subset as a bitstring, where each bit is dedicated to one specific leaf. The value of the bit naturally denotes if the leaf in question is included in the subset or not. By representing a subset as a bitstring, we can run through all possible subsets by starting with the bitstring of all zeros, $0_10_20_3...0_n$, and incrementing it for each new subset needed until we reach the bitstring of all ones, $1_11_21_3...1_n$. The pseudo code for the naive algorithm can be seen in Figure \ref{Code:Naive1}, where the tree pruning and comparison can be seen in the following subsections.
+We chose to represent a leaf subset as a bitstring, where each bit is dedicated to one specific leaf. The value of the bit naturally denotes if the leaf in question is included in the subset or not. By representing a subset as a bitstring, we can run through all possible subsets by starting with the bitstring of all zeros, $0_10_20_3...0_n$, and incrementing it for each new subset needed until we reach the bitstring of all ones, $1_11_21_3...1_n$. The pseudo code for the naive algorithm can be seen in Figure \ref{Code:Naive1}, where the tree pruning (the removal of 0-bit leaves) and comparison can be seen in the following subsections.
 
 \begin{figure}
 	\begin{lstlisting}[language=Java, mathescape]
@@ -29,12 +29,12 @@ We chose to represent a leaf subset as a bitstring, where each bit is dedicated 
 	\caption{Java pseudo code for The Naive Algorithm}
 	\label{Code:Naive1}
 \end{figure}
-One can improve this naive solution slightly by realizing that the parity of the subset bit string represents the size of the MAST, if the MAST indeed exists. This means that you can simply run through all possible values of the bitstring, but starting with the values of highest parity instead. The instant we find a value representing a possible MAST, we know that it is the largest possible. To keep the naive solution as simple as possible, we decided to refrain from implementing this small optimization.
+One can improve this naive solution slightly by realizing that the parity of the subset bit string represents the size of the agreement matching, if the agreement matching indeed exists. This means that you can simply run through all possible values of the bitstring, but starting with the values of highest parity instead. The instant we find a value representing an agreement matching, we know that it is the largest possible - the MAST. To keep the naive solution as simple as possible, we decided to refrain from implementing this small optimization.
 
-As for the running time, we see that we have $2^n$ diffrent subsets, which makes the naive approach exponential. Pruning of a tree can be done in O(n), and checking for isomorphism can likewise be done in O(n). All in all, the complexity for the entire algorithm is $O(3n*2^n)=O(n2^n)$.  
+As for the running time, we see that there are $2^n$ diffrent subsets, which makes the naive approach exponential. The pruning of a tree can be done in O(n), and checking for isomorphism can likewise be done in O(n). All in all, the complexity for the entire algorithm is $O(3n*2^n)=O(n2^n)$.  
 
 \section{Tree Pruning}
-Pruning is the act of removing a subset of nodes from a given tree and restoring the desired tree structure afterwards. In our case, where we deal with binary trees exclusively, we first remove the desired leaves, and then remove any redundant internal vertices. An internal node is deemed redundant when it has less than two children. An example pruning can be seen in Figure \ref{Fig:Pruning1}, where internal vertices D,F and G have been removed. 
+Pruning is the act of removing a subset of nodes from a given tree and restoring the desired tree structure afterwards. In our case, where we deal with binary trees exclusively, we first remove the 0-bit leaves, and then remove any redundant internal vertices. An internal node is deemed redundant when it has less than two children. An example pruning can be seen in Figure \ref{Fig:Pruning1}, where internal vertices D,F and G have been removed. 
 Our pruning algorithm can be seen in Figure \ref{Code:Prune1}, where the sibling of a given node simply denotes the other child of the parent.
 
 \begin{figure}
@@ -82,18 +82,21 @@ For each of the subsets in Figure \ref{Code:Naive1}, we have to ensure that the 
 
 \newtheorem{definition}{Definition}
 \begin{definition}
-	We say that two binary trees are isomorphic if they depict the same ancestral relationships. This is true exactly when there exists a mapping M, $T_1 \rightarrow T_2$, such that \\
-	$\forall L_{1.1}, L_{1.2} \in \{ x | x \in T_1 \bigwedge Type(x)=Leaf \}$, \\ $\forall L_2 \in \{ y | y \in T_1 \bigwedge Type(y)=Leaf \}$
-	\begin{itemize}
-		\item if $L_1 = L_2 : M(L_1)=L_2$
-		
-		\item if $L_{1.1} \neq L_{1.2} : M(lca_{T_1}(L_{1.1}, L_{1.2})) = lca_(T_2)(M(L_{1.1}), M(L_{1.2})$
-	\end{itemize}
-	Intuitively, such a mapping is possible when you are able to obtain one tree from the other by swapping the order of children of any given internal node.  
-	\todo{move to introduction??}
+	We say that two binary trees are isomorphic if they depict the same ancestral relationships. This is true exactly when there exists a mapping M, $T_1 \rightarrow T_2$, such that each leaf in $T_1$ maps to its twin in $T_2$, and for any two leaves of $T_1$, $L_1$ and $L_2$:  
+	\begin{equation*}
+		M(lca_{T_1}(L_{1}, L_{2})) = lca_{T_2}(M(L_{1}), M(L_{2}))
+	\end{equation*} 
+	Intuitively, such a mapping is possible when you are able to obtain one tree from the other by swapping the order of children of any given internal node. \\
 \end{definition}
 
-A simple solution to checking for isomorphism is through a base case and a recursive case. The base case simply checks if two leaves are the same, whereas the recursive case checks if two trees with roots A and B are isomorphic by making recursive calls for all four combinations of the subtrees rooted at the children of A and B, creating two cases; one case that checks for isomorphism when the children are swapped, and one when they are not. 
+A simple recursive solution for checking isomorphism can be described as follows. Let $T_a$ and $T_x$ denote the input trees. We now have the following cases:
+\begin{itemize}
+	\item Base Case: If either $T_a$ or $T_x$ is a leaf, check if the other denotes the same leaf. If it does, return true, otherwise false.
+	\item Recursive case: Let b and c denote the children of $T_a$, and let y and z denote the children of $T_x$. Return true if either of the following cases are true
+	\subitem $T_b$ and $T_y$ are isomorphic $\bigwedge$ $T_c$ and $T_z$ are isomorphic
+	\subitem $T_b$ and $T_z$ are isomorphic $\bigwedge$ $T_c$ and $T_y$ are isomorphic
+\end{itemize}
+
 
 
 
