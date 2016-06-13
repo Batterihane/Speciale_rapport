@@ -15,9 +15,6 @@ Preprocessing $T_2$ for inducing subtrees in linear time is also done by storing
 Inducing a subtree of $T_2$ from a set of leaves $L$ only requires storing data for each node of the subtree which will have size $O(|L|)$.
 
 For each side tree $M_i, 1 \le i \le p-1$ of $\pi$, the subtree $S_i$ is induced from the leaves of $T_2$ that are twins of the leaves of $M_i$. The total amount of leaves used to induce subtrees is therefore $\sum_{i=1}^{p-1} m_i < n$ and the space needed is $O(n)$.
-\\
-\\
-In order to create the sets of leaves used to induce subtrees, the leaves of the side trees of $\pi$ should be sorted, which can be done using bucket sort, giving a space consumption of $O(n)$.
 
 \subsection{Matching Graphs}
 Recall that a matching graph $G(x)$ consists of two sets of nodes $L(x)$ and $R(x)$ with edges between them. Only a constant amount of data needs to be stored at each node and each edge. As mentioned earlier, the total number of edges in all matching graphs has an upper bound of $O(nlogn)$ and since $|L(x)| \le n$ and $|R(x)| \le n$, the total amount of space needed for the matching graphs must be $O(nlogn)$.

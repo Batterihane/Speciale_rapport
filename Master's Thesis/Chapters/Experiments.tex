@@ -136,13 +136,18 @@ By choosing this tree topology, we tried to maximize the space consumption of th
 \end{figure}
 \begin{figure}
 	\includegraphics[width=\textwidth]{completeIdenticalTreesGCSubtracted}
-	\caption{The runtime of the $nlogn$ algorithm given two identical complete trees after having subtracted the runtime of the garbage collector.}
+	\caption{The runtime of the $O(nlogn)$ algorithm given two identical complete trees after having subtracted the runtime of the garbage collector.}
 	\label{completeIdenticalTreesGCSubtractedGraph}
 \end{figure}
 
 \section{Comparing Algorithms}
-In \todo{Graph with all experiment results - gc subtracted?} we see the runtime of each of the two algorithms \todo{include naive?}, given identical complete trees as input. Clearly, there is a huge improvement from the $O(n^2)$ algorithm to the $O(nlogn)$ algorithm and even for small input trees, the $O(nlogn)$ algorithm is dominant.
+In figure \ref{nsquaredVsNlognGraph} we see the runtime of the two algorithms, given identical complete trees as input. Clearly, there is a huge improvement from the $O(n^2)$ algorithm to the $O(nlogn)$ algorithm and even for small input trees, the $O(nlogn)$ algorithm is dominant.
 
+\begin{figure}
+	\includegraphics[width=\textwidth]{nsquaredVsNlogn}
+	\caption{The runtime of the $O(n^2)$ algorithm and the $O(nlogn)$ algorithm given identical complete trees after having subtracted the runtime of the garbage collector.}
+	\label{nsquaredVsNlognGraph}
+\end{figure}
 
 \section{MLIS}
 The small algorithm that we described in section \ref{mlisSection} only works for input trees of a special structure; the same tree structure that we evaluated would give the shortest runtime for the algorithm by Cole et. al. It is expected to run in $O(nlogn)$ time, but because of its simplicity, we expect it to be faster than the algorithm by Cole et. al. in practice. We tested this through an experiment where we ran the two algorithms with the exact same input trees and plotted the results in the graphs seen in figure \ref{baseCaseTreesColeVsLIS}
