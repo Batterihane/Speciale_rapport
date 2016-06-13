@@ -139,14 +139,14 @@ Now that we can induce a subtree from a set of leaves $L$ in $O(|L|)$ time, all 
 
 In order to induce subtree $S_i$, the input leaves needs to be sorted by the order that they appear in $T_2$. Our approach to this is to first compute a sorted list of all leaves in $T_1$ according to $T_2$, then splitting the leaves into lists corresponding to the subtrees $M_i$, $1 \le i \le p-1$ and finally use their twins (which can be found in constant time) to induce the subtree $S_i$ for each list.
 
-The leaves of $T_1$ is sorted by first giving each leaf of $T_2$ a number corresponding to its position (left to right) in $T_2$. This is done by a single iteration through $T_2$. Then we sort the leaves from $T_1$, by looking up the number of its twin in $T_2$, in linear time using bucket sort.
+The leaves of $T_1$ are sorted by iterating through the leaves of $T_2$, in order left to right, and adding the twin of each leaf to a list.
 
 %For the input trees, the leaves of $T_1$ could also be sorted by their name, assuming that the names of $T_2$ where sorted. However, in the recursive calls the names will no longer correspond to the number of leaves, meaning that they can't be sorted in linear time. Therefore we instead assign numbers to the leaves of $T_2$.
 
 % First try
 % Creating a list, where index $i$ holds the position, left to right, of the leaf named $i$ in $T_2$ compared to the other leaves, is done in linear time simply by iterating through $T_2$. That list is used when sorting the leaves of $T_1$ to look up the position of the twins in $T_2$. We sort the leaves in linear time using bucket sort.
 
-By iterating through each subtree $M_i$, we can use linear time to have each leaf store a number corresponding to the subtree to which it belongs. Having the sorted list of leaves in $T_1$, we can use the stored numbers to split the leaves into the final lists during a single iteration. Now the twins can be found and the subtrees $S_i$, $1 \le i \le p-1$ can be computed.
+By iterating through each side tree $M_i$, we can use linear time to have each leaf store a number corresponding to the side tree to which it belongs. Having the sorted list of leaves in $T_1$, we can use the stored numbers to split the leaves into the final lists during a single iteration. Now the twins can be found and the subtrees $S_i$, $1 \le i \le p-1$ can be computed.
 
 In our implementation, $S_i$ does not actually consist of nodes from $T_2$. It is a new tree where each node contains a reference to the corresponding node in $T_2$ and vice versa.
 
