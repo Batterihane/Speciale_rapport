@@ -1,15 +1,15 @@
-\chapter{The $O(N^2)$ algorithm}
-Goddard et. al.\cite{nsquared} describes a $O(n^2)$ algorithm for finding the maximum agreement subtree for two rooted binary trees. Given two trees T and U of size m and n, the idea is to iteratively find the largest agreement subtree and its size for every pair of subtrees from T and U. This can be done in quadratic time by using Lemma 1. 
+\chapter{The $O(n^2)$ algorithm}
+Goddard et. al.\cite{nsquared} describes a $O(n^2)$ algorithm for finding the maximum agreement subtree for two rooted binary trees. Given the two trees $T_a$ and $T_w$ each of size n, the idea is to iteratively find the largest agreement subtree and its size for every pair of subtrees from $T_a$ and $T_w$. This can be done in quadratic time by using an algorithm based on Lemma 1. Note that the algorithm also works when $T_a$ and $T_w$ does not have the same leaf set.
 
 \begin{Lemma}
-	Let $T_a$ be a tree rooted at vertex a with the children b and c; And let $T_w$ be rooted at w with children x and y. We now define $\#(T_a,T_w)$ as the size of the maximum agreement subtree of $T_a$ and $T_w$.  $\#(T_a,T_w)$ is given by the maximum of the following six numbers: \#$(T_b,T_x)+(T_c,T_y)$,
+	Let $T_a$ be a tree rooted at node a with the children b and c; And let $T_w$ be rooted at w with children x and y. We now define $\#(T_a,T_w)$ as the size of the maximum agreement subtree of $T_a$ and $T_w$.  $\#(T_a,T_w)$ is given by the maximum of the following six numbers: \#$(T_b,T_x)+(T_c,T_y)$,
 	\#$(T_b,T_y)+(T_c,T_x)$,
 	\#$(T_a,T_x)$,
 	\#$(T_a,T_y)$,
 	\#$(T_b,T_w)$,
 	\#$(T_c,T_w)$.\\
 	\textbf{Proof.}\\
-	This is a proof by case over the possible subtrees contributing to the agreement subtree for $T_a$ and $T_w$, $A_{aw}$.\\
+	This is a proof by case over the possible subtrees contributing to the agreement subtree $A_{aw}$ for $T_a$ and $T_w$.\\
 	\underline{Case 1}: Only $T_b$ of $T_a$ contributes to $A_{aw}$.
 	If this is the case, then the agreement subtree can only exist between $T_b$ and $T_w$, \#$(T_b,T_w)$.\\
 	\underline{Case 2}: Only $T_c$ of $T_a$ contributes to $A_{aw}$.
@@ -22,46 +22,48 @@ Goddard et. al.\cite{nsquared} describes a $O(n^2)$ algorithm for finding the ma
 	If this is the case, then the agreement subtree can only exist between $T_y$ and $T_a$,
 	\#$(T_a,T_y)$.\\
 	\underline{Case 5}: This case covers all that case 1 through 4 doesn't, which means that all children b, c, x and y contibute to the MAST.
-	Consider the agreement tree, $A_r$, rooted in r and with children j and l. We claim that a child of r cannot contain a leaf, $b'$, from $T_b$ and a leaf, $c'$, from $T_c$ at the same time. If this is the case, then we only need to find the MAST size of child pairing permutations across $T_a\ and\ T_w$: $max\{\#(T_b, T_x)+\#(T_c, T_y), \#(T_b, T_y)+\#(T_c, T_x)\}$.
-	Let us now prove our claim to be correct by assuming it doesn't hold, and use that to reach a  contradiction. Suppose that $A_j$ contains a leaf , $b'$, from $T_b$ and a leaf, $c'$, from $T_c$. Let f be another leaf from $T_b$. We now see that the subtree induced by $b', f and c'$ differs for $A_r$ and $T_a$ as illustrated in Figure \ref{Fig:Lemma1Binary}. This is clearly contradictory to the definition of an agreement tree, which is why we must conclude our claim to be correct.
+	Consider the agreement tree, $A_r$, rooted in r and with children s and t. We claim the following: A child of r cannot contain a leaf, $b'$, from $T_b$ and a leaf, $c'$, from $T_c$ at the same time.\\
+	If this is the case, then we only need to find the MAST size of child pairing permutations across $T_a\ and\ T_w$: $max\{\#(T_b, T_x)+\#(T_c, T_y), \#(T_b, T_y)+\#(T_c, T_x)\}$.
+	
+	Let us now prove our claim by assuming that it doesn't hold, and use that to reach a  contradiction. Suppose that $A_s$ contains a leaf , $b'$, from $T_b$ and a leaf, $c'$, from $T_c$. Let $f$ be any leaf from $A_t$. Assume that $f$ is from $T_b$ (the other case is identical). We now see that the subtree induced by $b'$, $f$ and $c'$ differs for $A_r$ and $T_a$ as illustrated in Figure \ref{Fig:Lemma1Binary}. This is clearly contradictory to the definition of an agreement tree, which is why we must conclude our claim to be correct.
 	\qed   	  
 \end{Lemma}
 
 \begin{figure}
 	\begin{enumerate}
 		
-		\item[]  \Tree [.r [.j b' c' ].j [.l f ].l ].r
+		\item[]  \Tree [.r [.s b' c' ].s [.t f ].t ].r
 		\hskip 0.4in
 		 \Tree [.a [.b b' f ].b [.c c' ].c ].a
 		
 	\end{enumerate}	
 	
-	\caption{Two example binary trees for, and they resulting MAST}
+	\caption{Two binary trees with different topology, induced by the same leaves.}
 	\label{Fig:Lemma1Binary}	
 \end{figure}
 
 
-What Lemma 1 essentially states is twofold. First, if the MAST contains children from all subtrees (a,b,x,y), then its size is given by the largest combination of these. Secondly, if the MAST does not include all subtrees, then its size is given by the largest combination of subtrees excluding at least one of them.    
+What Lemma 1 essentially states is twofold. First, if the MAST contains leaves from all subtrees ($T_b$,$T_c$,$T_x$,$T_y$), then its size is given by the two largest distinct agreement matchings between pairs of these. Secondly, if the MAST does not include all subtrees, then its size is given by the largest agreement matching between $T_a$ and $T_w$ where one of the subtrees is excluded.
 This gives rise to a recursive solution for finding the size of the maximum agreement subtree. The recursive function is defined in figure \ref{Fig:Function1}.
 
 \begin{figure}
 	\begin{equation*}
 	\begin{aligned}
-	f(T_a,T_w)=Max
+	f(T_a,T_w)=max
 	\begin{cases}
-	f(T_b,T_x)+f(T_c,T_y) & \text{if Type($T_a$)=Type($T_w$)=Internal Node}
+	f(T_b,T_x)+f(T_c,T_y) & \text{if $a$ and $w$ are both internal nodes}
 	\\
-	f(T_b,T_y)+f(T_c,T_x) & \text{if Type($T_a$)=Type($T_w$)=Internal Node}
+	f(T_b,T_y)+f(T_c,T_x) & \text{if $a$ and $w$ are both internal nodes}
 	\\
-	f(T_a, T_x)           & \text{if Type($T_w$)=Internal Node}
+	f(T_a, T_x)           & \text{if $w$ is an internal node}
 	\\
-	f(T_a, T_y)           & \text{if Type($T_w$)=Internal Node}
+	f(T_a, T_y)           & \text{if $w$ is an internal node}
 	\\
-	f(T_b, T_w)           & \text{if Type($T_a$)=Internal Node}
+	f(T_b, T_w)           & \text{if $a$ is an internal node}
 	\\
-	f(T_c, T_w)           & \text{if Type($T_a$)=Internal Node}
+	f(T_c, T_w)           & \text{if $a$ is an internal node}
 	\\
-	1 	                  & \text{if Type($T_a$)=Type($T_w$)=Leaf  $\land$  $T_a$=$T_w$}
+	1 	                  & \text{if $a$ and $w$ are both leaves and  $a$=$w$}
 	\\
 	0                     
 	\end{cases}
@@ -73,14 +75,12 @@ This gives rise to a recursive solution for finding the size of the maximum agre
 \end{figure}
 
 
-Like many similar recursive definitions in bioinformatics, we run into the problem that the recursive function computes the same partial results multiple times. This problem is rectified by the method of dynamic programming. Specifically, we wish to store the partial results in a $|T_a| \times |T_w|$ table. We seek to fill out the table with our partial results, and end up with the maximum size in the bottom right corner.
-Looking at the function in Figure \ref{Fig:Function1} we see that the partial result for each tree node is dependent on the results of its children. This implies that we must list the table nodes in postorder, thereby ensuring that the partial results, on which a given node is dependent, has already been calculated when we reach it. 
+Like many similar recursive definitions in bioinformatics, we run into the problem that the recursive function computes the same partial results multiple times. This problem is rectified by the method of dynamic programming. Specifically, we wish to store the partial results in a $O(|T_a|) \times O(|T_w|)$ table containing a row for each node in the first tree and a column for each node in the second tree. We seek to fill out the table row by row with our partial results, starting from the top left corner, such that a cell corresponding to two nodes contains the size of the maximum agreement subtree between the subtrees rooted at these two nodes. In the end, the size of the maximum agreement subtree should be stored in the bottom right corner.
+Looking at the function in figure \ref{Fig:Function1} we see that the partial result for each tree pair is dependent on the results for their subtrees. This implies that we must list the table nodes in postorder, thereby ensuring that the partial results, on which a given node is dependent, have already been calculated when we reach it. 
 By introducing such a table we also introduce a requirement of $O(n^2)$ space and time, making it a quadratic algorithm. Simple techniques for reducing the space requirement, like only storing a few number of rows in the table at a time, cannot be applied in this case, since the computation of a new row may depend on any of the previous rows.  
-\\
-We will in the following sections show how one can extend this method for calculation the size of the MAST to computing the actual tree.
 
-\subsection{Algorithm example}
-Two example trees have been provided in Figure \ref{Fig:Binary1}. We now wish to compute the size of their maximum agreement subtree using the agorithm described above. For this reason, we create a $15 \times 15$ table containing the nodes of each tree in postorder. Using the function described in \ref{Fig:Function1}, we can now fill out the table row wise by starting from the topmost row. The resulting table can be seen in \ref{Table:Table1}, where we from the bottom right corner than see that the maximum size of the MAST is 6. By looking at the trees for a little while, one can come to the conclusion that 6 is indeed correct, since removing only one leaf cannot produce an agreement tree in this case, while removing $leaf_1$ and $leaf_7$ will produce the desired agreement tree of size 6. Their MAST is likewise displayed in Figure \ref{Fig:Binary1}. 
+\section{Algorithm example}
+Two example trees have been provided in figure \ref{Fig:Binary1}. We now wish to compute the size of their maximum agreement subtree using the agorithm described above. For this reason, we create a $15 \times 15$ table, where the rows and columns correspond to the nodes of each tree in postorder. Using the function described in \ref{Fig:Function1}, we can now fill out the table row wise starting from the topmost row. The resulting table can be seen in \ref{Table:Table1}, where we from the bottom right corner see that the maximum size of the MAST is 6. We can conclude that 6 is indeed correct, since removing only one leaf cannot produce an agreement tree in this case, while removing $leaf_1$ and $leaf_7$ will produce the desired agreement tree of size 6. Their MAST is likewise displayed in figure \ref{Fig:Binary1}. 
 
 \begin{figure}
 	
@@ -95,7 +95,7 @@ Two example trees have been provided in Figure \ref{Fig:Binary1}. We now wish to
 		\Tree [.A [.B leaf_2 [.D leaf_3 leaf_4 ] ].B [.E [.F leaf_5 leaf_6 ] leaf_8 ].E ].A
 	\end{itemize}	
 	
-	\caption{Two example binary trees for, and they resulting MAST}
+	\caption{Two example binary trees and their resulting MAST}
 	\label{Fig:Binary1}	
 \end{figure}
 
@@ -114,86 +114,86 @@ Two example trees have been provided in Figure \ref{Fig:Binary1}. We now wish to
 		\textbf{H}       & 1                & 1                & 2          & ...            & 2          & 3          & 6          \\ \hline
 	\end{tabular}
 	
-	\caption{Score Matrix for the Trees in Figure \ref{Fig:Binary1}}
+	\caption{Score Matrix for the trees in figure \ref{Fig:Binary1}}
 	\label{Table:Table1}
 \end{table}
 
+We will in the following sections show how one can extend this method for calculating the size of the MAST to computing the actual tree.
 
 
-
-\subsection{Computing the MAST}
-Extending the solution for computing the size of the MAST to include the computation of the actual MAST is not covered in the article \cite{nsquared}, but is fairly simple in this case. We found two different ways of going about it. 
+\section{Computing the MAST}
+Extending the solution for computing the size of the MAST to include the computation of the actual MAST is fairly simple in this case. We found two different ways of going about it. 
 \\
 \\
 \textbf{Option 1: Continual Tree Construction} \\
-The first option is to extend the size algorithm simply by attaching the MAST responsible for the size of each cell in the size table. This cannot be done by copying subtrees from the input trees, since that would break our time constraints. For this reason, we store the pointer to the root of the subtree for each cell, and hence mutiple cells/masts will refer to the same subtrees. This means that we will end up creating a Directed Acyclic Graph, where the root node of the maximum sized MAST is saved in the bottom right corner of the size table. Usually a traversal fixing parent/child pointers is needed in the end.
+The first option is to extend the size algorithm simply by, for each cell in the table, attaching the MAST responsible for that size. This cannot be done by copying subtrees from the input trees, since that would break our time constraints. For this reason, a cell instead stores either a leaf or a node with pointers to its children, and hence mutiple cells/masts will refer to the same subtrees. This means that we will end up creating a Directed Acyclic Graph, where the root node of the MAST is saved in the bottom right corner of the size table. Finally a traversal of the tree, separating it from the DAG is needed.
 More concretely, the algorithm is described as follows: 
 
-For each pair of nodes $a$ and $w$ we compute the agreement subtree $A_{a,w}$ for the two subtrees $T_a$ and $T_w$ having respectively $a$ and $w$ as roots. For such a pair of nodes there are three cases.
+For each pair of nodes $p$ and $q$, one from each input tree, we compute the agreement subtree $A_{p,q}$ for the two subtrees $T_p$ and $T_q$ having respectively $p$ and $q$ as roots. For such a pair of nodes there are three cases.
 
-The first case is that $a$ and $w$ are both leaves. If the leaves are equal, i.e. they have the same name, then $A_{a,w}$ will be the tree consisting of exactly one leaf with that name. Otherwise $A_{a,w}$ is empty.
+The first case is that $p$ and $q$ are both leaves. If the leaves are equal, i.e. they have the same name, then $A_{p,q}$ will be the tree consisting of exactly one leaf with that name. Otherwise $A_{p,q}$ is empty.
 
-The second case is that we have a leaf and an internal node. Let's say $w$ is the internal node having $x$ and $y$ as children. If the leaf corresponding to $a$ is contained in $T_w$, it will also be contained in either $T_x$ or $T_y$ and $A_{a,w}$ will be the same as either $A_{a,x}$ or $A_{a,y}$. Since we do a postorder traversal of the trees, $A_{a,x}$ and $A_{a,y}$ have already been computed and $A_{a,w}$ can just be set to the largest of the two.
+The second case is that we have a leaf and an internal node. Let's say $q$ is the internal node having $x$ and $y$ as children. If the leaf corresponding to $p$ is contained in $T_q$, it will also be contained in either $T_x$ or $T_y$ and $A_{p,q}$ will be the same as either $A_{p,x}$ or $A_{p,y}$. Since we do a postorder traversal of the trees, $A_{p,x}$ and $A_{p,y}$ have already been computed and $A_{p,q}$ can just be set to the largest of the two.
 
-The third case is that both $a$ and $w$ are internal nodes, where $a$ have children $b$ and $c$ and $w$ have children $x$ and $y$. In this case we can use Lemma 1 and determine which of the six cases gives the largest size. Again, all the agreement subtrees to consider have already been computed. If the largest size is $\#A_{b,x} + \#A_{c,y}$, then $A_{a,w}$ will be a tree where the root has the roots of $A_{b,x}$ and $A_{c,y}$ as children. Similarly if the largest size is $\#A_{b,y} + \#A_{c,x}$.\\
+The third case is that both $p$ and $q$ are internal nodes, where $p$ have children $b$ and $c$ and $q$ have children $x$ and $y$. In this case we can use Lemma 1 and determine which of the six cases gives the largest size. Again, all the agreement subtrees to consider have already been computed. If the largest size is $\#A_{b,x} + \#A_{c,y}$, then $A_{p,q}$ will be a tree where the root has the roots of $A_{b,x}$ and $A_{c,y}$ as children. Similarly if the largest size is $\#A_{b,y} + \#A_{c,x}$.\\
 \\
 \textbf{Option 2: Recursive Backtracking} \\
-While the first option is fairly simple to implement and understand, it can consume quite a bit of memory due to all the trees we save that ultimately end up being irrelevant for the final result. Backtracking tries to rectify this problem by only computing and storing exactly the relevant subtrees for the final MAST. This is done by observing that the formula in Figure \ref{Fig:Function1}, on which the algorithm is based, is a maximization function. Therefore, the table is deterministicly constructed, allowing us for each cell to determine what cells were responsible for the size it contains. By computing the entire size table first, we can start with the bottom right cell and recursively run back through the table determining all cells responsible for the MAST size. The tree is then constructed following the same logic used in Option 1. 
+While the first option is fairly simple to implement and understand, it can consume quite a bit of memory due to the trees we save that ultimately end up being irrelevant for the final result. Backtracking tries to rectify this problem by only computing and storing exactly the relevant subtrees for the final MAST. This is done by observing that the function in figure \ref{Fig:Function1}, on which the algorithm is based, is a maximization function. Therefore, the table is deterministically constructed, allowing us, for each cell, to determine what cells were responsible for the size it contains. By computing the entire size table first, we can start with the bottom right cell and recursively run back through the table determining all cells responsible for the MAST size. The tree is then constructed following the same logic used in Option 1. 
 \\
-Java inspired pseudo-code for the backtracking algorithm can be seen in Figure \ref{Code:Backtracking1}. Notice that the order of the if-cases in the pseudo code are significant, which was not previously the case when only computing the MAST size. The reason is simply that several of the cases might actually lead to the same MAST size, but not all will lead to a valid binary tree. For instance the second and third recursive case might lead to the same size, but if you choose the third case, then you will end up will a null-branch in the produced MAST, since this branch does not contribute to the MAST size. 
+Java inspired pseudo-code for the backtracking algorithm can be seen in Figure \ref{Code:Backtracking1}. Notice that the order of the if-cases in the pseudo code are significant, which was not previously the case when only computing the MAST size. The reason is simply that several of the cases might actually lead to the same MAST size, but not all will lead to a valid binary tree. For instance the second and third recursive case might lead to the same size, which means that at least one subtree does not contribute to the MAST. Choosing the third case therefore means that we end up producing a null-branch in the MAST, since this branch does not contribute to the MAST size. 
     
 \begin{figure}
 	\begin{lstlisting}[language=Java]
-	Function RecBackTrack(Tree1, Tree2)	{
-	  int Score = ScoreMatrix[Tree1][Tree2];
+	Function RecBackTrack(Root1, Root2, ScoreMatrix)	{
+	  int Score = ScoreMatrix[Root1][Root2];
 	  
 	  /* Base Case */
-	  if (Type(Tree1) = Type(Tree2) = Leaf) {
-	    return Tree1 = Tree2 ? Tree1 : null; 
+	  if (Type(Root1) = Type(Root2) = Leaf) {
+	    return Root1 = Root2 ? Root1 : null; 
 	  }
 	  
 	  /* Recursive Case 1 */
-	  if (Type(Tree1) = InternalNode) {
-	    int Score1 = ScoreMatrix[Tree1.Child1][Tree2]; 
-	    int Score2 = ScoreMatrix[Tree1.Child2][Tree2];
+	  if (Type(Root1) = InternalNode) {
+	    int Score1 = ScoreMatrix[Root1.Child1][Root2]; 
+	    int Score2 = ScoreMatrix[Root1.Child2][Root2];
 	  
 	    if (Score = Score1) {
-	      return RecBackTrack(Tree1.Child1, Tree2);
+	      return RecBackTrack(Root1.Child1, Root2);
 	    }
 	    else if (Score = Score2) {
-	      return RecBackTrack(Tree1.Child2, Tree2);
+	      return RecBackTrack(Root1.Child2, Root2);
 	    }
 	  }
 	  
 	  /* Recursive Case 2 */
-	  if (Type(Tree2) = InternalNode) {
-	    int Score1 = ScoreMatrix[Tree1][Tree2.Child1]; 
-	    int Score2 = ScoreMatrix[Tree1][Tree2.Child2];
+	  if (Type(Root2) = InternalNode) {
+	    int Score1 = ScoreMatrix[Root1][Root2.Child1]; 
+	    int Score2 = ScoreMatrix[Root1][Root2.Child2];
 	  
 	    if (Score = Score1) {
-	      return RecBackTrack(Tree1, Tree2.Child1);
+	      return RecBackTrack(Root1, Root2.Child1);
 	    }
 	    else if (Score = Score2) {
-	      return RecBackTrack(Tree1, Tree2.Child2);
+	      return RecBackTrack(Root1, Root2.Child2);
 	    }
 	  }	
 	  
 	  /* Recursive Case 3 */
-	  if(Type(Tree1) = Type(Tree2) = InternalNode) {
-	    int Score1 = ScoreMatrix[Tree1.Child1][Tree2.Child1];
-	    int Score2 = ScoreMatrix[Tree1.Child2][Tree2.Child2];
-	    int Score3 = ScoreMatrix[Tree1.Child1][Tree2.Child2];
-	    int Score4 = ScoreMatrix[Tree1.Child2][Tree2.Child1];
+	  if(Type(Root1) = Type(Root2) = InternalNode) {
+	    int Score1 = ScoreMatrix[Root1.Child1][Root2.Child1];
+	    int Score2 = ScoreMatrix[Root1.Child2][Root2.Child2];
+	    int Score3 = ScoreMatrix[Root1.Child1][Root2.Child2];
+	    int Score4 = ScoreMatrix[Root1.Child2][Root2.Child1];
 	
 	    if(Score = Score1 + Score2) {
-	      Tree subTree1 = RecBackTrack(Tree1.Child1, Tree2.Child1);
-	      Tree subTree2 = RecBackTrack(Tree1.Child2, Tree2.Child2);
+	      Tree subTree1 = RecBackTrack(Root1.Child1, Root2.Child1);
+	      Tree subTree2 = RecBackTrack(Root1.Child2, Root2.Child2);
 	      return /*internal node with subTree1 and 
 	        subTree2 as children */
 	    }
 	    else if (Score1 = Score3 + Score4) {
-	      Tree subTree1 = RecBackTrack(Tree1.Child1, Tree2.Child2);
-          Tree subTree2 = RecBackTrack(Tree1.Child2, Tree2.Child1);
+	      Tree subTree1 = RecBackTrack(Root1.Child1, Root2.Child2);
+          Tree subTree2 = RecBackTrack(Root1.Child2, Root2.Child1);
 	      return /*internal node with subTree1 and 
 	        subTree2 as children */
 	    }
@@ -205,5 +205,5 @@ Java inspired pseudo-code for the backtracking algorithm can be seen in Figure \
 \end{figure}	
 
 \section{Evaluation}
-All in all, the $O(n^2)$ algorithm is fairly simple to implement and understand, but it also has its practical limitations when working with large trees. As we will see in the testing section, the algorithm starts having trouble with binary trees of size 6000 in terms of time and memory consumption. The main problem with the algorithm is that it considers too many combinations of subtrees that end up being irrelevant. Effectively most of the time spent filling out the size table is wasted. In our previous example of filling out the size table of 225 cells, only 25 cells ended up ultimately having an impact on the produced MAST, since those were the only ones accesed by the backtracking algorithm. The $O(nlogn)$ algorithm that we are about to examine improves on the 'wasted' work by only considering more relevant information between subtrees.
+All in all, the $O(n^2)$ algorithm is fairly simple to implement and understand, but it also has its practical limitations when working with large trees. As we will see in the experiments section, the algorithm starts having trouble with binary trees of size larger than 6000 in terms of time and memory consumption. The main problem with the algorithm is that it considers too many combinations of subtrees that end up being irrelevant. Effectively most of the time spent filling out the size table is wasted. In our previous example of filling out the size table of 225 cells, only 25 cells ended up ultimately having an impact on the produced MAST, since those were the only ones accesed by the backtracking algorithm. The $O(nlogn)$ algorithm that we are about to examine improves on the 'wasted' work by only considering more relevant information between subtrees.
 Similarly to the naive algorithm, there are no worst-case or best-case trees to consider, since we always fill out the entire size table despite what the tree topology might look like. 
