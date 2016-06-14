@@ -1,9 +1,9 @@
-Computing the LWAM for the graph $G(x)$ is done by processing each node of $L(x)$ in order starting with the bottom node. Recall that we will compute the LWAM containing only edges from $u_i$ and nodes below $u_i$ in $L(x)$, for each $u_i \in L(x)$. This is done by adding that information to $\mathcal{T}$ while processing the nodes of $L(x)$. 
+Computing the LWAMs for the graph $G(x)$ is done by processing each node of $L(x)$ in order starting with the bottom node. Recall that we will compute the LWAM containing only edges from $u_i$ and nodes below $u_i$ in $L(x)$, for each $u_i \in L(x)$. This is done by adding that information to $\mathcal{T}$ while processing the nodes of $L(x)$. 
 
 First, we will describe the information that needs to be stored in $\mathcal{T}$. Next, we will explain how nodes are processed and how to extract the LWAMs from $\mathcal{T}$. Finally we explain the total time complexity of this step.
 
 \subsubsection{Auxiliary Information in $\mathcal{T}$}
-While processing the edges of $G(x)$ we will maintain information at each node of $\mathcal{T}$ about the LWAM of the currently processed edges. For a node $z \in \mathcal{T}$, we define $anc(z)$ as the set of ancestors of $z$, including $z$ itself in order top to bottom. $lfringe(z)$ is defined as the left children of the vertices in $anc(z)$ which are not in $anc(z)$ themselves. $lfringe$ will only contain nodes with indices less than $index(z)$. $rfringe(z)$ is defined analogously where the nodes all have indices greater or equal to $index(z)$. $anc(z)$ need not be stored in $\mathcal{T}$, but can be created while searching for $z$ in $\mathcal{T}$. Likewise, $lfringe(z)$ and $rfringe(z)$ can be created by iterating through $anc(z)$. After processing an edge $(u,v)$, we say that the edge is in $\mathcal{T}$. For a node $z \in \mathcal{T}$ we also say that the edge $(u,v)$ is in $T(z)$ if $T(z)$ contains the node corresponding to $v$.
+While processing the edges of $G(x)$ we will maintain information at each node of $\mathcal{T}$ about the LWAM of the currently processed edges. For a node $z \in \mathcal{T}$, we define $anc(z)$ as the set of ancestors of $z$, including $z$ itself in order top to bottom. $lfringe(z)$ is defined as the left children of the vertices in $anc(z)$ which are not in $anc(z)$ themselves. $lfringe(z)$ will only contain nodes with indices less than $index(z)$. $rfringe(z)$ is defined analogously where the nodes all have indices greater or equal to $index(z)$. $anc(z)$ need not be stored in $\mathcal{T}$, but can be created while searching for $z$ in $\mathcal{T}$. Likewise, $lfringe(z)$ and $rfringe(z)$ can be created by iterating through $anc(z)$. After processing an edge $(u,v)$, we say that the edge is in $\mathcal{T}$. For a node $z \in \mathcal{T}$ we also say that the edge $(u,v)$ is in $\mathcal{T}(z)$ if $\mathcal{T}(z)$ contains the leaf corresponding to $v$.
 
 The following information is maintained at each node $z \in \mathcal{T}$. This is taken directly from \cite{nlogn}, but slightly elaborated.
 \begin{itemize}
@@ -38,7 +38,7 @@ There are four possible cases for the LWAM:
 	This matching is given by $max_{z \in rfringe(l)} y(z)$
 \end{itemize}
 
-These LWAMs can be found doing a single iteration through rfringe(l) starting from the top. The four cases cover all possible LWAMs containing only edges dominated by $e$, so adding $e$ as the topmost white edge to the largest of these agreement matchings, gives us the LWAM that should replace $m(z), z \in anc(l)$ if it has larger weight than the agreement matching already stored.
+These LWAMs can be found doing a single iteration through $rfringe(l)$ starting from the top. The four cases cover all possible LWAMs containing only edges dominated by $e$, so adding $e$ as the topmost white edge to the largest of these agreement matchings, gives us the LWAM that should replace $m(z), z \in anc(l)$ if it has larger weight than the agreement matching already stored.
 
 In order to avoid copying the agreement matching just found, which would take linear time w.r.t. the number of edges, the new agreement matching can be stored as the white edge $e$ and a pointer to the other agreement matching. This will also minimize the amount of space needed.
 
@@ -57,7 +57,7 @@ y(z)
 \phantom{\hspace{6cm}}
 \end{equation*}
 
-For the same reason $g(z)$ should be reset for all $z \in anc(l)$. However, in order to not lose the information at g(z), $g(z')$ needs to be updated to $max_{z'' \in anc(z')} g(z'')$ for each $z' \in lfringe(l) \cup rfringe(l)$ before resetting. Finally, $r(z)$ need to be updated for $z \in anc(l)$ if the weight of $e$ is greater than that the current value of $r(z)$. $r(z)=max\{r(z), e\}$.
+For the same reason $g(z)$ should be reset for all $z \in anc(l)$. However, in order to not lose the information at $g(z)$, $g(z')$ needs to be updated to $max_{z'' \in anc(z')} g(z'')$ for each $z' \in lfringe(l) \cup rfringe(l)$ before resetting. Finally, $r(z)$ need to be updated for $z \in anc(l)$ if the weight of $e$ is greater than that the current value of $r(z)$. $r(z)=max\{r(z), e\}$.
 
 Updating all these values only requires a single iteration through $anc(l)$ starting from the root, where both the nodes of $anc(l)$ and children of these nodes are updated.
 
@@ -81,11 +81,11 @@ For processing white non-singleton edges, we will introduce some extra informati
 The following information is stored at each node $z \in {anc(l_1) \cup anc(l_2) \cup ... }$ as they are being visited the first time.
 
 \begin{itemize}
-	\item $rm(z)$: This is the heaviest of the agreement matching of $m(z'), z' \in rfringe(z)$.
+	\item $rm(z)$: This is the heaviest of the agreement matchings of $m(z'), z' \in rfringe(z)$.
 		\subitem $rm(z) = max_{z'\in rfringe(z)} m(z')$
-	\item $rx(z)$: This is the heaviest of the agreement matching of $x(z'), z' \in rfringe(z)$.
+	\item $rx(z)$: This is the heaviest of the agreement matchings of $x(z'), z' \in rfringe(z)$.
 		\subitem $rx(z) = max_{z'\in rfringe(z)} x(z')$
-	\item $ry(z)$: This is the heaviest of the agreement matching of $y(z'), z' \in rfringe(z)$.
+	\item $ry(z)$: This is the heaviest of the agreement matchings of $y(z'), z' \in rfringe(z)$.
 		\subitem $ry(z) = max_{z'\in rfringe(z)} y(z')$
 	\item $ag(z)$: This is the heaviest of the edges $g(z'), z' \in anc(z)$.
 		\subitem $ag(z) = max_{z'\in anc(z)} g(z')$

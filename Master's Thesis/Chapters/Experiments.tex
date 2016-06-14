@@ -16,7 +16,7 @@ The algorithm by Goddard et. al. \cite{nsquared} produces an $n*n$ table no matt
 
 \begin{figure}
 	\includegraphics[width=\textwidth]{nsquaredBestCaseTreesTimeDivided}
-	\caption{The runtime of the $O(n^2)$ algorithm given trees where each internal node has at least one leaf as a child.}
+	\caption{The runtime of the $O(n^2)$ algorithm given trees where each internal node has a leaf as one of its children.}
 	\label{nsquaredBestCaseTreesGraph}
 	
 	\includegraphics[width=\textwidth]{nsquaredIdenticalCompleteTreesTimeDivided}
@@ -59,11 +59,11 @@ The result of this experiment is seen in Figure \ref{randomTreesGraph}. Since we
 
 We suspected this behaviour to be caused by the garbage collector and therefore executed the same experiment again, but this time plotting the runtime of the algorithm after having subtracted the runtime of the garbage collector. The result is shown in figure \ref{randomTreesGCSubtractedGraph} after having divided the runtime with $nlogn$. This graph indeed looks like it will stay below some constant. We therefore believe that the runtime of the algorithm has an upper bound of $O(nlogn)$.
 
-\begin{figure}
-	\includegraphics[width=\textwidth]{randomTreesGCGraph}
-	\caption{The runtime of the garbage collector when running the $nlogn$ algorithm given random trees.}
-	\label{randomTreesGCGraph}
-\end{figure}
+%\begin{figure}
+%	\includegraphics[width=\textwidth]{randomTreesGCGraph}
+%	\caption{The runtime of the garbage collector when running the $nlogn$ algorithm given random trees.}
+%	\label{randomTreesGCGraph}
+%\end{figure}
 
 \begin{figure}
 	\includegraphics[width=\textwidth]{randomTreesGCSubtractedGraph}
@@ -87,7 +87,7 @@ Recall how the edges are determined. For each leaf in $T_2$, an edge will be cre
 
 The process of creating edges is however done in every recursive call of the algorithm, so we want a structure of $T_1$ that gives the fewest possible recursive calls. Choosing the same tree structure as for $T_2$ means that each side tree of $\pi$ will have size 1 so there will be no recursive calls. The result is that the total number of edges created by the algorithm is equal to the number of leaves in $T_2$, namely $n$. This actually means that the step of creating matching graphs in the algorithm only requires $O(n)$ space, instead of $O(nlogn)$.
 
-When processing a matching graph $G(x)$ to compute LWAMs, each edge $(u_i, v_j)$ will be processed where the leaf in the search tree corresponding to $v_j$ is searched for in $O(log\frac{|T_2(x)|}{n_j})$ time for singleton edges. Having input trees of the topology just mentioned, means that there is only one graph $G(r)$, where $r$ is the root of $T_2$. All edges are singleton edges and for each node $v_j$, $n_j = 1$. So even with this tree topology, the total runtime of the algorithm is $O(\sum_{v_j \in \pi(r)} log |T_2(r)|) = O(nlogn)$. We therefore don't expect an asymptotic improvement of the runtime compared to the result with random trees, but we do expect a noticeable constant improvement.
+When processing a matching graph $G(x), x \in X$ to compute LWAMs, each edge $(u_i, v_j)$ will be processed where the leaf in the search tree corresponding to $v_j$ is searched for in $O(log\frac{|T_2(x)|}{n_j})$ time for singleton edges. Having input trees of the topology just mentioned, means that there is only one graph $G(r)$, where $r$ is the root of $T_2$. All edges are singleton edges and for each node $v_j$, $n_j = 1$. So even with this tree topology, the total runtime of the algorithm is $O(\sum_{v_j \in \pi(r)} log |T_2(r)|) = O(nlogn)$. We therefore don't expect an asymptotic improvement of the runtime compared to the result with random trees, but we do expect a noticeable constant improvement.
 
 Another thing about the input trees that affects the runtime of the algorithm, is how similar the two trees are. The more they have in common, the larger the LWAMs will become, and processing these LWAMs will take more time. Since the similarity of the trees does not affect the amount of edges created for this tree structure, the algorithm will be fastest for trees that are not similar. Again we don't expect an asymptotic improvement compared to using identical trees, but a slight constant improvement.
 
@@ -116,7 +116,7 @@ Now let's consider the structure of $T_1$. Since the process of creating edges i
 To see the runtime of these kind of input trees, we created an experiment for running the algorithm with only complete binary trees as input. We explained earlier that if the input trees are similar, the LWAMs will be larger. However it also means that there will be fewer edges in the matching graphs, since the leaves of a side tree in $T_1$ will be split out over fewer side trees in $T_2$, so that might affect the runtime even more.
 
 The graphs in figure \ref{completeIdenticalTreesGraph} and \ref{completeNonidenticalTreesGraph} shows the result of the experiment when the input trees are identical and when the leaves are randomly distributed in the trees. From these graphs, we see that there is not a significant difference in runtime between the two. In both cases, it is easily seen that the runtime is worse than when inputting random trees, and again we see sudden increases in runtime when reaching certain tree sizes. Already at tree size \textasciitilde 42000, the JVM ran out of memory and could not continue the execution. 
-By choosing this tree topology, we tried to maximize the space consumption of the algorithm and the garbage collector therefore needs to run more often and causes the increase in runtime. The graph in figure \ref{completeIdenticalTreesGCGraph} shows the runtime of the garbage collector during the experiment and figure \ref{completeIdenticalTreesGCSubtractedGraph} shows the runtime of the algorithm after having subtracted the runtime of the garbage collector. As expected, the algorithm still seems to satisfy the runtime upper bound of $O(nlogn)$.
+By choosing this tree topology, we tried to maximize the space consumption of the algorithm and the garbage collector therefore needs to run more often and causes the increase in runtime. The graph in figure \ref{completeIdenticalTreesGCSubtractedGraph} shows the runtime of the algorithm after having subtracted the runtime of the garbage collector. As expected, the algorithm still seems to satisfy the runtime upper bound of $O(nlogn)$.
 
 \begin{figure}
 	\includegraphics[width=\textwidth]{completeIdenticalTreesGraph}
@@ -129,11 +129,11 @@ By choosing this tree topology, we tried to maximize the space consumption of th
 	\label{completeNonidenticalTreesGraph}
 \end{figure}
 
-\begin{figure}
-	\includegraphics[width=\textwidth]{completeIdenticalTreesGCGraph}
-	\caption{The runtime of the garbage collector when running the $nlogn$ algorithm given two identical complete trees.}
-	\label{completeIdenticalTreesGCGraph}
-\end{figure}
+%\begin{figure}
+%	\includegraphics[width=\textwidth]{completeIdenticalTreesGCGraph}
+%	\caption{The runtime of the garbage collector when running the $nlogn$ algorithm given two identical complete trees.}
+%	\label{completeIdenticalTreesGCGraph}
+%\end{figure}
 \begin{figure}
 	\includegraphics[width=\textwidth]{completeIdenticalTreesGCSubtracted}
 	\caption{The runtime of the $O(nlogn)$ algorithm given two identical complete trees after having subtracted the runtime of the garbage collector.}

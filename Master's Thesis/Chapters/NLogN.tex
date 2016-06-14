@@ -11,7 +11,7 @@ In this chapter we will walk through the $O(nlogn)$ algorithm for the MAST probl
 
 \section{Definitions and Notations}
 \subsubsection{Trees}
-In the rest of the chapter, all trees will be binary rooted trees \todo{$log$ means $log_2$} \todo{also the case for other chapters - move to introduction?}. The size of a tree is the number of leaves, and for a tree $T$, $T(x)$ will refer to the subtree of $T$ having $x$ as root. We will refer to the two input trees as $T_1$ and $T_2$ each of which have size $n$. Every leaf of $T_1$ has a unique name and for each of these leaves there is a corresponding leaf in $T_2$ with that same name. These two leaves are said to be twins.
+For a tree $T$, $T(x)$ will refer to the subtree of $T$ having $x$ as root. We will refer to the two input trees as $T_1$ and $T_2$ each of which have size $n$. Every leaf of $T_1$ has a unique name and for each of these leaves there is a corresponding leaf in $T_2$ with that same name. These two leaves are said to be twins.
 
 \subsubsection{Centroid Decompositions}
 The centroid decomposition for $T_1$ is a path of nodes $u_1, u_2, ..., u_p$ in the tree, starting from the root and ending at a leaf. Such a path is called a centroid path. It is referred to as $\pi$ and has length $p$.
@@ -26,20 +26,19 @@ Each node $v$ in a centroid path has a side tree, which is the subtree having as
 	\caption{Centroid paths in $T_1$ and $T_2$ with $\pi$ starting in root of $T_1$ and $\pi(x)$ starting in $x = v_1$ in $T_2$. \cite{nlogn}}
 \end{figure}
 
-Given a side tree $M_i$ of $\pi, 1 \le i \le p-1$, $S_i$ will refer to the subtree of $T_2$ induced by the leaves in $T_2$ corresponding to the leaves in $M_i$.
+Given a side tree $M_i$ of $\pi, 1 \le i \le p-1$, $S_i$ will refer to the subtree of $T_2$ induced by the twins of the leaves in $M_i$.
 
 \section{The Overall Strategy}
-The idea of the algorithm is that an Agreement Subtree $A$ can be represented as a bipartite graph, where each edge represents a distinct subtree of $A$ and the weight of the edge is the size of that subtree. This special kind of graph, called an Agreement Matching is defined in a way that makes sure that it satisfies everything that an Agreement Subtree should satisfy. The purpose of the algorithm is now to compute the Largest Weight Agreement Matching (LWAM) for two input trees $T_1$ and $T_2$, which in the end can be translated to the Maximum Agreement Subtree. It will be a requirement that the two input trees contain the exact same leaves.
+The idea of the algorithm is that an Agreement Subtree $A$ can be represented as a bipartite graph, where each edge represents a distinct subtree of $A$ and the weight of the edge is the size of that subtree. This special kind of graph, called an Agreement Matching is obtained from a so called Matching Graph which contains edges that might be part of an agreement matching. An agreement matching is defined in a way that makes sure that it satisfies everything that an agreement subtree should satisfy, which is explained further in section \ref{lwamVsMastSection}. The purpose of the algorithm is now to compute the Largest Weight Agreement Matching (LWAM) for two input trees $T_1$ and $T_2$, which in the end can be translated to the Maximum Agreement Subtree.
 
 The algorithm '$computeLWAM(T_1,T_2)$' has five overall steps, each of which will be covered in the following sections.
 
 \begin{enumerate}
 	\item Create centroid decompositions.
-	\item Induce subtree $S_i$ of $T_2$ from each side tree $M_i$ of $\pi$.
+	\item Induce subtree $S_i$ of $T_2$ for each side tree $M_i$ of $\pi$.
 	\item Recursively construct $computeLWAM(M_i, S_i), 1 \le i \le p-1$.
-	\item Create a Matching Graph for each path $\pi(x)$ in the decomposition of $T_2$.
-		\subitem A Matching Graph is a bipartite graph used to compute the Agreement Matchings.
-	\item Compute Agreement Matchings and find the Largest Weight Agreement Matching.
+	\item Create a matching graph for each path $\pi(x)$ in the decomposition of $T_2$.
+	\item Compute agreement matchings and find the largest weight agreement matching.
 \end{enumerate}
 
 \section{Initial Setup}
@@ -47,10 +46,10 @@ One thing we need to set up before starting the main algorithm, is to make sure 
 
 First we want the names of all leaves to be numbers from 0 to $n-1$. This is done before starting the algorithm, e.g. when reading the input trees. Of course it should be possible to obtain the original names from the new names after the algorithm has finished, so one could for example store the original names in a list at indices corresponding to the new names.
 
-Setting up twins is done by storing a list containing the leaves of $T_2$, where each leaf is at the index corresponding to its name, the twin of a leaf named $i$ from $T_1$ can be looked up in constant time from the list for $T_2$ at index $i$. Then the twins of all leaves can be set in $O(n)$ time.
+Setting up twins is done by storing a list containing the leaves of $T_2$, where each leaf is at the index corresponding to its name. The twin of a leaf named $i$ from $T_1$ can be looked up in constant time from the list for $T_2$ at index $i$. Then the twins of all leaves can be set in $O(n)$ time.
 
 \section{Centroid decompositions}
-The first step of the algorithm is to compute the \texttt{Centroid decomposition}s for the two trees. Recall that a centroid decomposition consists of one or more disjoint centroid paths through the tree. The first path starts at the root node in the tree. The next node is the child node holding the largest amount of leaves in its subtree and so forth. In case of a tie, we will pick the left node, but either one of the children could be picked. The path will continue until reaching a leaf.
+The first step of the algorithm is to compute the centroid decompositions for the two trees. Recall that a centroid decomposition consists of one or more disjoint centroid paths through the tree. The first path starts at the root node in the tree. The next node is the child node holding the largest amount of leaves in its subtree and so forth. In case of a tie, we will pick the left node, but either one of the children could be picked. The path will continue until reaching a leaf.
 
 For $T_1$, this is the only path in the centroid decomposition. For $T_2$, there is a new path starting at the root of each side tree if it is not a leaf, such that all internal nodes of $T_2$ is in a centroid path.
 
@@ -58,7 +57,7 @@ Creating the centroid decompositions can be done in $O(n)$ time in the following
 
 First, at each node $v$ in the two trees we need to store the number of leaves in the subtree having $v$ as root. This can be done in a single post-order traversal of each tree. For a leaf, the number is 1. For an internal node, it is the sum of the numbers stored at its two children. Clearly this takes $O(n)$ time.
 
-Now for the centroid decomposition of the first tree, we simply start with the root node and add the child node with the highest number stored. For the second tree, the same thing is done, but when adding a child node, another path is started at the child that wasn't added if it's not a leaf. While creating the paths for $T_2$ we will make each node on a path point to the start node of that path. This will be useful later in the algorithm.
+Now for the centroid decomposition of the first tree, we simply start with the root node and add the child node with the highest number stored. We continue until reaching a leaf. For the second tree, the same thing is done, but when adding a child node, another path is started at the child that wasn't added if it's not a leaf. While creating the paths for $T_2$ we will make each node on a path point to the start node of that path. This will be useful later in the algorithm.
 
 Each node is not visited more than once so the time complexity is $O(n)$.
 
@@ -84,21 +83,21 @@ Both of these requirements can be achieved in $O(|T|)$ time.
 
 The node depths can be set in $O(|T|)$ time by a simple pre-order tree traversal, where the depth of each node is set to its parent's depth plus one. The depth of the root is initialized to zero.  
 
-Computing LCA in $O(1)$ time is possible after having preprocessed $T$ in $O(|T|)$ time. This is however a more complicated matter, and is covered in section \ref{lcaSection}.
+Computing LCA in $O(1)$ time is possible after having preprocessed $T$ in $O(|T|)$ time. This is however a more complicated matter which we will not go into any detail with. Gusfield \cite{gusfield} explains an algorithm for how it can be done and our implementation directly follows this approach.
 
 \subsection{Inducing the subtree}
 The algorithm works in 3 steps:
 \begin{enumerate}
-	\item Find the LCA of each consecutive pair of leaves and add them to $L$ such that $LCA(l_i,l_{i+1}), 1 \le i \le |L|-1$ is added between $l_i$ and $l_{i+1}$.
+	\item Find the LCA of each consecutive pair of leaves in $L$ and add them to $L$ such that $LCA(l_i,l_{i+1}), 1 \le i \le |L|-1$ is added between $l_i$ and $l_{i+1}$.
 	\subitem After this step, $L$ will contain all nodes in the induced subtree.
 	\subitem We will refer to the modified $L$ as $L'$.
-	\item For each node $v$ in $L'$, find the closest node on either side, $v_l$ and $v_r$, that has smaller depth than itself.
-	\item Construct the tree: The parent of each node $v$ will be whichever of $v_l$ and $v_r$ that has the greatest depth.
+	\item For each node $v$ in $L'$, find the closest node on either side, $v_l$ and $v_r$, that has smaller depth than itself. $v_l$ being the left node and $v_r$ being the right node.
+	\item Construct the tree: The parent of each node $v \in L'$ will be whichever of $v_l$ and $v_r$ that has the greatest depth.
 \end{enumerate}
 
 Since the LCA between two leaves can be computed in constant time, the first step takes $O(|L|)$ time.
 
-The challenge was to perform step 2 in linear time, which is not covered by Cole et. al \cite{nlogn}. We did this by realizing that for any node $v$ in $L'$ that has greater depth than the node immediately to the right of it in $L'$, $v_l$ and $v_r$ are the nodes immediately to the left and right in $L'$ (because of how the LCAs were added to the set). By not considering these nodes any more, the same will be the case for the nodes that now has greater depth than the node to the right of it in $L'$. This resulted in the approach for step 2 seen in listing \ref{lst:induceSubtreeCode}. Here, each node $v$ of $L'$ will eventually be added to $S$ and removed when $v_l$ and $v_r$ has been updated correctly. For each node, a constant amount of computation needs to be performed, so the time complexity is $O(|L'|) = O(|L|)$.
+The challenge was to perform step 2 in linear time, which is not covered by Cole et. al \cite{nlogn}. We did this by realizing that for any node $v$ in $L'$ that has greater depth than the node immediately to the right of it in $L'$, $v_l$ and $v_r$ are the nodes immediately to the left and right in $L'$ (because of how the LCAs were added to the set). This is also the case for the rightmost node in $L'$. By not considering these nodes any more, the same will be the case for each node that now has greater depth than the node to the right of it in $L'$. This resulted in the approach for step 2 seen in listing \ref{lst:induceSubtreeCode}. Here, each node $v$ of $L'$ will eventually be added to $S$ and removed when $v_l$ and $v_r$ has been updated correctly. For each node, a constant amount of computation needs to be performed, so the time complexity is $O(|L'|) = O(|L|)$.
 
 Step three is done in a single iteration through $L'$ where the parent of each node is found in constant time, giving a total runtime of $O(|L'|) = O(|L|)$.
 
@@ -137,7 +136,7 @@ Function induceSubtree(inputLeaves) {
 \subsection{Computing the induced subtrees of $T_2$}
 Now that we can induce a subtree from a set of leaves $L$ in $O(|L|)$ time, all we need is to find the leaves from which we can induce the subtree $S_i$ of $T_2$, given the subtree $M_i$.
 
-In order to induce subtree $S_i$, the input leaves needs to be sorted by the order that they appear in $T_2$. Our approach to this is to first compute a sorted list of all leaves in $T_1$ according to $T_2$, then splitting the leaves into lists corresponding to the subtrees $M_i$, $1 \le i \le p-1$ and finally use their twins (which can be found in constant time) to induce the subtree $S_i$ for each list.
+In order to induce subtree $S_i$, the input leaves need to be sorted by the order that they appear in $T_2$. Our approach to this is to first compute a sorted list of all leaves in $T_1$ according to $T_2$, then splitting the leaves into lists corresponding to the subtrees $M_i$, $1 \le i \le p-1$ and finally use their twins (which can be found in constant time) to induce the subtree $S_i$ for each list.
 
 The leaves of $T_1$ are sorted by iterating through the leaves of $T_2$, in order left to right, and adding the twin of each leaf to a list.
 
@@ -146,7 +145,7 @@ The leaves of $T_1$ are sorted by iterating through the leaves of $T_2$, in orde
 % First try
 % Creating a list, where index $i$ holds the position, left to right, of the leaf named $i$ in $T_2$ compared to the other leaves, is done in linear time simply by iterating through $T_2$. That list is used when sorting the leaves of $T_1$ to look up the position of the twins in $T_2$. We sort the leaves in linear time using bucket sort.
 
-By iterating through each side tree $M_i$, we can use linear time to have each leaf store a number corresponding to the side tree to which it belongs. Having the sorted list of leaves in $T_1$, we can use the stored numbers to split the leaves into the final lists during a single iteration. Now the twins can be found and the subtrees $S_i$, $1 \le i \le p-1$ can be computed.
+By iterating through each side tree $M_i$, we can use linear time to have each leaf store a number corresponding to the side tree to which it belongs. By a single iteration through the sorted list of leaves in $T_1$, we can use the stored numbers to split the leaves into separate lists, each corresponding to a side tree $M_i$. The twins of the leaves in these lists can now be used to compute the subtrees $S_i$, $1 \le i \le p-1$.
 
 In our implementation, $S_i$ does not actually consist of nodes from $T_2$. It is a new tree where each node contains a reference to the corresponding node in $T_2$ and vice versa.
 
@@ -191,11 +190,11 @@ Since the left set of each graph only contains nodes from $\pi$ we can add these
 \begin{enumerate}
 	\item Find the corresponding node $z'$ in $T_2$.
 	\subitem This takes constant time since $z$ has a reference to $z'$.
-	\item If $z'$ is on a centroid path $\pi(z')$ (this is the case if $z'$ has a pointer to the start node of a path), do the following:
-	\subitem Find the graph $G(z')$ that corresponds to the path $\pi(z')$. This is done in constant time since $z'$ has a pointer to the start node $start(\pi(z'))$ which has a pointer to the graph.
-	\subitem Add $u_i$ to $L(z')$ if it has not already been added.
-	\subitem Add an edge between $u_i$ and $z'$ in $G(z')$.
-	\subitem Repeat from step 2 using the parent of $start(\pi(z'))$ as node $z'$.
+	\item If $z'$ is on a centroid path $\pi(x)$ (this is the case if $z'$ has a pointer to the start node $x$ of a path), do the following:
+	\subitem Find the graph $G(x)$ that corresponds to the path $\pi(x)$. This is done in constant time since $x$ has a pointer to the graph.
+	\subitem Add $u_i$ to $L(x)$ if it has not already been added.
+	\subitem Add an edge between $u_i$ and $z'$ in $G(x)$.
+	\subitem Repeat from step 2 using the parent of $x$ as node $z'$.
 	\item If $z'$ is not on a centroid path, repeat from step 2 using the parent of $z'$.
 \end{enumerate}
 The loop stops either when reaching the root of $T_2$ or when reaching a node which is on the same path as the node in $T_2$ that corresponds to the parent of $z$ in $S_i$. The second case means that the rest of the processing has already been done by the parent. This ensures that for each node visited in $T_2$, an edge is added to some graph, meaning that the process of adding all edges takes linear time with respect to the total number of edges in the graphs. In the article \cite{nlogn}, an analysis proves that the total number of edges is bound by the sizes of the side trees of $\pi$ namely $O(\sum_{i=1}^{p-1}m_ilog\dfrac{n}{m_i})$ which is bound by $O(nlogn)$ since $\sum_{i=1}^{p} m_i = n$.
@@ -207,7 +206,7 @@ For any node $z \in S_i, 1 \le i \le p-1$, $z'$ being the corresponding node in 
 For $u_p$, $z'$ being the twin of $u_p$, if node $v_j$ is visited in the iteration, then $z' \in N_j$ so an edge should be added.
 
 \subsection{Edge Weights}
-Each edge in a graph is a multiedge consisting of a white, green and red edge, each with its own weight. The weights are defined as follows:
+Each edge in a matching graph $G(x), x \in X$ is a multiedge consisting of a white, green and red edge, each with its own weight. The weights are defined as follows:
 \begin{itemize}
 	\item White edge weight: $weight_w(u_i, v_j)=$ size of $MAST(M_i,N_j)$
 	\item Green edge weight: $weight_g(u_i, v_j)=$ size of $MAST(M_i,T_2(v_j))$
@@ -216,20 +215,20 @@ Each edge in a graph is a multiedge consisting of a white, green and red edge, e
 
 Let's again consider the input trees of figure \ref{Fig:InputTrees}. The edges of the matching graph $G(H)$ in figure \ref{matchingGraphFigure} are all multiedges that should get weights assigned to them. For example, the weight of the white edge $(u_1, v_1)$ is 2, since $MAST(M_1,N_1)$ is the tree having only the two leaves named $4$ and $6$. The weight of the green edge $(u_1, v_1)$ is 4, since $MAST(M_1,T_2(v_1))$ contains all four leaves of $M_1$.
 
-The thing to notice about the edge weights is first that the size of a MAST is equal to the weight of the corresponding LWAM, and second that $LWAM(M_i, T_2) = LWAM(M_i, S_i), 1 \le i \le p-1$ which have already been computed in the recursive calls, so each node $v$ of $S_i$ holds the LWAM and its weight for $M_i$ and $S_i(v)$.
+As we will later explain, the size of a MAST is actually equal to the weight of the corresponding LWAM. Also, $LWAM(M_i, T_2) = LWAM(M_i, S_i), 1 \le i \le p-1$ which has already been computed in step 3 of the overall algorithm, so each node $v$ of $S_i$ holds the LWAM and its weight for $M_i$ and $S_i(v)$, which is equal to the size of $MAST(M_i, T_2(v))$.
 
-In order to compute the weight of each edge in constant time, a node $map(i,j)$ is defined for the multiedge $(u_i,v_j)$. $map(i,j)$ is the node of $S_i$ which is closest to the root and its corresponding node in $T_2$ is either a descendant of or equal to $v_j$. The edge $(u_i,v_j)$ is added to a graph during an iteration of a node in $S_i$, as described in the previous section. That node is exactly the node closest to the root in $S_i$ which is also a descendant or equal to $v_j$ in $T_2$, so a reference to $map(i,j)$ is added in constant time and doesn't change the time complexity.
-
-First, if one of $u_i$ and $v_j$ is a leaf, then the weight of all three edges is 1. Otherwise, let $y=map(i,j)$.
+In order to compute the weight of each edge in constant time, a node $map(i,j)$ is defined for each multiedge $(u_i,v_j)$. $map(i,j)$ is the node of $S_i$ which is closest to the root and its corresponding node in $T_2$ is either a descendant of or equal to $v_j$. The edge $(u_i,v_j)$ is added to a graph during an iteration of a node $z$ in $S_i$, as described in the previous section. That node is exactly the node closest to the root in $S_i$ which is also a descendant or equal to $v_j$ in $T_2$, so $map(i,j) = z$.\\
+\\
+The following sections explain how the edge weights are computed for a multiedge $(u_i, v_j)$ in a matching graph $G(x), x \in X$. First, if one of $u_i$ and $v_j$ is a leaf, then the weight of each of three edges is 1. Otherwise, let $y=map(i,j)$.
 
 \subsubsection{White Edge Weight}
-$y$ is either a descendant of or equal to $v_j$. In the former case, we know that $y \in N_j$ or the edge would not have been added. So the weight of the white edge is the weight of $LWAM(M_i, S_i(y))$, which can be looked up at $y$ in constant time. In the latter case, one of $y's$ children is in $N_j$. That child $z$ is then the node closest to the root of $S_i$ which is in $N_j$, so the weight is equal to the weight of $LWAM(M_i, S_i(z))$, which is looked up in $z$. Since all nodes on a path of $T_2$ has a reference to the start node of that path, $z$ can be found in constant time by picking the child of $v_j$ that does not have a reference to the same node as $v_j$, i.e. it must be the root of $N_j$. If that node is the first child of $v_j$, then $z$ is the first child of $y$ and vice versa.
+$y$ is either a descendant of or equal to $v_j$. In the former case, we know that $y \in N_j$ or the edge would not have been added. So the weight of the white edge is the weight of $LWAM(M_i, S_i(y))$, which can be looked up at $y$ in constant time. In the latter case, one of $y's$ children is in $N_j$. That child $z$ is then the node closest to the root of $S_i$ which is in $N_j$, so the weight is equal to the weight of $LWAM(M_i, S_i(z))$, which is looked up at $z$. Since each node on a path of $T_2$ has a reference to the start node of that path, $z$ can be found in constant time by finding out which child of $v_j$ that does not have a reference to the same node as $v_j$, i.e. it must be the root of $N_j$. If that node is the first child of $v_j$, then $z$ is the first child of $y$ and vice versa.
 
 \subsubsection{Green Edge Weight}
 The green edge weight is equal to the weight of $LWAM(M_i,T_2(v_j))$. $S_i(y)$ is the subtree of $T_2(v_j)$ containing only leaves of $M_i$, so the weight is equal to the weight of $LWAM(M_i, S_i(y))$ which is looked up at $y$ in constant time.
 
 \subsubsection{Red Edge Weight}
-Now let $y$ be the root of $N_j$, which we showed how to find in constant time. Since $y$ is a descendant of $x$ and the graphs and LWAMs are computed in order bottom the top, the LWAMs of $G(y)$, has already been computed. In that computation, the LWAM containing only edges from $u_i$ and nodes below $u_i$ in $L(y)$ was also computed, corresponding to $LWAM(T_1(u_i), N_j)$. The red edge weight is the weight of that matching which is looked up in constant time. We know that $u_i$ is in $L(y)$ since $M_i$ and $N_j = T_2(y)$ intersects.\\
+Now let $y$ be the root of $N_j$, which we showed how to find in constant time. Since $y$ is a descendant of $x$ and the matching graphs and LWAMs are computed in order bottom to top, the LWAMs of $G(y)$, has already been computed. In that computation, the LWAM containing only edges from $u_i$ and nodes below $u_i$ in $L(y)$ was also computed, corresponding to $LWAM(T_1(u_i), N_j)$. The red edge weight is the weight of that matching which is looked up in constant time. We know that $u_i$ is in $L(y)$ since $M_i$ and $N_j = T_2(y)$ intersects.\\
 
 
 The weight of each edge is computed in constant time, so the time of computing all edge weights is linear w.r.t. the number of edges which we showed is limited by $O(nlogn)$.
@@ -240,7 +239,7 @@ An agreement matching is a subset of a matching graph $G(x), x \in X$, that corr
 
 For each $u_i \in L(x)$, starting from the bottom, we will compute the largest weight agreement matching containing only edges from $u_i$ and nodes below $u_i$ in $L(x)$ and for each $v_j \in R(x)$, we will compute the largest weight agreement matching containing only edges from $v_j$ and nodes below $v_j$ in $R(x)$.
 
-This will be done for all matching graphs in order bottom to top, where a graph $G(x)$ is above the graph $G(x')$ if and only if $x$ is an ancestor of $x'$ in $T_2$. This means that the final LWAMs to be computed are from the matching graph $G(r)$, where $r$ is the root of $T_2$. The LWAM for $T_1$ and $T_2$ is then LWAM containing only edges from $u_1$ and nodes below $u_1$ in $L(r)$.
+This will be done for all matching graphs in order bottom to top, where a graph $G(x)$ is above the graph $G(x')$ if and only if $x$ is an ancestor of $x'$ in $T_2$. This means that the final LWAMs to be computed are from the matching graph $G(r)$, where $r$ is the root of $T_2$. The LWAM for $T_1$ and $T_2$ is then the LWAM containing only edges from $u_1$ and nodes below $u_1$ in $L(r)$.
 
 \subsection{Definitions}
 We will start by describing some definitions used in agreement matchings.
@@ -272,19 +271,20 @@ Consider again the matching graph from figure \ref{matchingGraphFigure}. Given t
 \end{figure}
 
 \subsection{Agreement Matchings and MASTs}
-Consider the two trees $T_1$ and $T_2$ giving the graph $G(x)$ for the topmost node $x$ in a centroid path $\pi(x)$ of $T_2$. $T_1$ has the centroid path $\pi$. For each multiedge $e = (u_i, v_j), u_i \in L(x), v_j \in R(x)$ of $G(x)$, the white edge of $e$ corresponds to the tree $MAST(M_i, N_j)$, the green edge of $e$ corresponds to $MAST(M_i, T_2(v_j))$ and the red edge of $e$ corresponds to $MAST(T_1(u_i), N_j)$. Since the weight of each edge in $G(x)$ is the size of its corresponding tree, the largest weight agreement matching gives the set of trees, satisfying the conditions for an agreement matching, with the maximum number of leaves. These trees will be side trees on a path in the MAST between $T_1$ and $T_2(x)$.
+\label{lwamVsMastSection}
+Consider the two trees $T_1$ and $T_2$ for which the graph $G(x), x \in X$ is constructed. $T_1$ has the centroid path $\pi$. For each multiedge $e = (u_i, v_j), u_i \in L(x), v_j \in R(x)$ of $G(x)$, the white edge of $e$ corresponds to the tree $MAST(M_i, N_j)$, the green edge of $e$ corresponds to $MAST(M_i, T_2(v_j))$ and the red edge of $e$ corresponds to $MAST(T_1(u_i), N_j)$. Since the weight of each edge in $G(x)$ is the size of its corresponding tree, the largest weight agreement matching gives the set of trees, satisfying the conditions for an agreement matching, with the maximum number of leaves. These trees will be side trees on a path in the MAST between $T_1$ and $T_2(x)$.\\
+\\
+Consider the MAST $\mathcal{A}$ between $T_1$ and $T_2(x)$. Each node of $\mathcal{A}$ will correspond to both a node in $T_1$ and a node in $T_2(x)$.
 
-Consider the MAST $\mathcal{A}$ between $T_1$ and $T_2(x)$. Each node of $\mathcal{A}$ will correspond to both a node in $T_1$ and a node in $T_2(x)$. If $\mathcal{A}$ doesn't contain any node corresponding to a node from $\pi(x)$, then it must be equal to the MAST between $T_1$ and $N_j$ for some sidetree $N_j$ of $\pi(x)$. If $u_i$ is the topmost node in $\pi$ for which $M_i \cap N_j \ne \emptyset$, then $MAST(T_1, N_j) = MAST(T_1(u_i), N_j)$ which can be represented by a single red edge between $u_i$ and $v_j$. If $\mathcal{A}$ doesn't contain any node corresponding to a node from $\pi$, it is equal to the MAST between $M_i$ and $T_2(x)$ for some sidetree $M_i$ of $\pi$. If $v_j$ is the topmost node in $\pi(x)$ for which $M_i \cap N_j \ne \emptyset$, then $MAST(M_i, T_2(x)) = MAST(M_i, T_2(v_j))$. This MAST would be represented by a single green edge between $u_i$ and $v_j$.
+If $\mathcal{A}$ doesn't contain any node corresponding to a node from $\pi(x)$, then it must be equal to the MAST between $T_1$ and $N_j$ for some sidetree $N_j$ of $\pi(x)$. If $u_i$ is the topmost node in $\pi$ for which $M_i \cap N_j \ne \emptyset$, then $MAST(T_1, N_j) = MAST(T_1(u_i), N_j)$ which can be represented by a single red edge between $u_i$ and $v_j$.
 
-Now let's look at the final case where $\mathcal{A}$ contains nodes from both $\pi$ and $\pi(x)$. Then at least one node in $\mathcal{A}$ will correspond to both a node in $\pi$ and a node in $\pi(x)$. This will always be the case for the root of $\mathcal{A}$. Let $w$ be one such node and $u_i \in \pi$ and $v_j \in \pi(x)$ be the nodes in $T_1$ and $T_2$ corresponding to $w$.
+If $\mathcal{A}$ doesn't contain any node corresponding to a node from $\pi$, it is equal to the MAST between $M_i$ and $T_2(x)$ for some sidetree $M_i$ of $\pi$. If $v_j$ is the topmost node in $\pi(x)$ for which $M_i \cap N_j \ne \emptyset$, then $MAST(M_i, T_2(x)) = MAST(M_i, T_2(v_j))$. This MAST would be represented by a single green edge between $u_i$ and $v_j$.
 
-If $w$ is not the bottommost such node in $\mathcal{A}$, then one of its children is too, and the other is not. Let $z$ be the child which is not. Then $\mathcal{A}(z)$ must be the MAST between $M_i$ and $N_j$. This MAST can be represented by a single white edge between $u_i$ and $v_j$.
-
-Now assume that $w$ is indeed the bottommost such node in $\mathcal{A}$. If $w$ is a leaf, then $u_i$ is the leaf $u_p$ and $v_j$ is the leaf $v_q$ and $\mathcal{A}$ is the MAST between $T_1(u_p)$ and $N_q$ which is represented by a single red edge between $u_p$ and $v_q$. If $w$ is not a leaf, then the subtrees rooted at the two children of $w$ are one of the following.
+Now let's look at the final case where $\mathcal{A}$ contains nodes from both $\pi$ and $\pi(x)$. Then at least one node in $\mathcal{A}$ will correspond to both a node in $\pi$ and a node in $\pi(x)$. This will always be the case for the root of $\mathcal{A}$. Let $w$ be one such node and $u_i \in \pi$ and $v_j \in \pi(x)$ be the nodes in $T_1$ and $T_2$ corresponding to $w$. If $w$ is not the bottommost such node in $\mathcal{A}$, then one of its children will also correspond to a node in both $\pi$ and $\pi(x)$, and the other will not. Let $z$ be the child which does not. Then $\mathcal{A}(z)$ must be the MAST between $M_i$ and $N_j$. This MAST can be represented by a single white edge between $u_i$ and $v_j$. Now assume that $w$ is indeed the bottommost such node in $\mathcal{A}$. If $w$ is a leaf, then $u_i$ is the leaf $u_p$ and $v_j$ is the leaf $v_q$ and $\mathcal{A}$ is the MAST between $T_1(u_p)$ and $N_q$ which is represented by a single red edge between $u_p$ and $v_q$. If $w$ is not a leaf, then the subtrees rooted at the two children of $w$ are one of the following.
 
 \begin{itemize}
-	\item One subtree is the MAST between $M_i$ and $N_j$. The other is the MAST between $T_1(u_{i+1})$ and $N_j'$ for some $j', j < j' \le q$.
-	\item One subtree is the MAST between $M_i$ and $N_j$. The other is the MAST between $M_i'$ and $T_2(v_{j+1})$ for some $i', i < i' \le p$.
+	\item One subtree is the MAST between $M_i$ and $N_j$. The other is the MAST between $T_1(u_{i+1})$ and $N_{j'}$ for some $j', j < j' \le q$.
+	\item One subtree is the MAST between $M_i$ and $N_j$. The other is the MAST between $M_{i'}$ and $T_2(v_{j+1})$ for some $i', i < i' \le p$.
 	\item One subtree is the MAST between $T_1(u_{i+1})$ and $N_j$. The other is the MAST between $M_i$ and $T_2(v_{j+1})$.
 \end{itemize}
 
@@ -293,8 +293,8 @@ The first case can be represented by a white edge between $u_i$ and $v_j$ and a 
 The second case can be represented by a white edge between $u_i$ and $v_j$ and a green edge between $u_{i'}$ and $v_{j'}$, where $v_{j'}, j' > j$ is the topmost node below $v_j$ in $\pi(x)$ for which $M_{i'} \cap N_{j'} \ne \emptyset$.
 
 The third case can be represented by a red edge between $u_{i'}$ and $v_{j}$, where $u_{i'}, i' > i$ is the topmost node below $u_i$ in $\pi$ for which $M_{i'} \cap N_{j} \ne \emptyset$ and a green edge between $u_{i}$ and $v_{j'}$, where $v_{j'}, j' > j$ is the topmost node below $v_j$ in $\pi(x)$ for which $M_{i} \cap N_{j'} \ne \emptyset$.\\
-
-All possible cases of $\mathcal{A}$ has been covered and in each case the the subtrees of $\mathcal{A}$ could be represented by edges in an agreement matching.
+\\
+All possible cases of $\mathcal{A}$ have been covered and in each case the subtrees of $\mathcal{A}$ could be represented by edges in an agreement matching.
 
 \subsection{The Weighted Search Tree}
 In order to compute the LWAMs in $O(nlogn)$ time, we will create a weight balanced binary search tree $\mathcal{T}$ for each matching graph $G(x)$. This tree will be used to store the information needed to determine which edges of $G(x)$ forms the LWAMs. The structure of the tree will ensure that filling the tree and extracting the LWAMs will not take more than $O(nlogn)$ time.
@@ -304,22 +304,22 @@ $\mathcal{T}$ is created from the nodes in $R(x)$ such that $\mathcal{T}$ will h
 Recall that for each $u_i \in L(x)$, we want to compute the LWAM containing only edges from $u_i$ and nodes below $u_i$ in $L(x)$. This is done by processing each node $u_i \in L(x)$ in order bottom-to-top, where each node in $R(x)$, that has an edge to $u_i$, is searched for in $\mathcal{T}$, while storing information about the edges in $\mathcal{T}$.  After processing $u_i$, the LWAM can be extracted from $\mathcal{T}$. 
 
 \subsubsection{Constructing the Weighted Search Tree}
-For a matching graph $G(x)$, the weighted search tree can be constructed in $O(|R(x)|)$ time. Since $\sum_{x \in X} |R(x)| = n$, all the search trees needed for the matching graphs can be constructed in $O(n)$ time. This is not covered by Cole et. al. \cite{nlogn}, but in the paper \cite{fredman} by Fredman, it it described how a balanced search tree can be constructed in $O(N)$ time, given $O(N)$ probabilities which should be associated with the nodes of the tree.
+For a matching graph $G(x)$, the weighted search tree can be constructed in $O(|R(x)|)$ time. Since $O(\sum_{x \in X} |R(x)|) = O(n)$, all the search trees needed for the matching graphs can be constructed in $O(n)$ time. This is not covered by Cole et. al. \cite{nlogn}, but in the paper \cite{fredman} by Fredman, it is described how a balanced search tree can be constructed in $O(N)$ time, given $O(N)$ probabilities which should be associated with the nodes of the tree.
 
 Though not completely applicable to our situation, we used it as a basis for the following algorithm. Each node in the tree will get an index number which is used for searching.
 
 \begin{itemize}
 	\item Given weights ${w_0, w_1, ..., w_{|R(x)|-1}}$, construct two lists of sums ${L_0, ..., L_{|R(x)|}}$ and ${R_0, ..., R_{|R(x)|}}$, where
-	\subitem $L_j=\sum_{k=0}^{j-1} w_k$, $L_0=0$
-	\subitem $R_j=\sum_{k=j}^{|R(x)|-1} w_k$, $R_{|R(x)|}=0$
+	\subitem $L_j=\sum_{k=0}^{j-1} w_k, 0 < j \le |R(x)|$, $L_0=0$
+	\subitem $R_j=\sum_{k=j}^{|R(x)|-1} w_k, 0 \le j < |R(x)|$, $R_{|R(x)|}=0$
 	\item Construct the tree using the recursive procedure $constructST(w_0, w_1, ..., w_{|R(x)|-1})$ which returns the root of the search tree.
 	\item $constructST(w_i, ..., w_j)$ has the following steps:
-	\subitem If $i+1=j$ then create and return a node with index $j$ having a left child with index i and a right child with index j.
+	\subitem If $i+1=j$ then create and return a node with index $j$ having a left child with index $i$ and a right child with index $j$.
 	\subitem Otherwise, determine the smallest $k, i<k\le j$ such that
 	\subsubitem $L_k-L_i \ge R_k-R_{j+1}$
 	\subitem Define a node with index $k$ having $constructST(w_i, ..., w_{k-1})$ as left child and $constructST(w_k, ..., w_j)$ as right child.
 	\subsubitem If $i=k-1$, the left child is just a leaf with index $i$.
-	\subsubitem If $k=j$, the right child is just a leaf with index $j$.
+	\subsubitem If $j=k$, the right child is just a leaf with index $j$.
 \end{itemize}
 
 Determining $k$ from the weights ${w_i, ..., w_j}$ is done by finding the smallest $k$ satisfying $L_k-L_i \ge R_k-R_{j+1}$. This can be done in $O(log(k-i))$ time as follows:
@@ -340,7 +340,7 @@ Let $F(N)$ be the time taken to construct a search tree with $N$ internal nodes.
 
 $F(N) \le max\{A + Blog(k) + F(k-1) + F(N-k), 1 \le k \le (N+1)/2\}$
 
-where $A$ and $B$ are constants and $N$ and $k$ are natural numbers. This function can be proven to grow at most linearly with $N$, thus constructing a search tree has linear runtime w.r.t. the number of internal nodes. The proof can be seen in section \ref{searchTreeProof}. $|R(x)|$ is greater than the number of internal nodes, so a weight balanced binary search tree can be constructed in $O(|R(x)|)$ time.
+where $A$ and $B$ are constants and $N$ and $k$ are natural numbers. This function can be proven to grow at most linearly with $N$, thus constructing a search tree has linear runtime w.r.t. the number of internal nodes. The complete proof can be seen in section \ref{searchTreeProof}. $|R(x)|$ is greater than the number of internal nodes, so a weight balanced binary search tree can be constructed in $O(|R(x)|)$ time.
 
 \subsubsection{Searching}
 \label{st_searching}
@@ -356,7 +356,7 @@ Given a subset of $R(x)$ in top to bottom order, searching for the corresponding
 
 \subsubsection{Properties of the Search Tree}
 \label{stProperties}
-A search tree $\mathcal{T}$ is created such that a leaf $l$ corresponding to $v_j \in R(x)$ has weight $n_j + \frac{|T_2(x)|}{nsav(x)}$ if a non-singleton edge in $G(x)$ has endpoint in $v_j$ and weight $n_j$ otherwise. Balancing the tree with these weights ensures that the depth of any leaf $l$ corresponding to node $v_j \in R(x)$ is $O(log\frac{|T_2(x)|}{n_j})$. When searching for an ordered subset of $k$ leaves in $\mathcal{T}$ as specified in the previous section, the structure of $\mathcal{T}$ also ensures that the number of nodes visited is $O(k*log \dfrac{nsav(x)}{k})$ and each node is visited a most thrice. The reasoning behind these claims can be found in \cite{nlogn}.
+A search tree $\mathcal{T}$ is created such that a leaf $l$ corresponding to $v_j \in R(x)$ has weight $n_j + \frac{|T_2(x)|}{nsav(x)}$ if a non-singleton edge in $G(x)$ has endpoint in $v_j$ and weight $n_j$ otherwise. Balancing the tree with these weights ensures that the depth of any leaf $l$ corresponding to node $v_j \in R(x)$ is $O(log\frac{|T_2(x)|}{n_j})$. When searching for an ordered subset of $k$ leaves in $\mathcal{T}$ as specified in the previous section, the structure of $\mathcal{T}$ also ensures that the number of nodes visited is $O(k*log \dfrac{nsav(x)}{k})$. Each of these nodes is visited a most thrice. The reasoning behind these claims can be found in \cite{nlogn}.
 
 \subsection{Computing the Largest Weight Agreement Matchings}
 \input{./Chapters/ComputingLWAMs.tex}
@@ -374,10 +374,10 @@ Recall that a white edge $(u_i, v_j)$ corresponds to the subtree $MAST(M_i,N_j)$
 	\label{lwam_mast_figure}
 \end{figure}
 
-What we need now is to find the subtrees corresponding to the edges in the matching. All the LWAMs corresponding to these subtrees have already been computed. Each is found in constant time by the same procedure as the edge weights were determined. \todo{explain?} \todo{store subtrees/matchings at edges??}. The subtrees can now be constructed recursively.
+What we need now is to find the subtrees corresponding to the edges in the matching. All the LWAMs corresponding to these subtrees have already been computed. Each is found in constant time by the same procedure as the edge weights were determined. The subtrees can now be constructed recursively.
 
-\subsection{Challenges} \todo{Maybe a whole section for challenges?}
-Our first approach to construct the MAST for the two input trees, was to construct and save the MAST for each of the LWAMs created in the algorithm. When constructing the MAST for a LWAM, the subtrees corresponding to each edge had already been created and could therefore be looked up in constant time. However, this gave rise to a runtime complexity of $O(n^2)$. Consider a tree where each internal node, except for the bottommost, has a leaf as one of its children. If the input trees are of this structure and have size $n$, the algorithm would create $n$ LWAMs, one for each $u_i \in \pi$, with sizes $1, ..., n$ each of which should be used to construct a MAST. Constructing the MAST from a LWAM takes time linear w.r.t. to the size of the LWAM giving a total runtime of $O(n^2)$.
+\subsection{Challenges}
+Our first approach to construct the MAST for the two input trees, was to construct and save the MAST for each of the LWAMs created in the algorithm. When constructing the MAST for a LWAM, the subtrees corresponding to each edge had already been created and could therefore be looked up in constant time. However, this gave rise to a runtime complexity of $O(n^2)$. Consider a tree where each internal node has a leaf as one of its children. If the input trees are of this structure and have size $n$, the algorithm would create $n$ LWAMs, one for each $u_i \in \pi$, with sizes $1, ..., n$ each of which should be used to construct a MAST. Constructing the MAST from a LWAM takes time linear w.r.t. to the size of the LWAM giving a total runtime of $O(n^2)$.
 
 Instead, we chose to only create and store the LWAMs in the algorithm and construct the final MAST recursively after having created every LWAM.
 
@@ -390,7 +390,7 @@ The base case for finding the largest weight agreement matching of $T_1$ and $T_
 \section{Time Complexity}
 Throughout this chapter, we explained the runtime of each step of the algorithm, aside from the step of making recursive calls. Since each step satisfies the time complexity of $O(nlogn)$ and there is a constant number of steps, we can show that the total runtime of the algorithm is $O(nlogn)$.
 
-For the two input trees $T_1$ and $T_2$, we recursively create LWAMs for each pair $(M_i, S_i)$ of size $m_i, 1 \le i \le p-1$. We will inductively assume that each recursive call takes $O(m_ilogm_i)$ time. Then, since $\sum_{i=1}^p m_i = n$, the runtime of the recursive calls is $O(\sum_{i=1}^{p-1} m_ilogm_i) \le O(\sum_{i=1}^{p-1} m_ilogn) = O((\sum_{i=1}^{p-1} m_i)logn) = O(nlogn)$. Since each other step of the algorithm is limited by $O(nlogn)$, the total runtime of the algorithm is $O(nlogn)$.
+For the two input trees $T_1$ and $T_2$, we recursively create LWAMs for each pair $(M_i, S_i)$ of size $m_i, 1 \le i \le p-1$. We will inductively assume that each recursive call takes $O(m_ilogm_i)$ time. Then, since $\sum_{i=1}^p m_i = n$, the runtime of all the recursive calls is $O(\sum_{i=1}^{p-1} m_ilogm_i) \le O(\sum_{i=1}^{p-1} m_ilogn) = O((\sum_{i=1}^{p-1} m_i)logn) = O(nlogn)$. Since each other step of the algorithm is limited by $O(nlogn)$, the total runtime of the algorithm is $O(nlogn)$.
 
 Table \ref{runtimeTable} gives an overview.
 \begin{table}[]
@@ -398,7 +398,7 @@ Table \ref{runtimeTable} gives an overview.
 	\begin{tabular}{l|l}
 		Creating Centroid Decompositions & O(n)     \\
 		Inducing Subtrees                & O(n)     \\
-		Construct LWAMs recursively		 & O(nlogn) \\
+		Constructing LWAMs recursively   & O(nlogn) \\
 		Creating Matching Graphs         & O(nlogn) \\
 		Computing LWAMs                  & O(nlogn) \\
 		Creating the MAST                & O(n)     \\ \hline
@@ -411,17 +411,14 @@ Table \ref{runtimeTable} gives an overview.
 \section{Space Consumption}
 \input{./Chapters/SpaceConsumption.tex}
 
-\section{LCA}
-\label{lcaSection}
-A requirement for the algorithm is that any tree $T$ can be preprocessed in $O(|T|)$ time such that the Least Common Ancestor of any two leaves in $T$ can be computed in constant time. Gusfield \cite{gusfield} explains in detail an algorithm for how this can be done. Our implementation directly follows this approach.
-
-\section{Linear Time Search Tree Construction Proof?}
-Let us start by reminding ourselves that the function F(N) for the weighted search tree construction satisfies the following inequality, where $A$ and $B$ are constants, while $N$ and $j$ are natural numbers. 
+\section{Linear Time Search Tree Construction Proof}
+\label{searchTreeProof}
+Let us start by reminding ourselves that the function F(N) for the weighted search tree construction satisfies the following inequality, where $A$ and $B$ are constants and $N$ and $j$ are natural numbers. 
 \begin{equation}
 F(N) \le Max\{A + Blog(j) + F(j-1) + F(N-j); 1 \le j \le (N+1)/2)\}
 \label{FNinequality}	
 \end{equation}
-Initially it is not obvious that F(N) grows at most linearly with N. As such, we want to prove that any function restricted by inquality \ref{FNinequality} is at most linear in complexity. For the sake of generality, let F(N) denote an undefined function that fulfils \ref{FNinequality}. We will start by investigating the function F(N) by defining a secondary function G(N) that is defined over the constants of F: A, B and F(0).
+Initially it is not obvious that F(N) grows at most linearly with N. As such, we want to prove that any function restricted by inquality (\ref{FNinequality}) is at most linear in complexity. For the sake of generality, let F(N) denote an undefined function that fulfils (\ref{FNinequality}). We will start by investigating the function F(N) by defining a secondary function G(N) that is defined over the constants of F: A, B and F(0).
 \begin{equation*}
 \begin{aligned}
 G(N)=
@@ -449,10 +446,11 @@ $$\lim_{N\to\infty} \frac{Nlog(2)-log(N+1)}{N} = log(2)$$
 This means that if the claims we made about the coefficients of A, B and F(0) are true, then the following inequality will show that F(N) can at most grow linearly as a function of N.
 \begin{equation}
 F(N) \le AN + F(0)(N+1) + B(Nlog(2)-log(N+1)) 	
+\label{FNinequality2}
 \end{equation}
 Let us now prove that this inequality indeed holds.
 \subsection{Proof}
-We prove inequality \ref{FNinequality} by the use of strong induction.
+We prove inequality (\ref{FNinequality2}) by the use of strong induction.
 \subsubsection{Base case}
 Our base case is defined for the lowest value, N=0. We simply insert this value into the inequality.
 \begin{align*}
@@ -463,17 +461,17 @@ F(0)\ \le&\ \  F(0) &
 Clearly, the inequality holds in the base case.
 
 \subsubsection{Inductive case}
-We are now given an Integer N, and we assume in the spirit of strong induction our Induction Hypothesis to be
+We are now given a natural number N, and assume in the spirit of strong induction our Induction Hypothesis to be
 \begin{equation}
 \forall x < N,\ F(x) \le Ax + F(0)(x+1) + B(xlog(2)-log(x+1))
 \label{IH}	
 \end{equation}
-and use that to prove that 
+and it that to prove that 
 \begin{equation}
 F(N) \le AN + F(0)(N+1) + B(Nlog(2)-log(N+1))
 \label{InequalityToProve} 	
 \end{equation}
-Let J be the value of j that maximizes $A + Blog(j) + F(j-1) + F(N-j)$ in inequality \ref{FNinequality}. From the Induction Hypothesis \ref{IH}, we now have for $x=J-1$ and $x=N-J$ the following two inequalities.
+Let J be the value of j that maximizes $A + Blog(j) + F(j-1) + F(N-j)$ in inequality (\ref{FNinequality}). From the Induction Hypothesis (\ref{IH}), we now have for $x=J-1$ and $x=N-J$ the following two inequalities.
 \begin{equation}
 F(J-1) \le A(J-1) + F(0)((J-1)+1) + B((J-1)log(2)-log((J-1)+1))
 \label{IHJ1} 	
@@ -482,12 +480,12 @@ F(J-1) \le A(J-1) + F(0)((J-1)+1) + B((J-1)log(2)-log((J-1)+1))
 F(N-J) \le A(N-J) + F(0)((N-J)+1) + B((N-J)log(2)-log((N-J)+1))
 \label{IHNJ} 	
 \end{equation}
-We can now insert $F(J-1)$ and $F(N-J)$ into \ref{InequalityToProve}, creating an inequality to verify.
+We can now insert $F(J-1)$ and $F(N-J)$ into (\ref{InequalityToProve}), creating an inequality to verify.
 \begin{align*}
 F(N)\ \le&\ \  A + Blog(J) + F(J-1) + F(N-J) \le   & \\
 &\ \  AN + F(0)(N+1) + B(Nlog(2)-log(N+1) & 
 \end{align*}
-We expand $F(J-1)$ and $F(N-J)$ according to \ref{IHJ1} and \ref{IHNJ}, and simplify the resulting inequality.
+We expand $F(J-1)$ and $F(N-J)$ according to (\ref{IHJ1}) and (\ref{IHNJ}), and simplify the resulting inequality.
 
 \begin{equation*}	
 \begin{aligned}
@@ -516,25 +514,25 @@ We expand $F(J-1)$ and $F(N-J)$ according to \ref{IHJ1} and \ref{IHNJ}, and simp
 &log(\frac{N+1}{N-J+1}) \  \le \  log(2)                 & 	
 \end{aligned}
 \end{equation*}
-We know from \ref{FNinequality} that $1 \le J \le \frac{N+1}{2}$, meaning that $J=\frac{N+1}{2}$ maximizes $log(\frac{N+1}{N-J+1})$. If the inequality holds for the maximum J, then it will hold for the entire interval: 
+We know from (\ref{FNinequality}) that $1 \le J \le \frac{N+1}{2}$, meaning that $J=\frac{N+1}{2}$ maximizes $log(\frac{N+1}{N-J+1})$. If the inequality holds for the maximum J, then it will hold for the entire interval: 
 \begin{equation*}	
 \begin{aligned}	
 &log(\frac{N+1}{N-\frac{N+1}{2}+1}) = log(2) \  \le \  log(2);  & N \ge 0 	
 \end{aligned}
 \end{equation*}
-As such, the inductive case in \ref{InequalityToProve} is proven to hold, which completes the proof. $\qed$
+As such, the inductive case in (\ref{InequalityToProve}) is proven to hold, which completes the proof. $\qed$
 
 \section{An Alternative Base Case}
-An alternative base case could be when the two input trees have a structure such that the internal nodes of each tree form a single path through its tree. In this case the maximum agreement subtree can be computed by using a modified version of the $O(nlogn)$ solution to the Longest Increasing Subsequence (LIS) Problem. Even though this procedure works, it can't be part of the final algorithm since it does not compute the LWAMs that are needed for the rest of the algorithm to work. However, we chose to implement it anyway in order to find out if it would be faster for these kind of tree inputs.
+An alternative base case for the algorithm could be when the two input trees have a structure such that each internal node has a leaf as one of its children, i.e. the internal nodes of each tree form a single path through its tree. In this case the maximum agreement subtree can be computed by using a modified version of the $O(nlogn)$ solution to the Longest Increasing Subsequence (LIS) Problem.
+
+Even though this procedure works, it can't be part of the final algorithm since it cannot compute all the LWAMs that are needed for the rest of the algorithm to work in $O(nlogn)$ time. However, we chose to implement it anyway in order to find out if it would be faster for these kind of tree inputs.
 
 We will first describe the $O(nlogn)$ solution the the LIS problem and afterwards describe how we modified it to help us find the MAST of $T_1$ and $T_2$.
 
 \subsection{Solving the Longest Increasing Subsequence Problem}
-Given a list $L$ of integers, we want to compute the longest increasing subsequence of integers from that list.
+Given a list $L$ of distinct natural numbers, we want to compute the longest increasing subsequence of numbers from that list. Fredman \cite{fredman_lis} explains how this can be done in $O(|L|log|L|)$ time.
 
-\todo{reference Bespamyatnikh or Knuth?}
-
-The idea of this solution is to compute a list $I$ where the last index holds the smallest integer that ends a longest increasing subsequence of $L$. By having each number point to the number which was previous to it in $I$ when it was added (we will refer to this number as the parent), the LIS can be constructed by iterating through these pointers starting from the last number in $I$.
+The idea of this solution is to compute a list $I$ where the last index holds the smallest number that ends a longest increasing subsequence of $L$. By having each number point to the number which was previous to it in $I$ when it was added (we will refer to this number as the parent), the LIS can be constructed by iterating through these pointers starting from the last number in $I$.
 
 The procedure is as follows:
 
@@ -542,7 +540,7 @@ The procedure is as follows:
 	\item Initialize list $I$ and add the first number of $L$.
 	\item For every other number $x$ in $L$ do the following:
 	\subitem If $x$ is greater than the last number of $I$, add $x$ to the end of $I$.
-	\subitem Otherwise, find the smallest number in $I$ which is greater than $x$ and replace it with $x$. This number can be found in $O(logn)$ time using binary search.
+	\subitem Otherwise, find the smallest number in $I$ which is greater than $x$ and replace it with $x$. This number can be found in $O(log|L|)$ time using binary search.
 	\item Construct the list $LIS$.
 	\subitem The last number of $LIS$ is the last number $x$ of $I$.
 	\subitem The second last number is the parent $x'$ of $x$.
@@ -552,13 +550,13 @@ The procedure is as follows:
 
 \subsection{The Modified Longest Increasing Subsequence Problem}
 \label{mlisSection}
-Having the two trees $T_1$ and $T_2$, we can number the leaves of $T_1$ top to bottom, where the ordering of the bottommost two leaves is arbitrary, and number the leaves of $T_2$ such that twins have the same number. This can be done in linear time by having each leaf of $T_1$ point to its twin. By iterating through the leaves of $T_2$ top to bottom, again the ordering of the bottommost two leaves is arbitrary, we get a list $L$ of possibly non-increasing numbers. Since all internal nodes except from the bottommost have exactly one leaf as a child and the numbers of the leaves in $T_1$ are increasing top to bottom, we can construct a MAST from the two trees by finding the longest increasing subsequence of $L$ where the last number need only be greater than the third last number. Since the ordering of the bottommost two leaves of the result doesn't change the topology of the tree, the ordering of the last two numbers of the LIS shouldn't change the result either.
+Having the two trees $T_1$ and $T_2$, we can assign numbers in increasing order to the leaves of $T_1$ top to bottom, where the ordering of the bottommost two leaves is arbitrary, and number the leaves of $T_2$ such that twins have the same number. This can be done in linear time by having each leaf of $T_1$ point to its twin. By iterating through the leaves of $T_2$ top to bottom, we get a list $L$ of possibly non-increasing numbers. Since all internal nodes except from the bottommost have exactly one leaf as a child and the numbers of the leaves in $T_1$ are increasing top to bottom, we can construct a MAST from the two trees by finding the longest increasing subsequence of $L$ where the last number need only be greater than the third last number. Since the ordering of the bottommost two leaves of the result doesn't change the topology of the tree, the ordering of the last two numbers of the LIS shouldn't change the result either.
 
 This gives rise to our modified version of the Longest Increasing Subsequence Problem (MLIS):\\
 \\
 Given a list $L$ of integers, we want to compute the longest increasing subsequence of integers from that list, but where the last integer only needs to be greater than the third last.
 
-Our solution to this problem is simply a modification to the solution described in the previous section.
+Our solution to this problem is simply a modification of the solution described in the previous section.
 
 The list $I$ is constructed similarly, but the last number of $I$ might not be greater than the previous number. Besides having a parent, the last number $x$ of $I$ will also have a pointer to the number which preceded the parent when $x$ was added to $I$ (We will refer to this number as the grandparent of $x$).
 
@@ -573,8 +571,6 @@ Initially, the first two numbers of $L$ is added to $I$. For every other number 
 	\subsubitem If $y < y'$, then the parent of $y$ is updated so that it now points to its grandparent.
 	\subitem If x is smaller than both of the two last numbers of I, find the smallest number in $I$ which is greater than $x$, using binary search, and replace it with $x$.
 \end{itemize}
-
-\todo{explain each case?}
 
 \noindent As in the LIS solution, the result is constructed by iterating through the parent pointers starting from the last number in $I$.\\
 \\

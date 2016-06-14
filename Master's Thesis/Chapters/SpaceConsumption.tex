@@ -17,21 +17,21 @@ Inducing a subtree of $T_2$ from a set of leaves $L$ only requires storing data 
 For each side tree $M_i, 1 \le i \le p-1$ of $\pi$, the subtree $S_i$ is induced from the leaves of $T_2$ that are twins of the leaves of $M_i$. The total amount of leaves used to induce subtrees is therefore $\sum_{i=1}^{p-1} m_i < n$ and the space needed is $O(n)$.
 
 \subsection{Matching Graphs}
-Recall that a matching graph $G(x)$ consists of two sets of nodes $L(x)$ and $R(x)$ with edges between them. Only a constant amount of data needs to be stored at each node and each edge. As mentioned earlier, the total number of edges in all matching graphs has an upper bound of $O(nlogn)$ and since $|L(x)| \le n$ and $|R(x)| \le n$, the total amount of space needed for the matching graphs must be $O(nlogn)$.
+Recall that a matching graph $G(x), x \in X$ consists of two sets of nodes $L(x)$ and $R(x)$ with edges between them. Only a constant amount of data needs to be stored at each node and each edge. As mentioned earlier, the total number of edges in all matching graphs has an upper bound of $O(nlogn)$ and since $|L(x)| \le n$ and $|R(x)| \le n$, the total amount of space needed for the matching graphs must be $O(nlogn)$.
 
 \subsection{Agreement Matchings}
 \subsubsection{The Weighted Search Tree}
-For each matching graph $G(x)$ a binary search tree is created. The search tree gets a leaf for each node in $R(x)$, so the amount of space needed for a single search tree is $O(|R(x)|)$. Each node of $T_2$ can only be contained in one centroid path and the sets $R(x), x \in X$ contain nodes from distinct centroid paths so the amount of space needed for all search trees is $O(\sum_{x \in X} |R(x)|) = O(n)$.
+For each matching graph $G(x), x \in X$ a binary search tree is created. The search tree gets a leaf for each node in $R(x)$, so the amount of space needed for a single search tree is $O(|R(x)|)$. For all search trees, that gives a space consumption of $O(\sum_{x \in X} |R(x)|) = O(n)$.
 
 \subsubsection{Largest Weight Agreement Matchings}
-Recall that for each matching graph $G(x)$, we compute and store the LWAM containing only edges from $u_i$ and nodes below $u_i$ in $L(x)$, for each $u_i \in L(x)$, and we compute and store the LWAM containing only edges from $v_j$ and nodes below $v_j$ in $R(x)$, for each $v_j \in R(x)$. The LWAMs are constructed while processing the edges of $G(x)$ and saved in the search tree. When updating a node in the search tree, only a constant amount of information is added. Either an edge or a proper crossing is updated, or an agreement matching is updated which is either a proper crossing or a white edge and a pointer to an agreement matching. So the amount of space needed to store the LWAMs is proportional to the number of times a node is updated.
+Recall that for each matching graph $G(x), x \in X$, we compute and store the LWAM containing only edges from $u_i$ and nodes below $u_i$ in $L(x)$, for each $u_i \in L(x)$, and we compute and store the LWAM containing only edges from $v_j$ and nodes below $v_j$ in $R(x)$, for each $v_j \in R(x)$. The LWAMs are constructed while processing the edges of $G(x)$ and the edges are stored in the search tree. When updating a node in the search tree, only a constant amount of information is added. Either an edge or a proper crossing is updated, or an agreement matching is updated which is either a proper crossing or a white edge and a pointer to an agreement matching. So the amount of space needed to store the LWAMs is proportional to the number of times a node is updated.
 
 In section \ref{lwam_analysis} we concluded that the total amount of nodes visited when searching for leaves in the search trees, for any node $u_i \in \pi$, is $O(m_ilog\dfrac{n}{m_i})$ and these nodes are visited only a constant number of times. So the amount of space needed for LWAMs must be  $O(\sum_{i=1}^p m_ilog\dfrac{n}{m_i}) \le O(nlogn)$.
 
 \subsection{Creating the MAST}
 Creating the final MAST requires no more space than the size of the tree which can't be larger than $n$, so the amount of space used is $O(n)$.
 
-\subsection{\todo{Total}}
+\subsection{Total}
 We will show that the total amount of space needed for storing the LWAMs that are recursively constructed is $O(nlogn)$. We can inductively assume that each recursive call $computeLWAM(M_i, S_i)$ uses $O(m_ilogm_i)$ space, $1 \le i \le p-1$. Creating centroid decompositions, inducing subtrees and creating the final MAST uses $O(n)$ space and creating matching graphs and LWAMs uses $O(nlogn)$ space, so the total amount of space used by the algorithm is $O(n) + O(nlogn) + O(\sum_{i=1}^{p-1} m_ilogm_i) = O(nlogn)$.
 
 Table \ref{spaceTable} gives an overview.
@@ -40,7 +40,7 @@ Table \ref{spaceTable} gives an overview.
 	\begin{tabular}{l|l}
 		Creating Centroid Decompositions & O(n)     \\
 		Inducing Subtrees                & O(n)     \\
-		Construct LWAMs recursively		 & O(nlogn) \\
+		Constructing LWAMs recursively	 & O(nlogn) \\
 		Creating Matching Graphs         & O(nlogn) \\
 		Computing LWAMs                  & O(nlogn) \\
 		Creating the MAST                & O(n)     \\ \hline
